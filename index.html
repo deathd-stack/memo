@@ -22,4 +22,160 @@
       font-weight: bold;
     }
 
-    .contain...
+    .container {
+      padding: 16px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #ff8c00;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .btn.gray {
+      background: #ccc;
+      color: #333;
+    }
+
+    .memo {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .memo-text {
+      flex: 1;
+    }
+
+    .time {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>JAS MEMO</header>
+
+<div class="container">
+
+  <!-- 메인 화면 -->
+  <div id="mainScreen">
+    <button class="btn" onclick="openEditor()">＋ 추가</button>
+    <button class="btn gray" onclick="toggleDelete()">🗑 삭제</button>
+    <div id="memoList"></div>
+  </div>
+
+  <!-- 메모 작성 화면 -->
+  <div id="editorScreen" class="hidden">
+    <textarea id="memoInput" placeholder="메모 입력"></textarea>
+    <button class="btn" onclick="saveMemo()">저장</button>
+    <button class="btn gray" onclick="closeEditor()">취소</button>
+  </div>
+
+</div>
+
+<script>
+  const memoList = document.getElementById("memoList");
+  const mainScreen = document.getElementById("mainScreen");
+  const editorScreen = document.getElementById("editorScreen");
+  const memoInput = document.getElementById("memoInput");
+
+  let deleteMode = false;
+  let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
+
+  function saveData() {
+    localStorage.setItem("jas_memos", JSON.stringify(memos));
+  }
+
+  function render() {
+    memoList.innerHTML = "";
+    memos.forEach((m, i) => {
+      const div = document.createElement("div");
+      div.className = "memo";
+
+      if (deleteMode) {
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.dataset.index = i;
+        div.appendChild(cb);
+      }
+
+      const text = document.createElement("div");
+      text.className = "memo-text";
+      text.innerHTML = `
+        ${m.text}
+        <div class="time">${m.time}</div>
+      `;
+      div.appendChild(text);
+
+      memoList.appendChild(div);
+    });
+  }
+
+  function openEditor() {
+    memoInput.value = "";
+    mainScreen.classList.add("hidden");
+    editorScreen.classList.remove("hidden");
+  }
+
+  function closeEditor() {
+    editorScreen.classList.add("hidden");
+    mainScreen.classList.remove("hidden");
+  }
+
+  function saveMemo() {
+    if (!memoInput.value.trim()) return;
+    memos.unshift({
+      text: memoInput.value,
+      time: new Date().toLocaleString()
+    });
+    saveData();
+    closeEditor();
+    render();
+  }
+
+  function toggleDelete() {
+    if (!deleteMode) {
+      deleteMode = true;
+    } else {
+      const checks = document.querySelectorAll("input[type=checkbox]:checked");
+      const indexes = [...checks].map(c => Number(c.dataset.index));
+      memos = memos.filter((_, i) => !indexes.includes(i));
+      deleteMode = false;
+      saveData();
+    }
+    render();
+  }
+
+  render();
+</script>
+
+</body>
+</html>
