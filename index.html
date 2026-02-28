@@ -1,160 +1,285 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAS MEMO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAS MEMO VER.2 !</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #fff6eb;
-    }
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#ff8c00;
+}
+header{
+  text-align:center;
+  padding:16px;
+  font-size:20px;
+  font-weight:bold;
+  color:white;
+  user-select:none;
+}
+.container{ padding:14px; }
 
-    header {
-      background: #ff8c00;
-      color: white;
-      text-align: center;
-      padding: 16px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+.topBtns{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+.topBtns button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  font-weight:700;
+}
 
-    #mainScreen, #memoScreen {
-      padding: 16px;
-    }
+.add{ background:white; color:#ff8c00; }
+.del{ background:#222; color:white; }
+.sch{ background:#444; color:white; }
 
-    button {
-      background: #ff8c00;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+.memoCard{
+  background:white;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:8px;
+  position:relative;
+}
 
-    #addBtn {
-      width: 100%;
-      margin-bottom: 16px;
-    }
+.memoTitle{ font-weight:700; }
 
-    .memoItem {
-      background: white;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.time{
+  color:red;
+  font-weight:700;
+  margin-top:4px;
+}
 
-    .deleteBtn {
-      background: #ff4d4d;
-      font-size: 14px;
-      padding: 6px 10px;
-    }
+.modal{
+  position:fixed;
+  inset:0;
+  background:white;
+  z-index:100;
+  padding:14px;
+  overflow:auto;
+}
+.hidden{ display:none; }
 
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 16px;
-    }
+.selectRow{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.selectRow button{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+}
+.active{
+  background:#ff8c00;
+  color:white;
+}
 
-    .actionRow {
-      display: flex;
-      gap: 10px;
-    }
+.row{ display:flex; gap:6px; }
+.row input{ flex:1; }
 
-    .actionRow button {
-      flex: 1;
-    }
-  </style>
+input,textarea{
+  width:100%;
+  padding:6px;
+  margin-bottom:6px;
+  font-size:14px;
+}
+
+label{ font-weight:600; font-size:13px; }
+
+.photo{
+  width:100%;
+  margin-top:10px;
+  touch-action:pan-x pan-y pinch-zoom;
+}
+</style>
 </head>
 
 <body>
 
-  <header>JAS MEMO</header>
+<header ondblclick="addPhoto()">JAS MEMO VER.2 !</header>
 
-  <!-- 메인 화면 -->
-  <div id="mainScreen">
-    <button id="addBtn">＋ 추가</button>
-    <div id="memoList"></div>
+<div class="container">
+  <div class="topBtns">
+    <button class="add" onclick="newMemo()">추가</button>
+    <button class="del" onclick="deleteMode()">삭제</button>
+    <button class="sch" onclick="toggleSchedule()">스케쥴</button>
   </div>
 
-  <!-- 메모 입력 화면 -->
-  <div id="memoScreen" style="display:none;">
-    <textarea id="memoInput" placeholder="메모를 입력하세요"></textarea>
-    <div class="actionRow">
-      <button id="saveBtn">저장</button>
-      <button id="closeBtn">닫기</button>
+  <input type="file" id="photoInput" accept="image/*" hidden>
+  <div id="content"></div>
+</div>
+
+<div id="editor" class="modal hidden"></div>
+
+<script>
+let memos=JSON.parse(localStorage.getItem("jas2")||"[]");
+let photo=localStorage.getItem("jas2_photo");
+let edit=null, delMode=false, delSet=new Set();
+let showSchedule=false;
+let mode={in:false,out:false};
+
+function now(){
+  const d=new Date();
+  return d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");
+}
+function num(e,n){ e.value=e.value.replace(/[^0-9]/g,"").slice(0,n); }
+
+function render(){
+  content.innerHTML="";
+  if(showSchedule && photo){
+    content.innerHTML=`<img src="${photo}" class="photo">`;
+    return;
+  }
+
+  memos.forEach((m,i)=>{
+    content.innerHTML+=`
+    <div class="memoCard" onclick="${delMode?`toggleDel(${i})`:`openMemo(${i})`}">
+      ${delMode?`<input type="checkbox" ${delSet.has(i)?"checked":""}
+      onclick="event.stopPropagation();toggleDel(${i})">`:""}
+      <div class="memoTitle">
+        ${m.in?`7C[${m.c7}] HL[${m.hl}]`:""}
+        ${m.out?` 7C[${m.c7o}]`:""}
+      </div>
+      ${m.in?`<div class="time">${m.ti}</div>`:""}
+      ${m.out?`<div class="time">${m.to}</div>`:""}
+    </div>`;
+  });
+
+  if(delMode){
+    content.innerHTML+=`
+    <button onclick="confirmDel()">삭제 실행</button>
+    <button onclick="cancelDel()">취소</button>`;
+  }
+}
+
+function newMemo(){
+  edit=null;
+  mode={in:false,out:false};
+  openEditor({
+    c7:"",hl:"",c7o:"",
+    ti:now(),to:now(),
+    cm:["","","",""],
+    t:"",d:"",b:"",w:"",c:"",
+    tt:"",tb:"",
+    memo:""
+  });
+}
+
+function openMemo(i){
+  edit=i;
+  mode.in=memos[i].in;
+  mode.out=memos[i].out;
+  openEditor(memos[i]);
+}
+
+function openEditor(m){
+  editor.innerHTML=`
+    <button onclick="closeEditor()">←</button>
+
+    <div class="selectRow">
+      <button class="${mode.in?"active":""}" onclick="toggleMode('in')">INBOUND</button>
+      <button class="${mode.out?"active":""}" onclick="toggleMode('out')">OUTBOUND</button>
     </div>
-  </div>
 
-  <script>
-    const mainScreen = document.getElementById("mainScreen");
-    const memoScreen = document.getElementById("memoScreen");
-    const memoList = document.getElementById("memoList");
-    const memoInput = document.getElementById("memoInput");
+    ${mode.in?`
+    <label>7C / HL</label>
+    <div class="row">
+      <input value="${m.c7}" oninput="num(this,4)">
+      <input value="${m.hl}" oninput="num(this,4)">
+    </div>
+    <div class="time" onclick="m.ti=now();openEditor(m)">${m.ti}</div>`:""}
 
-    let memos = JSON.parse(localStorage.getItem("jas_memos")) || [];
+    ${mode.out?`
+    <label>7C</label>
+    <input value="${m.c7o}" oninput="num(this,4)">
+    <div class="time" onclick="m.to=now();openEditor(m)">${m.to}</div>`:""}
 
-    function showMain() {
-      memoScreen.style.display = "none";
-      mainScreen.style.display = "block";
-      renderMemos();
-    }
+    <label>CMPT</label>
+    ${m.cm.map((v,i)=>`
+      <div class="row">
+        <input value="${v}" placeholder="CMPT ${i+1}">
+      </div>`).join("")}
 
-    function showEditor() {
-      memoInput.value = "";
-      mainScreen.style.display = "none";
-      memoScreen.style.display = "block";
-    }
+    <label>T D B W C</label>
+    <div class="row">
+      <input value="${m.t}" oninput="num(this,3)">
+      <input value="${m.d}" oninput="num(this,2)">
+      <input value="${m.b}" oninput="num(this,2)">
+      <input value="${m.w}" oninput="num(this,2)">
+      <input value="${m.c}" oninput="num(this,2)">
+    </div>
 
-    function saveMemo() {
-      const text = memoInput.value.trim();
-      if (!text) return;
+    ${mode.out?`
+    <label>T/T · T/B</label>
+    <div class="row">
+      <input value="${m.tt}" oninput="num(this,4)">
+      <input value="${m.tb}" oninput="num(this,4)">
+    </div>`:""}
 
-      memos.push({
-        id: Date.now(),
-        text
-      });
+    <label>메모</label>
+    <textarea>${m.memo}</textarea>
 
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-      showMain();
-    }
+    <button onclick="save()">저장</button>
+  `;
+  editor.classList.remove("hidden");
+}
 
-    function deleteMemo(id) {
-      memos = memos.filter(m => m.id !== id);
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-      renderMemos();
-    }
+function toggleMode(t){ mode[t]=!mode[t]; openEditor(editorMemo()); }
+function editorMemo(){
+  const i=editor.querySelectorAll("input,textarea");
+  return {
+    in:mode.in,out:mode.out,
+    c7:i[0]?.value||"",hl:i[1]?.value||"",
+    c7o:i[2]?.value||"",
+    ti:i[3]?.innerText||now(),
+    to:i[4]?.innerText||now(),
+    cm:[i[5]?.value||"",i[6]?.value||"",i[7]?.value||"",i[8]?.value||""],
+    t:i[9]?.value||"",d:i[10]?.value||"",b:i[11]?.value||"",w:i[12]?.value||"",c:i[13]?.value||"",
+    tt:i[14]?.value||"",tb:i[15]?.value||"",
+    memo:i[16]?.value||""
+  };
+}
 
-    function renderMemos() {
-      memoList.innerHTML = "";
-      memos.forEach(memo => {
-        const div = document.createElement("div");
-        div.className = "memoItem";
-        div.innerHTML = `
-          <span>${memo.text}</span>
-          <button class="deleteBtn">삭제</button>
-        `;
-        div.querySelector(".deleteBtn").onclick = () => deleteMemo(memo.id);
-        memoList.appendChild(div);
-      });
-    }
+function save(){
+  const m=editorMemo();
+  if(edit===null) memos.push(m);
+  else memos[edit]=m;
+  localStorage.setItem("jas2",JSON.stringify(memos));
+  closeEditor(); render();
+}
 
-    document.getElementById("addBtn").onclick = showEditor;
-    document.getElementById("saveBtn").onclick = saveMemo;
-    document.getElementById("closeBtn").onclick = showMain;
+function closeEditor(){ editor.classList.add("hidden"); }
 
-    // 앱 시작 시 무조건 메인 화면
-    window.onload = showMain;
-  </script>
+function deleteMode(){ delMode=true; delSet.clear(); render(); }
+function toggleDel(i){ delSet.has(i)?delSet.delete(i):delSet.add(i); render(); }
+function cancelDel(){ delMode=false; delSet.clear(); render(); }
+function confirmDel(){
+  memos=memos.filter((_,i)=>!delSet.has(i));
+  localStorage.setItem("jas2",JSON.stringify(memos));
+  cancelDel();
+}
+
+function toggleSchedule(){ showSchedule=!showSchedule; render(); }
+
+function addPhoto(){
+  photoInput.click();
+}
+photoInput.onchange=e=>{
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ photo=r.result; localStorage.setItem("jas2_photo",photo); };
+  r.readAsDataURL(f);
+}
+
+render();
+</script>
 
 </body>
 </html>
