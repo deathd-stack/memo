@@ -40,30 +40,12 @@ button{
   padding:14px;
   border-radius:12px;
   margin-top:10px;
-  border-left:6px solid #ddd;
   position:relative;
 }
 
 .memoTitle{
   font-weight:700;
   font-size:16px;
-}
-
-.timeRow{
-  margin-top:6px;
-  font-size:13px;
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
-.timeRow.in{ color:#2563eb; }
-.timeRow.out{ color:#16a34a; }
-
-.timeRow span{
-  font-weight:700;
-  text-decoration:underline;
-  cursor:pointer;
 }
 
 .modal{
@@ -84,6 +66,7 @@ input{
   padding:6px;
   width:100%;
   font-size:14px;
+  margin-bottom:6px;
 }
 
 label{
@@ -93,26 +76,8 @@ label{
   display:block;
 }
 
-.selectRow{
-  display:flex;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.selectRow button{
-  flex:1;
-  background:#eee;
-}
-
-.selectRow button.active{
-  background:#ff8c00;
-  color:white;
-}
-
-.photoView{
-  width:100%;
-  margin-top:10px;
-  touch-action:pan-x pan-y pinch-zoom;
+.compRow input{
+  margin-bottom:6px;
 }
 </style>
 </head>
@@ -123,11 +88,7 @@ label{
 
 <div class="container">
   <button class="mainBtn" onclick="newMemo()">메모 추가</button>
-  <button class="mainBtn" onclick="addPhoto()">사진 추가</button>
   <button class="mainBtn" onclick="deleteMode()">메모 삭제</button>
-
-  <input type="file" id="photoInput" accept="image/*" hidden>
-
   <div id="memoList"></div>
 </div>
 
@@ -135,155 +96,108 @@ label{
 
 <script>
 let memos = JSON.parse(localStorage.getItem("jas_memos")||"[]");
-let photo = localStorage.getItem("jas_photo");
-let editIndex=null;
-let deleteModeOn=false;
-let deleteTargets=new Set();
-let mode={in:false,out:false};
+let editIndex = null;
+let deleteModeOn = false;
+let deleteTargets = new Set();
 
-function nowTime(){
-  const d=new Date();
-  return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");
+function num(el,n){
+  el.value = el.value.replace(/[^0-9]/g,"").slice(0,n);
 }
-function num(el,n){ el.value=el.value.replace(/[^0-9]/g,"").slice(0,n); }
 
 function render(){
   memoList.innerHTML="";
-
-  if(photo){
-    memoList.innerHTML+=`
-      <img src="${photo}" class="photoView"
-        ondblclick="openPhoto()">`;
-  }
-
   memos.forEach((m,i)=>{
-    let title="";
-    if(m.in) title+=`7C[${m.c7}] HL[${m.hl}]`;
-    if(m.out) title+=(title?" ":"")+`7C[${m.c7o}]`;
-
     memoList.innerHTML+=`
-    <div class="memoCard"
-      onclick="${deleteModeOn?`toggleDelete(${i})`:`openMemo(${i})`}">
+      <div class="memoCard"
+        onclick="${deleteModeOn?`toggleDelete(${i})`:`openMemo(${i})`}">
 
-      ${deleteModeOn?`
-        <input type="checkbox"
-          style="position:absolute;left:10px;top:10px"
-          ${deleteTargets.has(i)?"checked":""}
-          onclick="event.stopPropagation();toggleDelete(${i})">
-      `:""}
+        ${deleteModeOn?`
+          <input type="checkbox"
+            style="position:absolute;left:10px;top:10px"
+            ${deleteTargets.has(i)?"checked":""}
+            onclick="event.stopPropagation();toggleDelete(${i})">
+        `:""}
 
-      <div class="memoTitle">${title}</div>
-
-      ${m.in?`
-        <div class="timeRow in">
-          IN <span onclick="editTime(event,${i},'in')">${m.timeIn}</span>
-        </div>`:""}
-
-      ${m.out?`
-        <div class="timeRow out">
-          OUT <span onclick="editTime(event,${i},'out')">${m.timeOut}</span>
-        </div>`:""}
-    </div>`;
+        <div class="memoTitle">7C[${m.c7}]</div>
+      </div>
+    `;
   });
 
   if(deleteModeOn){
     memoList.innerHTML+=`
       <button class="mainBtn" onclick="confirmDelete()">선택 삭제</button>
-      <button class="mainBtn" onclick="cancelDelete()">취소</button>`;
+      <button class="mainBtn" onclick="cancelDelete()">취소</button>
+    `;
   }
-}
-
-function addPhoto(){
-  photoInput.click();
-}
-photoInput.onchange=e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const r=new FileReader();
-  r.onload=()=>{ photo=r.result; localStorage.setItem("jas_photo",photo); render(); };
-  r.readAsDataURL(file);
-};
-
-function openPhoto(){
-  const w=window.open();
-  w.document.write(`<img src="${photo}" style="width:100%">`);
 }
 
 function newMemo(){
   editIndex=null;
-  mode={in:false,out:false};
   openEditor({
-    in:false,out:false,
-    c7:"",hl:"",c7o:"",
-    timeIn:nowTime(),timeOut:nowTime()
+    c7:"",
+    cmpt1:"",cmpt2:"",cmpt3:"",cmpt4:"",
+    t:"",d:"",b:"",w:"",c:""
   });
 }
 
 function openMemo(i){
   editIndex=i;
-  mode.in=memos[i].in;
-  mode.out=memos[i].out;
   openEditor(memos[i]);
 }
 
-let currentMemo;
 function openEditor(m){
-  currentMemo=m;
-  buildEditor();
-  editor.classList.remove("hidden");
-}
-
-function toggleMode(t){
-  mode[t]=!mode[t];
-  buildEditor();
-}
-
-function buildEditor(){
   editor.innerHTML=`
     <button onclick="closeEditor()">← 뒤로</button>
 
-    <div class="selectRow">
-      <button class="${mode.in?"active":""}" onclick="toggleMode('in')">INBOUND</button>
-      <button class="${mode.out?"active":""}" onclick="toggleMode('out')">OUTBOUND</button>
+    <label>7C</label>
+    <input value="${m.c7}" oninput="num(this,4)">
+
+    <label>CMPT</label>
+    <div class="compRow">
+      <input placeholder="CMPT 1" value="${m.cmpt1}">
+      <input placeholder="CMPT 2" value="${m.cmpt2}">
+      <input placeholder="CMPT 3" value="${m.cmpt3}">
+      <input placeholder="CMPT 4" value="${m.cmpt4}">
     </div>
 
-    <label>7C</label>
-    <input value="${currentMemo.c7||""}" oninput="num(this,4)">
-    <label>HL</label>
-    <input value="${currentMemo.hl||""}" oninput="num(this,4)">
-
-    ${mode.out?`
-      <label>7C (OUT)</label>
-      <input value="${currentMemo.c7o||""}" oninput="num(this,4)">`:""}
+    <label>T · D · B · W · C</label>
+    <div class="row">
+      <input placeholder="T" value="${m.t}" oninput="num(this,3)">
+      <input placeholder="D" value="${m.d}" oninput="num(this,2)">
+      <input placeholder="B" value="${m.b}" oninput="num(this,2)">
+      <input placeholder="W" value="${m.w}" oninput="num(this,2)">
+      <input placeholder="C" value="${m.c}" oninput="num(this,2)">
+    </div>
 
     <button class="mainBtn" onclick="save()">저장</button>
   `;
+  editor.classList.remove("hidden");
 }
 
 function save(){
-  const i=editor.querySelectorAll("input");
-  const m={
-    in:mode.in,out:mode.out,
-    c7:i[0]?.value||"",
-    hl:i[1]?.value||"",
-    c7o:i[2]?.value||"",
-    timeIn:currentMemo.timeIn,
-    timeOut:currentMemo.timeOut
+  const i = editor.querySelectorAll("input");
+  const m = {
+    c7:i[0].value,
+    cmpt1:i[1].value,
+    cmpt2:i[2].value,
+    cmpt3:i[3].value,
+    cmpt4:i[4].value,
+    t:i[5].value,
+    d:i[6].value,
+    b:i[7].value,
+    w:i[8].value,
+    c:i[9].value
   };
   if(editIndex===null) memos.push(m);
   else memos[editIndex]=m;
+
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeEditor(); render();
 }
 
-function editTime(e,i,t){
-  e.stopPropagation();
-  memos[i][t==="in"?"timeIn":"timeOut"]=nowTime();
-  localStorage.setItem("jas_memos",JSON.stringify(memos));
-  render();
+function closeEditor(){
+  editor.classList.add("hidden");
 }
-
-function closeEditor(){ editor.classList.add("hidden"); }
 
 function deleteMode(){
   deleteModeOn=true;
@@ -301,7 +215,7 @@ function cancelDelete(){
 }
 function confirmDelete(){
   if(!confirm("선택한 메모를 삭제할까요?")) return;
-  memos=memos.filter((_,i)=>!deleteTargets.has(i));
+  memos = memos.filter((_,i)=>!deleteTargets.has(i));
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   cancelDelete();
 }
