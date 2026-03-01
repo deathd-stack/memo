@@ -9,29 +9,38 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #ff8c00;
+  background: orange;
 }
 
 header {
   text-align: center;
-  font-weight: bold;
   font-size: 22px;
-  padding: 15px;
-  background: #ff8c00;
-  color: #000;
-}
-
-button {
-  padding: 10px;
-  margin: 5px;
-  border: none;
   font-weight: bold;
-  cursor: pointer;
+  padding: 15px;
 }
 
 .top-buttons {
   display: flex;
   justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+#photoViewer {
+  text-align: center;
+  margin: 10px;
+}
+
+#photoViewer img {
+  max-width: 100%;
+  touch-action: pinch-zoom;
 }
 
 .container {
@@ -47,6 +56,11 @@ button {
 
 .memo-title {
   font-weight: bold;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
 }
 
 .input-row {
@@ -55,12 +69,8 @@ button {
   margin-bottom: 8px;
 }
 
-.input-row label {
-  white-space: nowrap;
-}
-
 input {
-  width: 80px;
+  width: 70px;
 }
 
 .cmpt-row {
@@ -80,10 +90,6 @@ input {
   cursor: pointer;
   margin-bottom: 10px;
 }
-
-.hidden {
-  display: none;
-}
 </style>
 </head>
 
@@ -97,16 +103,18 @@ input {
   <button onclick="addPhoto()">사진 추가</button>
 </div>
 
+<div id="photoViewer"></div>
+
 <div class="container" id="memoList"></div>
 
 <!-- 메모 추가 -->
 <div id="addMemo" class="container hidden">
-  <div class="input-row">
-    <label>7C</label><input maxlength="4">
-    <label>HL</label><input maxlength="4">
+  <div class="input-row" onclick="setTime()">
+    7C <input id="c7" maxlength="4">
+    HL <input id="hl" maxlength="4">
   </div>
 
-  <div class="time" onclick="setTime(this)">시간 입력</div>
+  <div id="time" class="time">시간 입력</div>
 
   <div class="cmpt-row">CMPT 1 <input></div>
   <div class="cmpt-row">CMPT 2 <input></div>
@@ -130,6 +138,8 @@ input {
   <button onclick="saveMemo()">저장</button>
 </div>
 
+<input type="file" id="photoInput" accept="image/*" hidden>
+
 <script>
 let deleteMode = false;
 
@@ -137,21 +147,23 @@ function openAdd() {
   document.getElementById('addMemo').classList.toggle('hidden');
 }
 
-function setTime(el) {
+function setTime() {
   const now = new Date();
-  el.textContent =
+  document.getElementById('time').textContent =
     String(now.getHours()).padStart(2,'0') + ':' +
     String(now.getMinutes()).padStart(2,'0');
 }
 
 function saveMemo() {
+  const c7 = document.getElementById('c7').value;
+  const hl = document.getElementById('hl').value;
+
   const box = document.createElement('div');
   box.className = 'memo';
 
   const title = document.createElement('div');
   title.className = 'memo-title';
-  const inputs = document.querySelectorAll('#addMemo input');
-  title.textContent = `7C[${inputs[0].value}] HL[${inputs[1].value}]`;
+  title.textContent = `7C[${c7}]  HL[${hl}]`;
 
   box.appendChild(title);
   document.getElementById('memoList').appendChild(box);
@@ -172,8 +184,18 @@ function toggleDelete() {
 }
 
 function addPhoto() {
-  alert('사진 기능은 다음 단계에서 연결됩니다.');
+  document.getElementById('photoInput').click();
 }
+
+document.getElementById('photoInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(file);
+  const viewer = document.getElementById('photoViewer');
+  viewer.innerHTML = '';
+  viewer.appendChild(img);
+});
 </script>
 
 </body>
