@@ -12,30 +12,34 @@ body{
   margin:0;
   font-family:system-ui;
   background:#ff9f1c;
+  font-size:1.1rem;
+  font-weight:600;
 }
 header{
   text-align:center;
-  font-weight:700;
   padding:12px;
+  font-size:1.3rem;
+  font-weight:800;
 }
 .controls{
   display:flex;
   justify-content:center;
-  gap:10px;
+  gap:8px;
+  margin-bottom:8px;
 }
 button{
   padding:8px 12px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background:#fff;
-  font-weight:600;
+  font-weight:700;
 }
 #memoList{
   padding:10px;
 }
 .memo{
   background:#fff;
-  border-radius:10px;
+  border-radius:12px;
   padding:8px;
   margin-bottom:8px;
   display:flex;
@@ -43,7 +47,7 @@ button{
   gap:6px;
 }
 .memo-title{
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
 }
 
@@ -61,68 +65,88 @@ button{
   width:95%;
   max-height:90vh;
   overflow:auto;
-  border-radius:12px;
-  padding:12px;
+  border-radius:14px;
+  padding:14px;
 }
 .row{
   display:flex;
   gap:6px;
   margin-bottom:6px;
+  align-items:center;
   flex-wrap:wrap;
 }
-.row label{font-size:12px;}
 input{
-  width:60px;
+  width:64px;
   text-align:center;
+  font-weight:700;
 }
 .cmpt{
   display:flex;
   gap:6px;
   margin-bottom:4px;
 }
-.cmpt label{width:70px;}
+.cmpt label{width:80px;}
 .red{
   color:red;
-  font-weight:700;
+  font-weight:800;
   cursor:pointer;
 }
 textarea{
   width:100%;
   height:60px;
+  font-weight:600;
 }
-h3{margin:6px 0 2px;}
+.section-title{
+  font-weight:800;
+  margin-top:8px;
+}
+
+/* photo */
+#photoView{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:none;
+}
+#photoView img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
 </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER 1.2.X</header>
+<header ondblclick="togglePhoto()">JAS MEMO VER 1.2.X</header>
 
 <div class="controls">
   <button onclick="openNew()">메모 추가</button>
   <button onclick="deleteSelected()">메모 삭제</button>
+  <button onclick="addPhoto()">사진 추가</button>
 </div>
 
 <div id="memoList"></div>
 
+<input type="file" id="photoInput" accept="image/*" hidden>
+
+<div id="photoView" onclick="togglePhoto()">
+  <img id="photoImg">
+</div>
+
 <!-- modal -->
 <div class="modal" id="modal">
   <div class="box">
+
     <div class="row">
       <label><input type="checkbox" id="inChk"> INBOUND</label>
+      &nbsp;&nbsp;
       <label><input type="checkbox" id="outChk"> OUTBOUND</label>
     </div>
 
-    <div class="row">
-      <label>7C</label><input id="in7c" maxlength="4" inputmode="numeric">
-      <label>HL</label><input id="hl" maxlength="4" inputmode="numeric">
-      <span class="red" id="time" onclick="setTime()" ondblclick="editTime()">--:--</span>
-    </div>
-
-    <div id="out7cRow" class="row" style="display:none">
-      <label>7C</label><input id="out7c" maxlength="4" inputmode="numeric">
-      <label>HL</label><input disabled>
-    </div>
+    <div class="red" id="time"
+      onclick="setTime()"
+      ondblclick="editTime()">--:--</div>
 
     <div id="sections"></div>
 
@@ -137,34 +161,32 @@ h3{margin:6px 0 2px;}
 
 <script>
 let memos=[];
-let editIndex=null;
+let photo=null;
 
 function openNew(){
-  editIndex=null;
   modal.style.display="flex";
   sections.innerHTML="";
-  out7cRow.style.display="none";
+  inChk.checked=false;
+  outChk.checked=false;
 }
 
-function closeModal(){
-  modal.style.display="none";
-}
+function closeModal(){ modal.style.display="none"; }
 
-inChk.onchange=outChk.onchange=()=>{
+inChk.onchange=outChk.onchange=renderSections;
+
+function renderSections(){
   sections.innerHTML="";
-  out7cRow.style.display = inChk.checked && outChk.checked ? "flex":"none";
-  renderSection();
-};
-
-function renderSection(){
-  sections.innerHTML="";
-  if(inChk.checked) sections.innerHTML+=block("INBOUND",false);
-  if(outChk.checked) sections.innerHTML+=block("OUTBOUND",true);
+  if(inChk.checked) sections.innerHTML+=section("INBOUND");
+  if(outChk.checked) sections.innerHTML+=section("OUTBOUND");
 }
 
-function block(title,withTT){
+function section(title){
   return `
-  <h3>${title}</h3>
+  <div class="section-title">${title}</div>
+  <div class="row">
+    <label>7C</label><input maxlength="4" inputmode="numeric">
+    <label>HL</label><input maxlength="4" inputmode="numeric">
+  </div>
   ${[1,2,3,4].map(n=>`
     <div class="cmpt">
       <label>CMPT ${n}</label><input>
@@ -179,7 +201,7 @@ function block(title,withTT){
     <label>C</label><input maxlength="3">
     <label>COB</label><input maxlength="3">
   </div>
-  ${withTT?`
+  ${title==="OUTBOUND"?`
   <div class="row">
     <label>T/T</label><input maxlength="4">
     <label>T/B</label><input maxlength="4">
@@ -192,16 +214,12 @@ function setTime(){
   time.textContent=d.toLocaleTimeString("ko-KR",{hour12:false,hour:"2-digit",minute:"2-digit"});
 }
 function editTime(){
-  const t=prompt("시간 수정 (HH:MM)",time.textContent);
+  const t=prompt("시간 수정",time.textContent);
   if(t) time.textContent=t;
 }
 
 function save(){
-  const title = inChk.checked && outChk.checked
-    ? `7C(IN)${in7c.value} HL${hl.value} | 7C(OUT)${out7c.value}`
-    : `7C${(inChk.checked?in7c.value:out7c.value)} HL${hl.value}`;
-
-  memos.push({title});
+  memos.push({title:"메모"});
   draw();
   closeModal();
 }
@@ -209,24 +227,34 @@ function save(){
 function draw(){
   memoList.innerHTML="";
   memos.forEach((m,i)=>{
-    const d=document.createElement("div");
-    d.className="memo";
-    d.innerHTML=`
+    memoList.innerHTML+=`
+    <div class="memo">
       <input type="checkbox">
-      <div class="memo-title" onclick="openEdit(${i})">${m.title}</div>`;
-    memoList.appendChild(d);
+      <div class="memo-title">메모 ${i+1}</div>
+    </div>`;
   });
-}
-
-function openEdit(i){
-  editIndex=i;
-  modal.style.display="flex";
 }
 
 function deleteSelected(){
   const c=[...document.querySelectorAll(".memo input")];
   memos=memos.filter((_,i)=>!c[i].checked);
   draw();
+}
+
+/* photo */
+function addPhoto(){
+  photoInput.click();
+}
+photoInput.onchange=e=>{
+  const f=e.target.files[0];
+  if(!f)return;
+  photo=URL.createObjectURL(f);
+}
+function togglePhoto(){
+  if(!photo)return;
+  photoView.style.display =
+    photoView.style.display==="block"?"none":"block";
+  photoImg.src=photo;
 }
 </script>
 
