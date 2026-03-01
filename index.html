@@ -1,160 +1,183 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAS MEMO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAS MEMO VER.1</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #fff6eb;
-    }
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#ff8c00;
+}
+header{
+  text-align:center;
+  padding:18px;
+  font-size:20px;
+  font-weight:bold;
+  color:white;
+}
+.container{ padding:16px; }
 
-    header {
-      background: #ff8c00;
-      color: white;
-      text-align: center;
-      padding: 16px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+button{
+  width:100%;
+  padding:14px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+}
+.memoBtn{ background:white; color:#ff8c00; }
 
-    #mainScreen, #memoScreen {
-      padding: 16px;
-    }
+.memoCard{
+  padding:14px;
+  border-radius:12px;
+  margin-top:10px;
+}
+.white{ background:white; color:black; }
+.black{ background:black; color:white; }
 
-    button {
-      background: #ff8c00;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+.modal{
+  position:fixed;
+  left:0; right:0; bottom:0;
+  background:white;
+  border-radius:20px 20px 0 0;
+  padding:16px;
+}
+.hidden{ display:none; }
 
-    #addBtn {
-      width: 100%;
-      margin-bottom: 16px;
-    }
+.row{ display:flex; gap:8px; }
+.row input{ flex:1; }
 
-    .memoItem {
-      background: white;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+input{
+  padding:6px;
+  margin:4px 0;
+  width:100%;
+}
 
-    .deleteBtn {
-      background: #ff4d4d;
-      font-size: 14px;
-      padding: 6px 10px;
-    }
+.bottomRow{
+  display:flex;
+  gap:12px;
+  margin-top:10px;
+}
+.bottomRow div{ flex:1; }
 
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-bottom: 16px;
-    }
-
-    .actionRow {
-      display: flex;
-      gap: 10px;
-    }
-
-    .actionRow button {
-      flex: 1;
-    }
-  </style>
+label{ font-size:13px; }
+</style>
 </head>
 
 <body>
 
-  <header>JAS MEMO</header>
+<header>JAS MEMO VER.1</header>
 
-  <!-- 메인 화면 -->
-  <div id="mainScreen">
-    <button id="addBtn">＋ 추가</button>
-    <div id="memoList"></div>
+<div class="container">
+<button class="memoBtn" onclick="newMemo()">메모 추가</button>
+<div id="memoList"></div>
+</div>
+
+<div id="editor" class="modal hidden"></div>
+
+<script>
+let memos = JSON.parse(localStorage.getItem("memos")||"[]");
+let editIndex=null;
+
+function num(el,n){
+  el.value = el.value.replace(/[^0-9]/g,"").slice(0,n);
+}
+
+function render(){
+  memoList.innerHTML="";
+  memos.forEach((m,i)=>{
+    const even = parseInt(m.c7)%2===0;
+    memoList.innerHTML+=`
+    <div class="memoCard ${even?"black":"white"}" onclick="openMemo(${i})">
+      7C[${m.c7}] HL[${m.hl}]
+    </div>`;
+  });
+}
+
+function newMemo(){
+  editIndex=null;
+  openEditor({
+    c7:"",hl:"",
+    t:"",d:"",b:"",w:"",c:"",
+    tt:"",tb:""
+  });
+}
+
+function openMemo(i){
+  editIndex=i;
+  openEditor(memos[i]);
+}
+
+function openEditor(m){
+  const showBottom = parseInt(m.c7)%2===1;
+  editor.innerHTML=`
+  <button onclick="closeEditor()">← 뒤로</button>
+
+  <label>7C</label>
+  <input value="${m.c7}" oninput="num(this,4);toggleBottom()">
+
+  <label>HL</label>
+  <input value="${m.hl}" oninput="num(this,4)">
+
+  <hr>
+
+  <div class="row">
+    <input placeholder="T" value="${m.t}" oninput="num(this,3)">
+    <input placeholder="D" value="${m.d}" oninput="num(this,2)">
+    <input placeholder="B" value="${m.b}" oninput="num(this,2)">
+    <input placeholder="W" value="${m.w}" oninput="num(this,2)">
+    <input placeholder="C" value="${m.c}" oninput="num(this,3)">
   </div>
 
-  <!-- 메모 입력 화면 -->
-  <div id="memoScreen" style="display:none;">
-    <textarea id="memoInput" placeholder="메모를 입력하세요"></textarea>
-    <div class="actionRow">
-      <button id="saveBtn">저장</button>
-      <button id="closeBtn">닫기</button>
+  <div id="bottom" class="${showBottom?"":"hidden"}">
+    <hr>
+    <div class="bottomRow">
+      <div>
+        <label>T/T</label>
+        <input value="${m.tt}" oninput="num(this,4)">
+      </div>
+      <div>
+        <label>T/B</label>
+        <input value="${m.tb}" oninput="num(this,4)">
+      </div>
     </div>
   </div>
 
-  <script>
-    const mainScreen = document.getElementById("mainScreen");
-    const memoScreen = document.getElementById("memoScreen");
-    const memoList = document.getElementById("memoList");
-    const memoInput = document.getElementById("memoInput");
+  <button class="memoBtn" onclick="save()">저장</button>
+  `;
+  editor.classList.remove("hidden");
+}
 
-    let memos = JSON.parse(localStorage.getItem("jas_memos")) || [];
+function toggleBottom(){
+  const c7 = editor.querySelectorAll("input")[0].value;
+  document.getElementById("bottom").classList.toggle(
+    "hidden", parseInt(c7)%2===0
+  );
+}
 
-    function showMain() {
-      memoScreen.style.display = "none";
-      mainScreen.style.display = "block";
-      renderMemos();
-    }
+function closeEditor(){
+  editor.classList.add("hidden");
+}
 
-    function showEditor() {
-      memoInput.value = "";
-      mainScreen.style.display = "none";
-      memoScreen.style.display = "block";
-    }
+function save(){
+  const i = editor.querySelectorAll("input");
+  const m={
+    c7:i[0].value, hl:i[1].value,
+    t:i[2].value, d:i[3].value,
+    b:i[4].value, w:i[5].value, c:i[6].value,
+    tt:i[7]?.value||"", tb:i[8]?.value||""
+  };
+  if(editIndex===null) memos.push(m);
+  else memos[editIndex]=m;
+  localStorage.setItem("memos",JSON.stringify(memos));
+  closeEditor(); render();
+}
 
-    function saveMemo() {
-      const text = memoInput.value.trim();
-      if (!text) return;
-
-      memos.push({
-        id: Date.now(),
-        text
-      });
-
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-      showMain();
-    }
-
-    function deleteMemo(id) {
-      memos = memos.filter(m => m.id !== id);
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-      renderMemos();
-    }
-
-    function renderMemos() {
-      memoList.innerHTML = "";
-      memos.forEach(memo => {
-        const div = document.createElement("div");
-        div.className = "memoItem";
-        div.innerHTML = `
-          <span>${memo.text}</span>
-          <button class="deleteBtn">삭제</button>
-        `;
-        div.querySelector(".deleteBtn").onclick = () => deleteMemo(memo.id);
-        memoList.appendChild(div);
-      });
-    }
-
-    document.getElementById("addBtn").onclick = showEditor;
-    document.getElementById("saveBtn").onclick = saveMemo;
-    document.getElementById("closeBtn").onclick = showMain;
-
-    // 앱 시작 시 무조건 메인 화면
-    window.onload = showMain;
-  </script>
+render();
+</script>
 
 </body>
 </html>
