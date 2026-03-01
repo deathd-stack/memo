@@ -1,227 +1,160 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JAS MEMO VER.1</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JAS MEMO</title>
 
-<style>
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  background:#ff8c00;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff6eb;
+    }
 
-header{
-  text-align:center;
-  padding:20px;
-  font-size:20px;
-  font-weight:bold;
-  color:white;
-}
+    header {
+      background: #ff8c00;
+      color: white;
+      text-align: center;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-.container{ padding:16px; }
+    #mainScreen, #memoScreen {
+      padding: 16px;
+    }
 
-button{
-  width:100%;
-  padding:14px;
-  margin-bottom:10px;
-  border:none;
-  border-radius:12px;
-  font-size:16px;
-  transition:transform .15s;
-}
-button:active{ transform:scale(.96); }
+    button {
+      background: #ff8c00;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+    }
 
-.memoBtn{ background:white; color:#ff8c00; }
-.photoBtn{ background:#ffe0b2; }
-.deleteBtn{ background:#ffccbc; }
+    #addBtn {
+      width: 100%;
+      margin-bottom: 16px;
+    }
 
-.memoCard{
-  background:white;
-  color:black;
-  padding:12px;
-  border-radius:12px;
-  margin-top:10px;
-}
+    .memoItem {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.hidden{ display:none; }
+    .deleteBtn {
+      background: #ff4d4d;
+      font-size: 14px;
+      padding: 6px 10px;
+    }
 
-/* 모달 */
-.modal{
-  position:fixed;
-  left:0; right:0; bottom:0;
-  background:white;
-  border-radius:20px 20px 0 0;
-  padding:16px;
-  animation:slideUp .3s ease;
-}
+    textarea {
+      width: 100%;
+      height: 120px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 16px;
+    }
 
-@keyframes slideUp{
-  from{ transform:translateY(100%); opacity:0; }
-  to{ transform:translateY(0); opacity:1; }
-}
+    .actionRow {
+      display: flex;
+      gap: 10px;
+    }
 
-@keyframes slideDown{
-  from{ transform:translateY(0); opacity:1; }
-  to{ transform:translateY(100%); opacity:0; }
-}
-
-input{
-  width:100%;
-  padding:6px;
-  margin:4px 0;
-}
-
-.redTime{
-  color:red;
-  font-weight:bold;
-}
-
-img{ max-width:100%; }
-</style>
+    .actionRow button {
+      flex: 1;
+    }
+  </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER.1</header>
+  <header>JAS MEMO</header>
 
-<div class="container">
-<button class="memoBtn" onclick="newMemo()">메모 추가</button>
-<button class="deleteBtn" onclick="deleteMemo()">메모 삭제</button>
-<button class="photoBtn" onclick="addPhoto()">사진 추가</button>
-
-<div id="memoList"></div>
-</div>
-
-<!-- 메모 상세 모달 -->
-<div id="editor" class="modal hidden"></div>
-
-<!-- 사진 보기 -->
-<div id="photoView" class="modal hidden" onclick="closePhoto()">
-  <img id="photoImg">
-</div>
-
-<input type="file" id="file" accept="image/*" hidden>
-
-<script>
-let memos=JSON.parse(localStorage.getItem("memos")||"[]");
-let editIndex=null;
-
-function num(el,n){
-  el.value=el.value.replace(/[^0-9]/g,"").slice(0,n);
-}
-
-function timeNow(){
-  return new Date().toLocaleTimeString();
-}
-
-function render(){
-  memoList.innerHTML="";
-  memos.forEach((m,i)=>{
-    memoList.innerHTML+=`
-    <div class="memoCard" onclick="openMemo(${i})">
-      <input type="checkbox" value="${i}"> 메모 ${i+1}
-    </div>`;
-  });
-}
-
-function newMemo(){
-  editIndex=null;
-  openEditor({
-    time:"",
-    c7:"",hl:"",
-    cmpt:["","","",""],
-    t:"",d:"",b:"",w:"",c:""
-  });
-}
-
-function openMemo(i){
-  editIndex=i;
-  openEditor(memos[i]);
-}
-
-function openEditor(data){
-  editor.innerHTML=`
-  <button onclick="closeEditor()">← 뒤로</button>
-
-  <div ondblclick="setTime(this)">
-    시간 <span class="redTime">${data.time||"눌러서 입력"}</span>
+  <!-- 메인 화면 -->
+  <div id="mainScreen">
+    <button id="addBtn">＋ 추가</button>
+    <div id="memoList"></div>
   </div>
 
-  7C <input value="${data.c7}" oninput="num(this,4)">
-  HL <input value="${data.hl}" oninput="num(this,4)">
+  <!-- 메모 입력 화면 -->
+  <div id="memoScreen" style="display:none;">
+    <textarea id="memoInput" placeholder="메모를 입력하세요"></textarea>
+    <div class="actionRow">
+      <button id="saveBtn">저장</button>
+      <button id="closeBtn">닫기</button>
+    </div>
+  </div>
 
-  <hr>
+  <script>
+    const mainScreen = document.getElementById("mainScreen");
+    const memoScreen = document.getElementById("memoScreen");
+    const memoList = document.getElementById("memoList");
+    const memoInput = document.getElementById("memoInput");
 
-  ${data.cmpt.map((v,i)=>`CMPT ${i+1}<input value="${v}">`).join("")}
+    let memos = JSON.parse(localStorage.getItem("jas_memos")) || [];
 
-  <hr>
+    function showMain() {
+      memoScreen.style.display = "none";
+      mainScreen.style.display = "block";
+      renderMemos();
+    }
 
-  T <input value="${data.t}" oninput="num(this,3)">
-  D <input value="${data.d}" oninput="num(this,2)">
-  B <input value="${data.b}" oninput="num(this,2)">
-  W <input value="${data.w}" oninput="num(this,2)">
-  C <input value="${data.c}" oninput="num(this,3)">
+    function showEditor() {
+      memoInput.value = "";
+      mainScreen.style.display = "none";
+      memoScreen.style.display = "block";
+    }
 
-  <button class="memoBtn" onclick="save()">저장</button>
-  `;
-  editor.classList.remove("hidden");
-}
+    function saveMemo() {
+      const text = memoInput.value.trim();
+      if (!text) return;
 
-function setTime(el){
-  el.querySelector("span").innerText=timeNow();
-}
+      memos.push({
+        id: Date.now(),
+        text
+      });
 
-function closeEditor(){
-  editor.style.animation="slideDown .3s ease";
-  setTimeout(()=>{
-    editor.classList.add("hidden");
-    editor.style.animation="";
-  },300);
-}
+      localStorage.setItem("jas_memos", JSON.stringify(memos));
+      showMain();
+    }
 
-function save(){
-  let e=editor.querySelectorAll("input");
-  let m={
-    time:editor.querySelector(".redTime").innerText,
-    c7:e[0].value,hl:e[1].value,
-    cmpt:[e[2].value,e[3].value,e[4].value,e[5].value],
-    t:e[6].value,d:e[7].value,b:e[8].value,w:e[9].value,c:e[10].value
-  };
-  if(editIndex===null) memos.push(m);
-  else memos[editIndex]=m;
-  localStorage.setItem("memos",JSON.stringify(memos));
-  closeEditor(); render();
-}
+    function deleteMemo(id) {
+      memos = memos.filter(m => m.id !== id);
+      localStorage.setItem("jas_memos", JSON.stringify(memos));
+      renderMemos();
+    }
 
-function deleteMemo(){
-  let chk=[...document.querySelectorAll("input[type=checkbox]:checked")];
-  chk.map(c=>c.value).sort((a,b)=>b-a).forEach(i=>memos.splice(i,1));
-  localStorage.setItem("memos",JSON.stringify(memos));
-  render();
-}
+    function renderMemos() {
+      memoList.innerHTML = "";
+      memos.forEach(memo => {
+        const div = document.createElement("div");
+        div.className = "memoItem";
+        div.innerHTML = `
+          <span>${memo.text}</span>
+          <button class="deleteBtn">삭제</button>
+        `;
+        div.querySelector(".deleteBtn").onclick = () => deleteMemo(memo.id);
+        memoList.appendChild(div);
+      });
+    }
 
-/* 사진 */
-function addPhoto(){ file.click(); }
-file.onchange=e=>{
-  let r=new FileReader();
-  r.onload=()=>localStorage.setItem("photo",r.result);
-  r.readAsDataURL(e.target.files[0]);
-};
+    document.getElementById("addBtn").onclick = showEditor;
+    document.getElementById("saveBtn").onclick = saveMemo;
+    document.getElementById("closeBtn").onclick = showMain;
 
-document.body.ondblclick=()=>{
-  let p=localStorage.getItem("photo");
-  if(p){
-    photoImg.src=p;
-    photoView.classList.remove("hidden");
-  }
-};
-
-function closePhoto(){ photoView.classList.add("hidden"); }
-
-render();
-</script>
+    // 앱 시작 시 무조건 메인 화면
+    window.onload = showMain;
+  </script>
 
 </body>
 </html>
