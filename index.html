@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JAS MEMO VER.1</title>
+<title>JAS MEMO VER.1.1</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: orange;
+  font-family: system-ui, sans-serif;
+  background: #ff9800;
 }
 
 header {
   text-align: center;
+  padding: 16px;
   font-size: 22px;
   font-weight: bold;
-  padding: 15px;
 }
 
-.top-buttons {
+.buttons {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -27,31 +27,22 @@ header {
 }
 
 button {
-  padding: 10px;
-  font-weight: bold;
+  padding: 10px 14px;
   border: none;
+  border-radius: 8px;
+  font-weight: bold;
   cursor: pointer;
 }
 
-#photoViewer {
-  text-align: center;
-  margin: 10px;
-}
-
-#photoViewer img {
-  max-width: 100%;
-  touch-action: pinch-zoom;
-}
-
 .container {
-  padding: 10px;
+  padding: 12px;
 }
 
 .memo {
   background: #fff;
+  border-radius: 10px;
   padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
 .memo-title {
@@ -63,65 +54,72 @@ button {
   display: none;
 }
 
-.input-row {
+.row {
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
+  align-items: center;
 }
 
 input {
-  width: 70px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-.cmpt-row {
+.cmpt {
   display: flex;
-  align-items: center;
   margin-bottom: 6px;
 }
 
-.cmpt-row input {
+.cmpt input {
   flex: 1;
-  margin-left: 10px;
+  margin-left: 8px;
 }
 
 .time {
   color: red;
   font-weight: bold;
-  cursor: pointer;
   margin-bottom: 10px;
+  cursor: pointer;
+}
+
+#photoView img {
+  max-width: 100%;
+  border-radius: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER.1</header>
+<header>JAS MEMO VER.1.1</header>
 
-<div class="top-buttons">
-  <button onclick="openAdd()">메모 추가</button>
+<div class="buttons">
+  <button onclick="openEditor()">메모 추가</button>
   <button onclick="toggleDelete()">메모 삭제</button>
   <button onclick="addPhoto()">사진 추가</button>
 </div>
 
-<div id="photoViewer"></div>
+<div id="photoView" class="container"></div>
 
 <div class="container" id="memoList"></div>
 
-<!-- 메모 추가 -->
-<div id="addMemo" class="container hidden">
-  <div class="input-row" onclick="setTime()">
+<!-- 메모 에디터 -->
+<div class="container hidden" id="editor">
+  <div class="row" onclick="setTime()">
     7C <input id="c7" maxlength="4">
     HL <input id="hl" maxlength="4">
   </div>
 
-  <div id="time" class="time">시간 입력</div>
+  <div class="time" id="time">시간 입력</div>
 
-  <div class="cmpt-row">CMPT 1 <input></div>
-  <div class="cmpt-row">CMPT 2 <input></div>
-  <div class="cmpt-row">CMPT 3 <input></div>
-  <div class="cmpt-row">CMPT 4 <input></div>
+  <div class="cmpt">CMPT 1 <input id="c1"></div>
+  <div class="cmpt">CMPT 2 <input id="c2"></div>
+  <div class="cmpt">CMPT 3 <input id="c3"></div>
+  <div class="cmpt">CMPT 4 <input id="c4"></div>
 
-  <div class="input-row">
+  <div class="row">
     T <input maxlength="3">
     D <input maxlength="2">
     B <input maxlength="2">
@@ -129,7 +127,7 @@ input {
     C <input maxlength="2">
   </div>
 
-  <div class="input-row">
+  <div class="row">
     T/T <input maxlength="4">
     T/B <input maxlength="4">
     <input maxlength="4">
@@ -141,61 +139,64 @@ input {
 <input type="file" id="photoInput" accept="image/*" hidden>
 
 <script>
+let editingMemo = null;
 let deleteMode = false;
 
-function openAdd() {
-  document.getElementById('addMemo').classList.toggle('hidden');
+function openEditor(memo = null) {
+  editingMemo = memo;
+  document.getElementById('editor').classList.remove('hidden');
 }
 
 function setTime() {
-  const now = new Date();
+  const d = new Date();
   document.getElementById('time').textContent =
-    String(now.getHours()).padStart(2,'0') + ':' +
-    String(now.getMinutes()).padStart(2,'0');
+    String(d.getHours()).padStart(2,'0') + ':' +
+    String(d.getMinutes()).padStart(2,'0');
 }
 
 function saveMemo() {
-  const c7 = document.getElementById('c7').value;
-  const hl = document.getElementById('hl').value;
+  const c7 = c7Input.value;
+  const hl = hlInput.value;
 
-  const box = document.createElement('div');
-  box.className = 'memo';
+  let memo = editingMemo || document.createElement('div');
+  memo.className = 'memo';
 
-  const title = document.createElement('div');
-  title.className = 'memo-title';
-  title.textContent = `7C[${c7}]  HL[${hl}]`;
+  memo.innerHTML = `
+    <div class="memo-title" onclick="openEditor(this.parentElement)">
+      7C[${c7}]  HL[${hl}]
+    </div>
+  `;
 
-  box.appendChild(title);
-  document.getElementById('memoList').appendChild(box);
-  document.getElementById('addMemo').classList.add('hidden');
+  if (!editingMemo) memoList.appendChild(memo);
+
+  editingMemo = null;
+  editor.classList.add('hidden');
 }
 
 function toggleDelete() {
   deleteMode = !deleteMode;
   document.querySelectorAll('.memo').forEach(m => {
-    if (deleteMode) {
+    if (deleteMode && !m.querySelector('input')) {
       const chk = document.createElement('input');
       chk.type = 'checkbox';
+      chk.onchange = () => chk.checked && m.remove();
       m.prepend(chk);
-    } else {
-      m.querySelector('input')?.remove();
     }
   });
 }
 
 function addPhoto() {
-  document.getElementById('photoInput').click();
+  photoInput.click();
 }
 
-document.getElementById('photoInput').addEventListener('change', e => {
+photoInput.onchange = e => {
   const file = e.target.files[0];
   if (!file) return;
+  photoView.innerHTML = '';
   const img = document.createElement('img');
   img.src = URL.createObjectURL(file);
-  const viewer = document.getElementById('photoViewer');
-  viewer.innerHTML = '';
-  viewer.appendChild(img);
-});
+  photoView.appendChild(img);
+};
 </script>
 
 </body>
