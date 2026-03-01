@@ -2,206 +2,284 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>JAS MEMO VER.1.2.X!</title>
+<meta name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+
+<title>JAS MEMO VER 1.2.X</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #ff9f0a;
+body{
+  margin:0;
+  font-family: system-ui, -apple-system;
+  background:#ff9f1c;
+  overflow:hidden;
 }
 
-header {
-  text-align: center;
-  padding: 15px;
-  font-weight: bold;
-  font-size: 22px;
+header{
+  text-align:center;
+  font-weight:700;
+  padding:12px;
+  font-size:18px;
 }
 
-button {
-  font-size: 16px;
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: none;
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:8px;
 }
 
-.top-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
+button{
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  background:#fff;
+  font-weight:600;
 }
 
-.memo-list {
-  padding: 10px;
+#photo{
+  position:absolute;
+  inset:0;
+  display:none;
+  background:#000;
+}
+#photo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
-.memo-item {
-  background: white;
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 8px;
-  font-weight: bold;
+#memoList{
+  padding:10px;
+  overflow:auto;
+  height:calc(100vh - 110px);
 }
 
-input, textarea {
-  font-size: 16px;
-  padding: 6px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.memo{
+  background:#fff;
+  border-radius:10px;
+  padding:8px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
-label {
-  font-weight: bold;
+.memo input[type=checkbox]{
+  transform:scale(1.2);
 }
 
-.row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-  align-items: center;
+.memo-title{
+  font-weight:700;
+  cursor:pointer;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none;
-  justify-content: center;
-  align-items: center;
+/* ===== modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
 
-.modal-content {
-  background: white;
-  width: 90%;
-  max-height: 90%;
-  overflow-y: auto;
-  border-radius: 16px;
-  padding: 15px;
+.modal-box{
+  background:#fff;
+  width:95%;
+  max-height:90vh;
+  overflow:auto;
+  border-radius:12px;
+  padding:12px;
 }
 
-.time {
-  color: red;
-  font-weight: bold;
+.row{
+  display:flex;
+  gap:6px;
+  margin-bottom:6px;
+}
+.row label{width:40px;font-size:12px;}
+.row input{
+  width:60px;
+  text-align:center;
 }
 
-textarea {
-  width: 100%;
-  resize: none;
+.cmpt{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:4px;
+}
+.cmpt label{width:70px;}
+
+h3{
+  margin:8px 0 4px;
+  font-size:14px;
+}
+
+.red{
+  color:red;
+  font-weight:700;
+}
+textarea{
+  width:100%;
+  height:50px;
 }
 </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER.1.2</header>
+<header>JAS MEMO VER 1.2.X</header>
 
-<div class="top-buttons">
-  <button onclick="openMemo()">메모 추가</button>
-  <button onclick="deleteMemo()">메모 삭제</button>
-  <button>사진 추가</button>
+<div class="controls">
+  <button onclick="openNew()">메모 추가</button>
+  <button onclick="deleteSelected()">메모 삭제</button>
+  <button onclick="addPhoto()">사진 추가</button>
 </div>
 
-<div class="memo-list" id="memoList"></div>
+<div id="memoList"></div>
+
+<!-- 사진 -->
+<div id="photo" ondblclick="closePhoto()">
+  <img id="photoImg">
+</div>
 
 <!-- 메모 모달 -->
-<div class="modal" id="memoModal">
-  <div class="modal-content">
-
+<div class="modal" id="modal">
+  <div class="modal-box">
     <div class="row">
-      7C <input maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="autoNext(this)">
-      HL <input maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      <label><input type="checkbox" id="chkIn"> IN</label>
+      <label><input type="checkbox" id="chkOut"> OUT</label>
     </div>
 
     <div class="row">
-      <span class="time" ondblclick="resetTime()" id="time"></span>
+      <label>7C</label><input maxlength="4" inputmode="numeric">
+      <label>HL</label><input maxlength="4" inputmode="numeric">
+      <span class="red" id="time"></span>
     </div>
 
-    <label>CMPT</label>
-    <div class="row"><input placeholder="CMPT 1"></div>
-    <div class="row"><input placeholder="CMPT 2"></div>
-    <div class="row"><input placeholder="CMPT 3"></div>
-    <div class="row"><input placeholder="CMPT 4"></div>
+    <div id="sectionWrap"></div>
+
+    <textarea placeholder="특이사항 (2줄)"></textarea>
 
     <div class="row">
-      T <input maxlength="3" inputmode="numeric">
-      D <input maxlength="2" inputmode="numeric">
-      B <input maxlength="2" inputmode="numeric">
-      W <input maxlength="2" inputmode="numeric">
-      C <input maxlength="3" inputmode="numeric">
+      <button onclick="saveMemo()">저장</button>
+      <button onclick="closeModal()">닫기</button>
     </div>
-
-    <div class="row">
-      T/T <input maxlength="4" inputmode="numeric">
-      T/B <input maxlength="4" inputmode="numeric">
-    </div>
-
-    <label>특이사항</label>
-    <textarea rows="2"></textarea>
-
-    <br><br>
-    <button onclick="saveMemo()">저장</button>
-    <button onclick="closeMemo()">닫기</button>
-
   </div>
 </div>
 
 <script>
-let memos = [];
+const modal=document.getElementById("modal");
+const sectionWrap=document.getElementById("sectionWrap");
+const memoList=document.getElementById("memoList");
+let memos=[];
+let editIndex=null;
 
-function openMemo() {
-  document.getElementById("memoModal").style.display = "flex";
-  setTime();
+/* ===== 시간 ===== */
+function updateTime(){
+  const d=new Date();
+  time.textContent=
+    d.toLocaleTimeString("ko-KR",{hour12:false});
+}
+setInterval(updateTime,1000);
+
+/* ===== modal ===== */
+function openNew(){
+  editIndex=null;
+  modal.style.display="flex";
+  sectionWrap.innerHTML="";
+  updateTime();
+}
+function closeModal(){
+  modal.style.display="none";
 }
 
-function closeMemo() {
-  document.getElementById("memoModal").style.display = "none";
+/* ===== section render ===== */
+chkIn.onchange=chkOut.onchange=render;
+function render(){
+  let html="";
+  if(chkIn.checked){
+    html+=`<h3>INBOUND</h3>${common("")}`;
+  }
+  if(chkOut.checked){
+    html+=`<h3>OUTBOUND</h3>${common("o")}${tt()}`;
+  }
+  sectionWrap.innerHTML=html;
 }
 
-function setTime() {
-  const now = new Date();
-  document.getElementById("time").textContent =
-    now.getHours().toString().padStart(2,"0") +
-    now.getMinutes().toString().padStart(2,"0");
+/* ===== blocks ===== */
+function common(p){
+  return `
+  ${cmpt(p)}
+  <div class="row">
+    <label>T</label><input maxlength="3" inputmode="numeric">
+    <label>D</label><input maxlength="2" inputmode="numeric">
+    <label>B</label><input maxlength="2" inputmode="numeric">
+    <label>W</label><input maxlength="2" inputmode="numeric">
+    <label>C</label><input maxlength="3" inputmode="numeric">
+  </div>`;
+}
+function cmpt(p){
+  return [1,2,3,4].map(n=>`
+    <div class="cmpt">
+      <label>CMPT ${n}</label>
+      <input>
+    </div>`).join("");
+}
+function tt(){
+  return `
+  <div class="row">
+    <label>T/T</label><input maxlength="4" inputmode="numeric">
+    <label>T/B</label><input maxlength="4" inputmode="numeric">
+  </div>`;
 }
 
-function resetTime() {
-  setTime();
+/* ===== save ===== */
+function saveMemo(){
+  const title="7C/HL";
+  memos.push({title});
+  draw();
+  closeModal();
 }
 
-function saveMemo() {
-  const inputs = document.querySelectorAll(".modal-content input");
-  const title = `7C[${inputs[0].value}] HL[${inputs[1].value}]`;
-  memos.push(title);
-  renderMemos();
-  closeMemo();
-}
-
-function renderMemos() {
-  const list = document.getElementById("memoList");
-  list.innerHTML = "";
-  memos.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "memo-item";
-    div.textContent = m;
-    div.onclick = openMemo;
-    list.appendChild(div);
+function draw(){
+  memoList.innerHTML="";
+  memos.forEach((m,i)=>{
+    const d=document.createElement("div");
+    d.className="memo";
+    d.innerHTML=`
+      <input type="checkbox">
+      <div class="memo-title">${m.title}</div>`;
+    memoList.appendChild(d);
   });
 }
 
-function deleteMemo() {
-  memos.pop();
-  renderMemos();
+function deleteSelected(){
+  const checks=[...document.querySelectorAll(".memo input")];
+  memos=memos.filter((_,i)=>!checks[i].checked);
+  draw();
 }
 
-function autoNext(el) {
-  if (el.value.length === el.maxLength) {
-    const inputs = Array.from(document.querySelectorAll("input"));
-    const idx = inputs.indexOf(el);
-    if (inputs[idx + 1]) inputs[idx + 1].focus();
-  }
+/* ===== photo ===== */
+function addPhoto(){
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/*";
+  input.onchange=e=>{
+    photoImg.src=URL.createObjectURL(e.target.files[0]);
+  };
+  input.click();
 }
+function closePhoto(){
+  photo.style.display="none";
+}
+document.body.ondblclick=()=>{
+  if(photoImg.src){
+    photo.style.display="block";
+  }
+};
 </script>
 
 </body>
