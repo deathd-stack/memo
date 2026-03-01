@@ -6,64 +6,63 @@
 <title>JAS MEMO VER.1</title>
 
 <style>
-body{
+body {
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,sans-serif;
   background:#ff8c00;
-}
-header{
-  text-align:center;
-  padding:18px;
-  font-size:20px;
-  font-weight:bold;
   color:white;
 }
-.container{ padding:16px; }
 
-button{
+header {
+  text-align:center;
+  padding:20px;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.container {
+  padding:16px;
+}
+
+button {
   width:100%;
   padding:14px;
   margin-bottom:10px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   font-size:16px;
 }
-.memoBtn{ background:white; color:#ff8c00; }
 
-.memoCard{
-  padding:14px;
-  border-radius:12px;
+.memoBtn { background:white; color:#ff8c00; }
+.photoBtn { background:#ffe0b2; }
+.deleteBtn { background:#ffccbc; }
+
+.memoCard {
+  background:white;
+  color:black;
+  padding:10px;
+  border-radius:10px;
   margin-top:10px;
 }
-.white{ background:white; color:black; }
-.black{ background:black; color:white; }
 
-.modal{
-  position:fixed;
-  left:0; right:0; bottom:0;
-  background:white;
-  border-radius:20px 20px 0 0;
-  padding:16px;
-}
-.hidden{ display:none; }
+.hidden { display:none; }
 
-.row{ display:flex; gap:8px; }
-.row input{ flex:1; }
-
-input{
+input[type=text] {
+  width:100%;
   padding:6px;
   margin:4px 0;
-  width:100%;
+  font-size:14px;
 }
 
-.bottomRow{
-  display:flex;
-  gap:12px;
-  margin-top:10px;
+.redTime {
+  color:red;
+  font-weight:bold;
+  margin:8px 0;
 }
-.bottomRow div{ flex:1; }
 
-label{ font-size:13px; }
+img {
+  max-width:100%;
+}
 </style>
 </head>
 
@@ -72,108 +71,111 @@ label{ font-size:13px; }
 <header>JAS MEMO VER.1</header>
 
 <div class="container">
-<button class="memoBtn" onclick="newMemo()">메모 추가</button>
+
+<button class="memoBtn" onclick="openMemo()">메모 추가</button>
+<button class="deleteBtn" onclick="deleteMemo()">메모 삭제</button>
+<button class="photoBtn" onclick="addPhoto()">사진 추가</button>
+
 <div id="memoList"></div>
+
+<div id="memoEditor" class="hidden memoCard">
+  <div onclick="setTime()" ondblclick="setTime()">
+    시간: <span id="time" class="redTime">눌러서 입력</span>
+  </div>
+
+  <div>
+    7C <input maxlength="4" oninput="num(this,4)">
+    HL <input maxlength="4" oninput="num(this,4)">
+  </div>
+
+  <hr>
+
+  <div>
+    CMPT1 <input>
+    CMPT2 <input>
+    CMPT3 <input>
+    CMPT4 <input>
+  </div>
+
+  <hr>
+
+  <div>
+    T <input maxlength="3" oninput="num(this,3)">
+    D <input maxlength="2" oninput="num(this,2)">
+    B <input maxlength="2" oninput="num(this,2)">
+    W <input maxlength="2" oninput="num(this,2)">
+    C <input maxlength="3" oninput="num(this,3)">
+  </div>
+
+  <button class="memoBtn" onclick="saveMemo()">저장</button>
 </div>
 
-<div id="editor" class="modal hidden"></div>
+<div id="photoViewer" class="hidden memoCard" onclick="closePhoto()">
+  <img id="photo">
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+
+</div>
 
 <script>
 let memos = JSON.parse(localStorage.getItem("memos")||"[]");
-let editIndex=null;
+let photo = localStorage.getItem("photo");
 
-function num(el,n){
-  el.value = el.value.replace(/[^0-9]/g,"").slice(0,n);
+function num(el,n){ el.value = el.value.replace(/[^0-9]/g,"").slice(0,n); }
+
+function setTime(){
+  document.getElementById("time").innerText =
+    new Date().toLocaleTimeString();
+}
+
+function openMemo(){
+  document.getElementById("memoEditor").classList.remove("hidden");
+}
+
+function saveMemo(){
+  memos.push(document.getElementById("memoEditor").innerHTML);
+  localStorage.setItem("memos",JSON.stringify(memos));
+  render();
 }
 
 function render(){
-  memoList.innerHTML="";
+  let list=document.getElementById("memoList");
+  list.innerHTML="";
   memos.forEach((m,i)=>{
-    const even = parseInt(m.c7)%2===0;
-    memoList.innerHTML+=`
-    <div class="memoCard ${even?"black":"white"}" onclick="openMemo(${i})">
-      7C[${m.c7}] HL[${m.hl}]
+    list.innerHTML+=`<div class="memoCard">
+    <input type="checkbox" value="${i}"> 메모 ${i+1}
     </div>`;
   });
 }
 
-function newMemo(){
-  editIndex=null;
-  openEditor({
-    c7:"",hl:"",
-    t:"",d:"",b:"",w:"",c:"",
-    tt:"",tb:""
-  });
-}
-
-function openMemo(i){
-  editIndex=i;
-  openEditor(memos[i]);
-}
-
-function openEditor(m){
-  const showBottom = parseInt(m.c7)%2===1;
-  editor.innerHTML=`
-  <button onclick="closeEditor()">← 뒤로</button>
-
-  <label>7C</label>
-  <input value="${m.c7}" oninput="num(this,4);toggleBottom()">
-
-  <label>HL</label>
-  <input value="${m.hl}" oninput="num(this,4)">
-
-  <hr>
-
-  <div class="row">
-    <input placeholder="T" value="${m.t}" oninput="num(this,3)">
-    <input placeholder="D" value="${m.d}" oninput="num(this,2)">
-    <input placeholder="B" value="${m.b}" oninput="num(this,2)">
-    <input placeholder="W" value="${m.w}" oninput="num(this,2)">
-    <input placeholder="C" value="${m.c}" oninput="num(this,3)">
-  </div>
-
-  <div id="bottom" class="${showBottom?"":"hidden"}">
-    <hr>
-    <div class="bottomRow">
-      <div>
-        <label>T/T</label>
-        <input value="${m.tt}" oninput="num(this,4)">
-      </div>
-      <div>
-        <label>T/B</label>
-        <input value="${m.tb}" oninput="num(this,4)">
-      </div>
-    </div>
-  </div>
-
-  <button class="memoBtn" onclick="save()">저장</button>
-  `;
-  editor.classList.remove("hidden");
-}
-
-function toggleBottom(){
-  const c7 = editor.querySelectorAll("input")[0].value;
-  document.getElementById("bottom").classList.toggle(
-    "hidden", parseInt(c7)%2===0
-  );
-}
-
-function closeEditor(){
-  editor.classList.add("hidden");
-}
-
-function save(){
-  const i = editor.querySelectorAll("input");
-  const m={
-    c7:i[0].value, hl:i[1].value,
-    t:i[2].value, d:i[3].value,
-    b:i[4].value, w:i[5].value, c:i[6].value,
-    tt:i[7]?.value||"", tb:i[8]?.value||""
-  };
-  if(editIndex===null) memos.push(m);
-  else memos[editIndex]=m;
+function deleteMemo(){
+  let checks=document.querySelectorAll("input[type=checkbox]:checked");
+  let idx=[...checks].map(c=>c.value).sort((a,b)=>b-a);
+  idx.forEach(i=>memos.splice(i,1));
   localStorage.setItem("memos",JSON.stringify(memos));
-  closeEditor(); render();
+  render();
+}
+
+function addPhoto(){
+  document.getElementById("file").click();
+}
+
+file.onchange=e=>{
+  let r=new FileReader();
+  r.onload=()=>{ localStorage.setItem("photo",r.result); }
+  r.readAsDataURL(e.target.files[0]);
+};
+
+document.body.ondblclick=()=>{
+  if(localStorage.getItem("photo")){
+    document.getElementById("photo").src=localStorage.getItem("photo");
+    document.getElementById("photoViewer").classList.remove("hidden");
+  }
+};
+
+function closePhoto(){
+  document.getElementById("photoViewer").classList.add("hidden");
 }
 
 render();
