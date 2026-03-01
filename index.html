@@ -16,57 +16,102 @@ body{
 }
 header{
   text-align:center;
-  padding:14px;
-  font-size:1.4rem;
+  padding:16px;
+  font-size:2.1rem; /* 기본보다 +10 이상 */
   font-weight:900;
 }
 .controls{
   display:flex;
-  gap:8px;
+  gap:10px;
   justify-content:center;
 }
 button{
-  padding:8px 14px;
+  padding:10px 16px;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   background:#fff;
   font-weight:800;
 }
-#memoList{padding:10px;}
+#memoList{padding:12px;}
 .memo{
   background:#fff;
-  border-radius:12px;
-  padding:10px;
-  margin-bottom:8px;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
   display:flex;
-  gap:8px;
+  gap:10px;
   align-items:center;
 }
-.memo-title{font-weight:900;cursor:pointer;}
+.memo-title{
+  font-weight:900;
+  cursor:pointer;
+}
 .modal{
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.5);
-  display:none;justify-content:center;align-items:center;
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
 .box{
   background:#fff;
   width:95%;
   max-height:90vh;
   overflow:auto;
-  border-radius:14px;
-  padding:14px;
+  border-radius:16px;
+  padding:16px;
 }
-.row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+}
 input{
   width:64px;
   text-align:center;
-  font-weight:700;
+  font-weight:800;
+  font-size:1rem;
 }
-.cmpt{display:flex;gap:6px;margin-bottom:4px;}
-.cmpt label{width:80px;}
-.red{color:red;font-weight:900;cursor:pointer;}
-textarea{width:100%;height:60px;font-weight:600;}
-.section-title{font-weight:900;margin-top:10px;}
+.cmpt{
+  display:flex;
+  gap:8px;
+  margin-bottom:4px;
+}
+.cmpt label{width:90px;}
+.red{
+  color:red;
+  font-weight:900;
+  cursor:pointer;
+  margin-bottom:8px;
+}
+textarea{
+  width:100%;
+  height:70px;
+  font-weight:700;
+  margin-top:6px;
+}
+.section-title{
+  font-weight:900;
+  margin-top:12px;
+}
+.hidden{display:none}
+
+/* 사진 */
+#photoViewer{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+#photoViewer img{
+  max-width:100%;
+  max-height:100%;
+  touch-action:manipulation;
+}
 </style>
 </head>
 
@@ -77,14 +122,16 @@ textarea{width:100%;height:60px;font-weight:600;}
 <div class="controls">
   <button onclick="newMemo()">메모 추가</button>
   <button onclick="deleteSelected()">메모 삭제</button>
+  <button onclick="addPhoto()">사진 추가</button>
 </div>
 
 <div id="memoList"></div>
 
+<!-- 메모 모달 -->
 <div class="modal" id="modal">
 <div class="box">
   <div class="row">
-    <label><input type="checkbox" id="inChk"> INBOUND</label>&nbsp;&nbsp;
+    <label><input type="checkbox" id="inChk"> INBOUND</label>
     <label><input type="checkbox" id="outChk"> OUTBOUND</label>
   </div>
 
@@ -101,14 +148,32 @@ textarea{width:100%;height:60px;font-weight:600;}
 </div>
 </div>
 
+<!-- 사진 -->
+<div id="photoViewer" ondblclick="hidePhoto()">
+  <img id="photoImg">
+</div>
+
 <script>
 let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let editId=null;
+let photo=null;
+
+/* 숫자 자동 이동 */
+document.addEventListener("input",e=>{
+  if(e.target.tagName!=="INPUT")return;
+  const max=e.target.maxLength;
+  if(max>0 && e.target.value.length>=max){
+    const inputs=[...document.querySelectorAll("input")];
+    const i=inputs.indexOf(e.target);
+    if(inputs[i+1]) inputs[i+1].focus();
+  }
+});
 
 function newMemo(){
   editId=null;
   modal.style.display="flex";
-  inChk.checked=false; outChk.checked=false;
+  inChk.checked=false;
+  outChk.checked=false;
   time.textContent="--:--";
   sections.innerHTML="";
   note.value="";
@@ -128,26 +193,28 @@ function section(type){
 return `
 <div class="section-title">${type}</div>
 <div class="row">
-<label>7C</label><input data-k="${type}-c7" maxlength="4">
-<label>HL</label><input data-k="${type}-hl" maxlength="4">
+<label>7C</label><input maxlength="4" data-k="${type}-c7">
+<label>HL</label><input maxlength="4" data-k="${type}-hl">
 </div>
 ${[1,2,3,4].map(i=>`
-<div class="cmpt"><label>CMPT ${i}</label>
-<input data-k="${type}-cmpt${i}"></div>`).join("")}
+<div class="cmpt">
+<label>CMPT ${i}</label>
+<input data-k="${type}-cmpt${i}">
+</div>`).join("")}
 <div class="row">
-<label>T</label><input data-k="${type}-t" maxlength="3">
-<label>D</label><input data-k="${type}-d" maxlength="2">
-<label>B</label><input data-k="${type}-b" maxlength="2">
+<label>T</label><input maxlength="3" data-k="${type}-t">
+<label>D</label><input maxlength="2" data-k="${type}-d">
+<label>B</label><input maxlength="2" data-k="${type}-b">
 </div>
 <div class="row">
-<label>W</label><input data-k="${type}-w" maxlength="2">
-<label>C</label><input data-k="${type}-c" maxlength="3">
-<label>COB</label><input data-k="${type}-cob" maxlength="3">
+<label>W</label><input maxlength="2" data-k="${type}-w">
+<label>C</label><input maxlength="3" data-k="${type}-c">
+<label>COB</label><input maxlength="3" data-k="${type}-cob">
 </div>
 ${type==="OUTBOUND"?`
 <div class="row">
-<label>T/T</label><input data-k="tt" maxlength="4">
-<label>T/B</label><input data-k="tb" maxlength="4">
+<label>T/T</label><input maxlength="4" data-k="tt">
+<label>T/B</label><input maxlength="4" data-k="tb">
 </div>`:""}
 `;
 }
@@ -192,7 +259,6 @@ const m=memos.find(x=>x.id===id);
 modal.style.display="flex";
 time.textContent=m.time;
 note.value=m.note||"";
-sections.innerHTML="";
 inChk.checked=!!m["INBOUND-c7"];
 outChk.checked=!!m["OUTBOUND-c7"];
 renderSections();
@@ -206,6 +272,25 @@ const checks=[...document.querySelectorAll(".memo input")];
 memos=memos.filter((_,i)=>!checks[i].checked);
 localStorage.setItem("jas_memos",JSON.stringify(memos));
 renderList();
+}
+
+/* 사진 */
+function addPhoto(){
+const f=document.createElement("input");
+f.type="file"; f.accept="image/*";
+f.onchange=e=>{
+const r=new FileReader();
+r.onload=()=>{photo=r.result; showPhoto();}
+r.readAsDataURL(e.target.files[0]);
+};
+f.click();
+}
+function showPhoto(){
+photoImg.src=photo;
+photoViewer.style.display="flex";
+}
+function hidePhoto(){
+photoViewer.style.display="none";
 }
 
 renderList();
