@@ -2,19 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1, maximum-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>JAS MEMO VER 2</title>
 
 <style>
 body{
   margin:0;
   font-family:system-ui,-apple-system;
-  background:#ff9f1c url("jas-bg.png") center/cover no-repeat fixed;
+  background:#ff9f1c;
   font-weight:600;
 }
-
 header{
   text-align:center;
   padding:18px;
@@ -22,14 +19,12 @@ header{
   font-weight:900;
   cursor:pointer;
 }
-
 .controls{
   display:flex;
   justify-content:center;
   gap:12px;
   margin-bottom:10px;
 }
-
 button{
   padding:10px 16px;
   border:none;
@@ -38,9 +33,7 @@ button{
   font-weight:900;
   font-size:1.1rem;
 }
-
 #memoList{padding:12px;}
-
 .memo{
   background:#fff;
   border-radius:14px;
@@ -49,14 +42,11 @@ button{
   display:flex;
   gap:10px;
 }
-
 .memo-title{
   font-weight:900;
   cursor:pointer;
   line-height:1.5;
 }
-
-/* modal */
 .modal{
   position:fixed;
   inset:0;
@@ -65,7 +55,6 @@ button{
   justify-content:center;
   align-items:center;
 }
-
 .box{
   background:#fff;
   width:95%;
@@ -74,123 +63,72 @@ button{
   border-radius:16px;
   padding:16px;
 }
-
 .row{
   display:flex;
   gap:10px;
   align-items:center;
   margin-bottom:6px;
+  flex-wrap:wrap;
 }
-
 input{
   width:70px;
   font-weight:800;
-  font-size:1rem;
 }
-
-input[data-long]{
-  width:260px;
-  padding-left:10px;
-  text-align:left;
-}
-
-.section{
-  margin-top:16px;
-}
-
+input[data-long]{width:260px}
+.section{margin-top:16px}
 .section-title{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   font-weight:900;
 }
-
 .time{
   color:red;
-  font-weight:900;
   cursor:pointer;
 }
-
-.tttb{
-  display:flex;
-  gap:12px;
-  margin-bottom:8px;
-}
-
 textarea{
   width:100%;
   height:70px;
-  margin-top:6px;
   font-weight:700;
-}
-
-/* photo */
-#photoLayer{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-
-#photoLayer img{
-  max-width:100%;
-  max-height:100%;
 }
 </style>
 </head>
 
 <body>
 
-<header onclick="openPhoto()">JAS MEMO VER 2</header>
+<header>JAS MEMO VER 2</header>
 
 <div class="controls">
   <button onclick="newMemo()">ADD</button>
   <button onclick="deleteSelected()">DELETE</button>
-  <button onclick="addPhoto()">PHOTO</button>
 </div>
 
 <div id="memoList"></div>
-<input type="file" id="photoInput" accept="image/*" hidden>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
 <div class="box">
 
-  <div class="row" style="justify-content:center">
-    <input type="checkbox" id="inChk"> INBOUND
-    <span style="width:30px"></span>
-    <input type="checkbox" id="outChk"> OUTBOUND
-  </div>
-
-  <div id="sections"></div>
-
-  <div class="row">
-    <button onclick="saveMemo()">SAVE</button>
-    <button onclick="closeModal()">CLOSE</button>
-  </div>
-
-</div>
+<div class="row" style="justify-content:center">
+  <input type="checkbox" id="inChk"> INBOUND
+  <span style="width:30px"></span>
+  <input type="checkbox" id="outChk"> OUTBOUND
 </div>
 
-<!-- PHOTO -->
-<div id="photoLayer" ondblclick="closePhoto()">
-  <img id="photoImg">
+<div id="sections"></div>
+
+<div class="row">
+  <button onclick="saveMemo()">SAVE</button>
+  <button onclick="closeModal()">CLOSE</button>
+</div>
+
+</div>
 </div>
 
 <script>
 const modal = document.getElementById("modal");
 const sections = document.getElementById("sections");
 const memoList = document.getElementById("memoList");
-const photoInput = document.getElementById("photoInput");
-const photoLayer = document.getElementById("photoLayer");
-const photoImg = document.getElementById("photoImg");
-
 let memos = JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let editId=null;
-let photo = localStorage.getItem("jas_photo");
 
 function now(){
   const d=new Date();
@@ -204,7 +142,6 @@ function newMemo(){
   sections.innerHTML="";
   modal.style.display="flex";
 }
-
 function closeModal(){ modal.style.display="none"; }
 
 inChk.onchange = outChk.onchange = renderSections;
@@ -219,38 +156,34 @@ function makeSection(type){
   const d=document.createElement("div");
   d.className="section";
   d.innerHTML=`
-    <div class="section-title">
-      ${type}
-      <span class="time"
-        onclick="this.textContent=now()"
-        ondblclick="this.textContent=prompt('TIME',this.textContent)||this.textContent"
-        data-k="${type}-time">--:--</span>
-    </div>
+  <div class="section-title">
+    ${type}
+    <span class="time" data-k="${type}-time"
+      onclick="this.textContent=now()">--:--</span>
+  </div>
 
+  <div class="row">
+    7C <input data-k="${type}-c7">
+    HL <input data-k="HL">
+    T <input data-k="${type}-T">
+    D <input data-k="${type}-D">
+    BB <input data-k="${type}-BB">
+    C <input data-k="${type}-C">
+    W <input data-k="${type}-W">
+    COB <input data-k="${type}-COB">
+  </div>
+
+  ${[1,2,3,4].map(i=>`
     <div class="row">
-      7C <input maxlength="4" inputmode="numeric" data-k="${type}-c7">
-      HL <input maxlength="4" inputmode="numeric" data-k="HL">
-      # <input maxlength="3" inputmode="numeric" data-k="${type}-hash">
-    </div>
+      CMPT ${i}
+      <input data-long data-k="${type}-cmpt${i}" value="${i<=2?'F':''}">
+    </div>`).join("")}
 
-    ${[1,2,3,4].map(i=>`
-      <div class="row">
-        CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}" value="${i<=2?'F':''}">
-      </div>`).join("")}
-
-    ${type==="OUTBOUND"?`
-    <div class="tttb">
-      T/T <input maxlength="4" data-k="OUTBOUND-tt">
-      T/B <input maxlength="4" data-k="OUTBOUND-tb">
-    </div>`:""}
-
-    <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
+  <textarea data-k="${type}-note" placeholder="특이사항"></textarea>
   `;
   return d;
 }
 
-/* HL 동기화 */
 document.addEventListener("input",e=>{
   if(e.target.dataset.k==="HL"){
     document.querySelectorAll('[data-k="HL"]').forEach(i=>{
@@ -259,31 +192,29 @@ document.addEventListener("input",e=>{
   }
 });
 
-/* SAVE */
 function saveMemo(){
   const data={id:editId??Date.now()};
   document.querySelectorAll("[data-k]").forEach(i=>{
     data[i.dataset.k]=i.value || i.textContent;
   });
   editId
-    ? memos[memos.findIndex(m=>m.id===editId)] = data
+    ? memos[memos.findIndex(m=>m.id===editId)]=data
     : memos.push(data);
-
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeModal(); renderList();
 }
 
 function renderList(){
   memoList.innerHTML="";
-  memos.forEach(m=>{
+  memos.forEach((m,i)=>{
     memoList.innerHTML+=`
-      <div class="memo">
-        <input type="checkbox">
-        <div class="memo-title" onclick="editMemo(${m.id})">
-          ${m["INBOUND-c7"]?`IN 7C[${m["INBOUND-c7"]}] HL[${m.HL||""}]`:""}<br>
-          ${m["OUTBOUND-c7"]?`OUT 7C[${m["OUTBOUND-c7"]}]`:""}
-        </div>
-      </div>`;
+    <div class="memo">
+      <input type="checkbox">
+      <div class="memo-title" onclick="editMemo(${m.id})">
+        ${m["INBOUND-c7"]?`IN 7C[${m["INBOUND-c7"]}] HL[${m.HL||""}]`:""}<br>
+        ${m["OUTBOUND-c7"]?`OUT 7C[${m["OUTBOUND-c7"]}]`:""}
+      </div>
+    </div>`;
   });
 }
 
@@ -296,35 +227,15 @@ function editMemo(id){
   renderSections();
   document.querySelectorAll("[data-k]").forEach(i=>{
     if(i.tagName==="SPAN") i.textContent=m[i.dataset.k]||"--:--";
-    else i.value=m[i.dataset.k]||"";
+    else i.value=m[i.dataset.k]||i.value||"";
   });
 }
 
-/* DELETE */
 function deleteSelected(){
   const c=[...document.querySelectorAll(".memo input")];
   memos=memos.filter((_,i)=>!c[i].checked);
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   renderList();
-}
-
-/* PHOTO */
-function addPhoto(){ photoInput.click(); }
-photoInput.onchange=e=>{
-  const f=e.target.files[0];
-  if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{ photo=r.result; localStorage.setItem("jas_photo",photo); };
-  r.readAsDataURL(f);
-};
-
-function openPhoto(){
-  if(!photo) return;
-  photoImg.src=photo;
-  photoLayer.style.display="flex";
-}
-function closePhoto(){
-  photoLayer.style.display="none";
 }
 
 renderList();
