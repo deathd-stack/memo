@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <title>JAS MEMO VER 2</title>
 
@@ -10,14 +11,14 @@
 body{
   margin:0;
   font-family:system-ui,-apple-system;
-  background:#ff9f1c url("./jas-bg.png") center / cover no-repeat fixed;
+  background:#ff9f1c url("jas-bg.png") center/cover no-repeat fixed;
   font-weight:600;
 }
 
 header{
   text-align:center;
-  padding:20px;
-  font-size:2.4rem;
+  padding:18px;
+  font-size:2.2rem;
   font-weight:900;
   cursor:pointer;
 }
@@ -30,33 +31,29 @@ header{
 }
 
 button{
-  padding:10px 18px;
+  padding:10px 16px;
   border:none;
-  border-radius:14px;
+  border-radius:12px;
   background:#fff;
   font-weight:900;
   font-size:1.1rem;
 }
 
-#memoList{ padding:12px; }
+#memoList{padding:12px;}
 
 .memo{
   background:#fff;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:12px;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
   display:flex;
   gap:10px;
-  align-items:flex-start;
 }
 
-.memo-lines{
+.memo-title{
   font-weight:900;
+  cursor:pointer;
   line-height:1.5;
-}
-
-.memo-lines div{
-  white-space:nowrap;
 }
 
 /* modal */
@@ -74,7 +71,7 @@ button{
   width:95%;
   max-height:90vh;
   overflow:auto;
-  border-radius:18px;
+  border-radius:16px;
   padding:16px;
 }
 
@@ -86,15 +83,20 @@ button{
 }
 
 input{
-  width:72px;
-  text-align:center;
+  width:70px;
   font-weight:800;
   font-size:1rem;
 }
 
-input[data-long]{ width:260px; }
+input[data-long]{
+  width:260px;
+  padding-left:10px;
+  text-align:left;
+}
 
-.section{ margin-top:16px; }
+.section{
+  margin-top:16px;
+}
 
 .section-title{
   display:flex;
@@ -107,6 +109,12 @@ input[data-long]{ width:260px; }
   color:red;
   font-weight:900;
   cursor:pointer;
+}
+
+.tttb{
+  display:flex;
+  gap:12px;
+  margin-bottom:8px;
 }
 
 textarea{
@@ -130,7 +138,6 @@ textarea{
 #photoLayer img{
   max-width:100%;
   max-height:100%;
-  transform:scale(1);
 }
 </style>
 </head>
@@ -150,22 +157,22 @@ textarea{
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-  <div class="box">
+<div class="box">
 
-    <div class="row" style="justify-content:center">
-      <input type="checkbox" id="inChk"> INBOUND
-      <span style="width:30px"></span>
-      <input type="checkbox" id="outChk"> OUTBOUND
-    </div>
-
-    <div id="sections"></div>
-
-    <div class="row">
-      <button onclick="saveMemo()">SAVE</button>
-      <button onclick="closeModal()">CLOSE</button>
-    </div>
-
+  <div class="row" style="justify-content:center">
+    <input type="checkbox" id="inChk"> INBOUND
+    <span style="width:30px"></span>
+    <input type="checkbox" id="outChk"> OUTBOUND
   </div>
+
+  <div id="sections"></div>
+
+  <div class="row">
+    <button onclick="saveMemo()">SAVE</button>
+    <button onclick="closeModal()">CLOSE</button>
+  </div>
+
+</div>
 </div>
 
 <!-- PHOTO -->
@@ -184,7 +191,6 @@ const photoImg = document.getElementById("photoImg");
 let memos = JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let editId=null;
 let photo = localStorage.getItem("jas_photo");
-let scale=1;
 
 function now(){
   const d=new Date();
@@ -215,19 +221,29 @@ function makeSection(type){
   d.innerHTML=`
     <div class="section-title">
       ${type}
-      <span class="time" onclick="this.textContent=now()">--:--</span>
+      <span class="time"
+        onclick="this.textContent=now()"
+        ondblclick="this.textContent=prompt('TIME',this.textContent)||this.textContent"
+        data-k="${type}-time">--:--</span>
     </div>
 
     <div class="row">
       7C <input maxlength="4" inputmode="numeric" data-k="${type}-c7">
       HL <input maxlength="4" inputmode="numeric" data-k="HL">
+      # <input maxlength="3" inputmode="numeric" data-k="${type}-hash">
     </div>
 
     ${[1,2,3,4].map(i=>`
       <div class="row">
         CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}">
+        <input data-long data-k="${type}-cmpt${i}" value="${i<=2?'F':''}">
       </div>`).join("")}
+
+    ${type==="OUTBOUND"?`
+    <div class="tttb">
+      T/T <input maxlength="4" data-k="OUTBOUND-tt">
+      T/B <input maxlength="4" data-k="OUTBOUND-tb">
+    </div>`:""}
 
     <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
   `;
@@ -247,9 +263,8 @@ document.addEventListener("input",e=>{
 function saveMemo(){
   const data={id:editId??Date.now()};
   document.querySelectorAll("[data-k]").forEach(i=>{
-    data[i.dataset.k]=i.value;
+    data[i.dataset.k]=i.value || i.textContent;
   });
-
   editId
     ? memos[memos.findIndex(m=>m.id===editId)] = data
     : memos.push(data);
@@ -264,9 +279,9 @@ function renderList(){
     memoList.innerHTML+=`
       <div class="memo">
         <input type="checkbox">
-        <div class="memo-lines" onclick="editMemo(${m.id})">
-          ${m["INBOUND-c7"] ? `<div>IN 7C[${m["INBOUND-c7"]}] HL[${m.HL||""}]</div>` : ""}
-          ${m["OUTBOUND-c7"] ? `<div>OUT 7C[${m["OUTBOUND-c7"]}]</div>` : ""}
+        <div class="memo-title" onclick="editMemo(${m.id})">
+          ${m["INBOUND-c7"]?`IN 7C[${m["INBOUND-c7"]}] HL[${m.HL||""}]`:""}<br>
+          ${m["OUTBOUND-c7"]?`OUT 7C[${m["OUTBOUND-c7"]}]`:""}
         </div>
       </div>`;
   });
@@ -280,7 +295,8 @@ function editMemo(id){
   outChk.checked=!!m["OUTBOUND-c7"];
   renderSections();
   document.querySelectorAll("[data-k]").forEach(i=>{
-    i.value=m[i.dataset.k]||"";
+    if(i.tagName==="SPAN") i.textContent=m[i.dataset.k]||"--:--";
+    else i.value=m[i.dataset.k]||"";
   });
 }
 
@@ -304,14 +320,11 @@ photoInput.onchange=e=>{
 
 function openPhoto(){
   if(!photo) return;
-  scale=1;
   photoImg.src=photo;
-  photoImg.style.transform="scale(1)";
   photoLayer.style.display="flex";
 }
 function closePhoto(){
   photoLayer.style.display="none";
-  scale=1;
 }
 
 renderList();
