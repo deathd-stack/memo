@@ -1,271 +1,223 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>JAS MEMO VER 2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작업 메모</title>
 
 <style>
-body{margin:0;font-family:-apple-system;background:#ff9f1c;font-weight:600;}
-header{text-align:center;padding:22px;font-size:2.6rem;font-weight:900;cursor:pointer;}
-.controls{display:flex;justify-content:center;gap:14px;margin-bottom:14px;}
-button{padding:10px 16px;border:none;border-radius:16px;background:#fff;font-weight:900;}
-.memo{background:#fff;margin:12px;padding:14px;border-radius:18px;
-box-shadow:0 6px 14px rgba(0,0,0,.15);transition:.3s;}
-.memo.flash{animation:flash .6s;}
-@keyframes flash{50%{background:#ffe8b5;transform:scale(1.04);}}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  padding:15px;
+  background:#f2f2f2;
+}
 
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);
-display:none;justify-content:center;align-items:flex-end;}
-.box{background:#fff;width:100%;max-height:92vh;overflow:auto;
-border-radius:28px 28px 0 0;padding:18px;}
+.section{
+  background:white;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:15px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
 
-.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
-input{width:70px;padding:6px;font-weight:800;border-radius:10px;border:1px solid #ccc;}
-input[data-long]{width:100%;}
-.section{background:#f7f7f7;padding:12px;border-radius:14px;margin-top:14px;}
-textarea{width:100%;height:80px;border-radius:12px;padding:8px;border:1px solid #ccc;}
+input[type="number"]{
+  width:100%;
+  padding:12px;
+  font-size:18px;
+  margin-top:5px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
 
-.time{color:red;font-weight:900;margin-top:6px;}
+label{
+  font-weight:600;
+  display:block;
+  margin-top:10px;
+}
 
-#photoLayer{position:fixed;inset:0;background:black;display:none;
-justify-content:center;align-items:center;}
-#photoLayer img{max-width:100%;max-height:100%;}
+button{
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  background:#007aff;
+  color:white;
+  margin-top:10px;
+}
+
+button.save-animate{
+  background:#34c759;
+  transform:scale(1.05);
+  transition:0.3s;
+}
+
+textarea{
+  width:100%;
+  height:90px;
+  font-size:16px;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+}
+
+.row input{
+  flex:1;
+}
+
+.hidden{
+  display:none;
+}
+
+img{
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
+}
 </style>
 </head>
-
 <body>
 
-<header ondblclick="openPhoto()">JAS MEMO VER 2</header>
+<div class="section">
+<label><input type="checkbox" id="inbound"> INBOUND</label>
+<label><input type="checkbox" id="outbound" onchange="toggleOutbound()"> OUTBOUND</label>
 
-<div class="controls">
-  <button onclick="newMemo()">ADD</button>
-  <button onclick="deleteSelected()">DELETE</button>
-  <button onclick="addPhoto()">PHOTO</button>
+<label>7C (4자리)</label>
+<input type="number" id="sevenC" maxlength="4">
+
+<label>HL (4자리)</label>
+<input type="number" id="hl" maxlength="4">
+
+<label># (3자리)</label>
+<input type="number" id="hashNum" maxlength="3">
 </div>
 
-<div id="memoList"></div>
-<input type="file" id="photoInput" accept="image/*" hidden>
-
-<div class="modal" id="modal">
-<div class="box">
-
-<div class="row" style="justify-content:center">
-  <input type="checkbox" id="inChk"> INBOUND
-  <span style="width:30px"></span>
-  <input type="checkbox" id="outChk"> OUTBOUND
-</div>
-
-<div id="sections"></div>
+<div class="section" id="cmpt4">
+<h3>CMPT 4</h3>
 
 <div class="row">
-  <button onclick="saveMemo()">SAVE</button>
-  <button onclick="closeModal()">CLOSE</button>
+<label><input type="checkbox"> T</label>
+<label><input type="checkbox"> D</label>
+<label><input type="checkbox"> BB</label>
 </div>
 
+<div class="row">
+<label><input type="checkbox"> W</label>
+<label><input type="checkbox"> C</label>
+<label><input type="checkbox"> COB</label>
+</div>
+
+<div id="tttb" class="hidden">
+<div class="row">
+<label><input type="checkbox"> T/T</label>
+<label><input type="checkbox"> T/B</label>
+</div>
 </div>
 </div>
 
-<div id="photoLayer" ondblclick="closePhoto()">
-  <img id="photoImg">
+<div class="section">
+<label>메모</label>
+<textarea id="memo"></textarea>
+<div id="saveTime" style="margin-top:5px;color:#666;font-size:14px;"></div>
+<button id="saveBtn" onclick="saveData()">저장</button>
+</div>
+
+<div class="section">
+<label>사진</label>
+<input type="file" accept="image/*" capture="environment" onchange="loadPhoto(event)">
+<img id="preview">
 </div>
 
 <script>
-const modal=document.getElementById("modal");
-const sections=document.getElementById("sections");
-const memoList=document.getElementById("memoList");
-const photoInput=document.getElementById("photoInput");
-const photoLayer=document.getElementById("photoLayer");
-const photoImg=document.getElementById("photoImg");
-const inChk=document.getElementById("inChk");
-const outChk=document.getElementById("outChk");
-
-let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
-let photo=localStorage.getItem("jas_photo");
-let editId=null;
-
-/* 숫자 제한 */
-function onlyNum(val,len){
-  return (val||"").replace(/[^0-9]/g,'').slice(0,len);
+function toggleOutbound(){
+  const outbound=document.getElementById("outbound").checked;
+  document.getElementById("tttb").classList.toggle("hidden",!outbound);
 }
 
-document.addEventListener("input",e=>{
-  const k=e.target.dataset.k;
-  if(!k) return;
-
-  if(k==="HL"){
-    e.target.value=onlyNum(e.target.value,4);
-    document.querySelectorAll('[data-k="HL"]').forEach(i=>i.value=e.target.value);
-  }
-  if(k==="HASH"){
-    e.target.value=onlyNum(e.target.value,3);
-    document.querySelectorAll('[data-k="HASH"]').forEach(i=>i.value=e.target.value);
-  }
-  if(k.includes("-c7")){
-    e.target.value=onlyNum(e.target.value,4);   // ✅ 7C 4자리 고정
-  }
-  if(k.includes("-cob")){
-    e.target.value=onlyNum(e.target.value,3);
-  }
-  if(k.includes("-d")||k.includes("-bb")||k.includes("-w")||k.includes("-c")){
-    e.target.value=onlyNum(e.target.value,2);
-  }
-  if(k.includes("-tt")||k.includes("-tb")){
-    e.target.value=onlyNum(e.target.value,4);
-  }
-});
-
-/* 섹션 */
-function makeSection(type){
-  const d=document.createElement("div");
-  d.className="section";
-
-  const extraOutbound = type==="OUTBOUND" ? `
-    <div class="row">
-      T/T <input data-k="${type}-tt">
-      T/B <input data-k="${type}-tb">
-    </div>
-  ` : "";
-
-  d.innerHTML=`
-    <div class="row">
-      7C <input data-k="${type}-c7">
-      HL <input data-k="HL">
-      # <input data-k="HASH">
-    </div>
-
-    ${[1,2,3,4].map(i=>`
-      <div class="row">
-        CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}">
-      </div>`).join("")}
-
-    <div class="row">
-      T <input data-k="${type}-t">
-      D <input data-k="${type}-d">
-      BB <input data-k="${type}-bb">
-    </div>
-
-    <div class="row">
-      W <input data-k="${type}-w">
-      C <input data-k="${type}-c">
-      COB <input data-k="${type}-cob">
-    </div>
-
-    ${extraOutbound}
-
-    <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
-  `;
-  return d;
+function padInput(id,length){
+  const el=document.getElementById(id);
+  el.value=el.value.replace(/\D/g,'').slice(0,length);
 }
 
-inChk.onchange=outChk.onchange=()=>{
-  sections.innerHTML="";
-  if(inChk.checked) sections.append(makeSection("INBOUND"));
-  if(outChk.checked) sections.append(makeSection("OUTBOUND"));
-};
+document.getElementById("sevenC").addEventListener("input",()=>padInput("sevenC",4));
+document.getElementById("hl").addEventListener("input",()=>padInput("hl",4));
+document.getElementById("hashNum").addEventListener("input",()=>padInput("hashNum",3));
 
-function newMemo(){
-  editId=null;
-  inChk.checked=false;
-  outChk.checked=false;
-  sections.innerHTML="";
-  modal.style.display="flex";
-}
+function generateMemo(){
+  const inbound=document.getElementById("inbound").checked;
+  const outbound=document.getElementById("outbound").checked;
 
-function closeModal(){modal.style.display="none";}
+  const sevenC=document.getElementById("sevenC").value.padStart(4,"0");
+  const hl=document.getElementById("hl").value.padStart(4,"0");
+  const hash=document.getElementById("hashNum").value.padStart(3,"0");
 
-function saveMemo(){
-  const data={id:editId??Date.now()};
-  document.querySelectorAll("[data-k]").forEach(i=>{
-    data[i.dataset.k]=i.value;
-  });
-  data.hasIn=inChk.checked;
-  data.hasOut=outChk.checked;
-  data.time=new Date().toLocaleTimeString().slice(0,5);
+  let memoText="";
 
-  if(editId){
-    memos[memos.findIndex(m=>m.id===editId)]=data;
-  }else{
-    memos.push(data);
+  if(inbound && outbound){
+    memoText=`IN 7C ${sevenC} HL ${hl}\nOUT 7C ${sevenC} # ${hash}`;
+  }
+  else if(inbound){
+    memoText=`IN 7C ${sevenC} HL ${hl} # ${hash}`;
+  }
+  else if(outbound){
+    memoText=`OUT 7C ${sevenC} HL ${hl} # ${hash}`;
   }
 
-  localStorage.setItem("jas_memos",JSON.stringify(memos));
-  closeModal();
-  renderList(data.id);
+  document.getElementById("memo").value=memoText;
 }
 
-function renderList(flashId){
-  memoList.innerHTML="";
-  memos.forEach(m=>{
-    const div=document.createElement("div");
-    div.className="memo";
-    if(m.id===flashId) div.classList.add("flash");
+function saveData(){
+  generateMemo();
 
-    let content="";
+  const now=new Date();
+  const timeString=
+  now.getFullYear()+"-"+
+  String(now.getMonth()+1).padStart(2,"0")+"-"+
+  String(now.getDate()).padStart(2,"0")+" "+
+  String(now.getHours()).padStart(2,"0")+":"+
+  String(now.getMinutes()).padStart(2,"0");
 
-    if(m.hasIn && m.hasOut){
-      content=`
-        <div>IN  7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""}</div>
-      `;
-    }else if(m.hasIn){
-      content=`<div>7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
-    }else if(m.hasOut){
-      content=`<div>7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
-    }
+  document.getElementById("saveTime").innerText=
+  `저장시간: ${timeString}`;
 
-    div.innerHTML=`
-      <div style="display:flex;gap:8px;">
-        <input type="checkbox" data-id="${m.id}">
-        <div style="flex:1;" onclick="editMemo(${m.id})">
-          ${content}
-          <div class="time">${m.time||""}</div>
-        </div>
-      </div>
-    `;
-    memoList.appendChild(div);
-  });
+  localStorage.setItem("memoData",document.getElementById("memo").value);
+  localStorage.setItem("saveTime",timeString);
+
+  const btn=document.getElementById("saveBtn");
+  btn.classList.add("save-animate");
+  setTimeout(()=>btn.classList.remove("save-animate"),800);
 }
 
-function editMemo(id){
-  const m=memos.find(x=>x.id===id);
-  editId=id;
-  modal.style.display="flex";
-  inChk.checked=m.hasIn;
-  outChk.checked=m.hasOut;
-  inChk.onchange();
-
-  setTimeout(()=>{
-    document.querySelectorAll("[data-k]").forEach(i=>{
-      i.value=m[i.dataset.k]||"";
-    });
-  },50);
+function loadPhoto(event){
+  const reader=new FileReader();
+  reader.onload=function(){
+    const img=document.getElementById("preview");
+    img.src=reader.result;
+    localStorage.setItem("photoData",reader.result);
+  }
+  reader.readAsDataURL(event.target.files[0]);
 }
 
-function deleteSelected(){
-  const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
-  const ids=[...checks].map(c=>Number(c.dataset.id));
-  memos=memos.filter(m=>!ids.includes(m.id));
-  localStorage.setItem("jas_memos",JSON.stringify(memos));
-  renderList();
+window.onload=function(){
+  const savedMemo=localStorage.getItem("memoData");
+  const savedTime=localStorage.getItem("saveTime");
+  const savedPhoto=localStorage.getItem("photoData");
+
+  if(savedMemo){
+    document.getElementById("memo").value=savedMemo;
+  }
+  if(savedTime){
+    document.getElementById("saveTime").innerText=`저장시간: ${savedTime}`;
+  }
+  if(savedPhoto){
+    document.getElementById("preview").src=savedPhoto;
+  }
 }
-
-/* 사진 */
-function addPhoto(){photoInput.click();}
-photoInput.onchange=e=>{
-  const f=e.target.files[0];
-  const r=new FileReader();
-  r.onload=()=>{
-    photo=r.result;
-    localStorage.setItem("jas_photo",photo);
-  };
-  r.readAsDataURL(f);
-};
-function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
-function closePhoto(){photoLayer.style.display="none";}
-
-renderList();
 </script>
 
 </body>
