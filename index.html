@@ -2,16 +2,15 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JAS MEMO VER 2</title>
 
 <style>
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont;
+  font-family:-apple-system;
   background:#ff9f1c;
   font-weight:600;
-  -webkit-tap-highlight-color:transparent;
 }
 
 header{
@@ -19,45 +18,39 @@ header{
   padding:22px;
   font-size:2.6rem;
   font-weight:900;
+  cursor:pointer;
 }
 
 .controls{
   display:flex;
   justify-content:center;
   gap:14px;
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
 
 button{
-  padding:12px 18px;
+  padding:10px 16px;
   border:none;
-  border-radius:18px;
+  border-radius:16px;
   background:#fff;
   font-weight:900;
-  font-size:1.1rem;
 }
-
-#memoList{padding:14px;}
 
 .memo{
   background:#fff;
-  border-radius:20px;
+  margin:12px;
   padding:14px;
-  margin-bottom:14px;
-  display:flex;
-  gap:12px;
-  box-shadow:0 6px 16px rgba(0,0,0,.15);
+  border-radius:18px;
+  box-shadow:0 6px 14px rgba(0,0,0,.15);
   transition:.3s;
 }
 
 .memo.flash{
-  animation:flash .6s ease;
+  animation:flash .6s;
 }
 
 @keyframes flash{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.05);background:#ffe8b5;}
-  100%{transform:scale(1)}
+  50%{background:#ffe8b5;transform:scale(1.04);}
 }
 
 .modal{
@@ -76,99 +69,146 @@ button{
   overflow:auto;
   border-radius:28px 28px 0 0;
   padding:18px;
-  transition:.25s;
-}
-
-.box.saving{
-  transform:scale(.96);
 }
 
 .row{
   display:flex;
-  gap:16px;
-  align-items:center;
-  margin-bottom:10px;
+  gap:12px;
   flex-wrap:wrap;
+  margin-bottom:10px;
+  align-items:center;
 }
 
 input{
-  width:60px;
+  width:70px;
+  padding:6px;
   font-weight:800;
-  font-size:1.05rem;
   border-radius:10px;
   border:1px solid #ccc;
-  padding:6px;
 }
 
 input[data-long]{width:100%;}
 
 .section{
-  margin-top:18px;
-  padding:12px;
-  border-radius:16px;
   background:#f7f7f7;
-}
-
-.section-title{
-  display:flex;
-  justify-content:space-between;
-  font-weight:900;
-  margin-bottom:8px;
+  padding:12px;
+  border-radius:14px;
+  margin-top:14px;
 }
 
 textarea{
   width:100%;
   height:80px;
-  border-radius:14px;
-  border:1px solid #ccc;
+  border-radius:12px;
   padding:8px;
-  font-weight:700;
+  border:1px solid #ccc;
+}
+
+#photoLayer{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+#photoLayer img{
+  max-width:100%;
+  max-height:100%;
 }
 </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER 2</header>
+<header ondblclick="openPhoto()">JAS MEMO VER 2</header>
 
 <div class="controls">
   <button onclick="newMemo()">ADD</button>
   <button onclick="deleteSelected()">DELETE</button>
+  <button onclick="addPhoto()">PHOTO</button>
 </div>
 
 <div id="memoList"></div>
+<input type="file" id="photoInput" accept="image/*" hidden>
 
 <div class="modal" id="modal">
 <div class="box" id="box">
 
-  <div class="row" style="justify-content:center">
-    <input type="checkbox" id="inChk"> INBOUND
-    <span style="width:30px"></span>
-    <input type="checkbox" id="outChk"> OUTBOUND
-  </div>
+<div class="row" style="justify-content:center">
+  <input type="checkbox" id="inChk"> INBOUND
+  <span style="width:30px"></span>
+  <input type="checkbox" id="outChk"> OUTBOUND
+</div>
 
-  <div id="sections"></div>
+<div id="sections"></div>
 
-  <div class="row">
-    <button onclick="saveMemo()">SAVE</button>
-    <button onclick="closeModal()">CLOSE</button>
-  </div>
+<div class="row">
+  <button onclick="saveMemo()">SAVE</button>
+  <button onclick="closeModal()">CLOSE</button>
+</div>
 
 </div>
+</div>
+
+<div id="photoLayer" ondblclick="closePhoto()">
+  <img id="photoImg">
 </div>
 
 <script>
 const modal=document.getElementById("modal");
-const box=document.getElementById("box");
 const sections=document.getElementById("sections");
 const memoList=document.getElementById("memoList");
+const photoInput=document.getElementById("photoInput");
+const photoLayer=document.getElementById("photoLayer");
+const photoImg=document.getElementById("photoImg");
 
 let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
+let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
-function now(){
-  return new Date().toLocaleTimeString("ko-KR",{hour12:false,hour:"2-digit",minute:"2-digit"});
+/* 숫자 + 자리수 고정 */
+function formatNumber(val,len){
+  val=val.replace(/[^0-9]/g,'');
+  if(!val) return "";
+  return val.slice(0,len).padStart(len,"0");
 }
+
+/* 공유 */
+document.addEventListener("input",e=>{
+  const k=e.target.dataset.k;
+  if(k==="HL"||k==="HASH"){
+    const len=k==="HL"?4:3;
+    e.target.value=formatNumber(e.target.value,len);
+    document.querySelectorAll(`[data-k="${k}"]`)
+      .forEach(i=>{if(i!==e.target)i.value=e.target.value;});
+  }
+  if(k?.includes("-c7")){
+    e.target.value=formatNumber(e.target.value,4);
+  }
+});
+
+/* 섹션 */
+function makeSection(type){
+  const d=document.createElement("div");
+  d.className="section";
+
+  d.innerHTML=`
+  <div class="row">
+    7C <input data-k="${type}-c7" inputmode="numeric">
+    HL <input data-k="HL" inputmode="numeric">
+    # <input data-k="HASH" inputmode="numeric">
+  </div>
+  `;
+  return d;
+}
+
+inChk.onchange=outChk.onchange=()=>{
+  sections.innerHTML="";
+  if(inChk.checked) sections.append(makeSection("IN"));
+  if(outChk.checked) sections.append(makeSection("OUT"));
+};
 
 function newMemo(){
   editId=null;
@@ -178,99 +218,20 @@ function newMemo(){
   modal.style.display="flex";
 }
 
-function closeModal(){ modal.style.display="none"; }
-
-inChk.onchange=outChk.onchange=renderSections;
-
-function renderSections(){
-  sections.innerHTML="";
-  if(inChk.checked) sections.append(makeSection("INBOUND"));
-  if(outChk.checked) sections.append(makeSection("OUTBOUND"));
-}
-
-function makeSection(type){
-  const d=document.createElement("div");
-  d.className="section";
-
-  const extraOutbound = type==="OUTBOUND" ? `
-    <div class="row">
-      T/T <input data-k="${type}-tt">
-      T/B <input data-k="${type}-tb">
-    </div>
-  ` : "";
-
-  d.innerHTML=`
-    <div class="section-title">
-      ${type}
-      <span onclick="this.textContent=now()" data-k="${type}-time">--:--</span>
-    </div>
-
-    <div class="row">
-      7C <input data-k="${type}-c7">
-      HL <input data-k="HL" inputmode="numeric">
-      # <input data-k="HASH" inputmode="numeric">
-    </div>
-
-    ${[1,2,3,4].map(i=>`
-      <div class="row">
-        CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}" value="${i<=2?'F':''}">
-      </div>`).join("")}
-
-    <div style="margin:18px 0 10px;padding:10px;border-radius:14px;background:#ececec;font-weight:900;">
-      작업 구역
-    </div>
-
-    <div class="row">
-      T <input data-k="${type}-t">
-      D <input data-k="${type}-d">
-      BB <input data-k="${type}-bb">
-    </div>
-
-    <div class="row">
-      W <input data-k="${type}-w">
-      C <input data-k="${type}-c">
-      COB <input data-k="${type}-cob">
-    </div>
-
-    ${extraOutbound}
-
-    <div style="margin:18px 0 8px;border-top:2px solid #ddd;"></div>
-
-    <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
-  `;
-
-  return d;
-}
-
-/* 숫자만 + 공유 */
-document.addEventListener("input",e=>{
-  const key=e.target.dataset.k;
-  if(key==="HL" || key==="HASH"){
-    e.target.value=e.target.value.replace(/[^0-9]/g,'');
-    document.querySelectorAll(`[data-k="${key}"]`)
-      .forEach(i=>{ if(i!==e.target) i.value=e.target.value; });
-  }
-});
+function closeModal(){modal.style.display="none";}
 
 function saveMemo(){
-  box.classList.add("saving");
+  const data={id:editId??Date.now()};
+  document.querySelectorAll("[data-k]").forEach(i=>{
+    data[i.dataset.k]=i.value;
+  });
+  editId
+    ? memos[memos.findIndex(m=>m.id===editId)]=data
+    : memos.push(data);
 
-  setTimeout(()=>{
-    const data={id:editId??Date.now()};
-    document.querySelectorAll("[data-k]").forEach(i=>{
-      data[i.dataset.k]=i.value||i.textContent;
-    });
-
-    editId
-      ? memos[memos.findIndex(m=>m.id===editId)]=data
-      : memos.push(data);
-
-    localStorage.setItem("jas_memos",JSON.stringify(memos));
-    box.classList.remove("saving");
-    closeModal();
-    renderList(data.id);
-  },250);
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  closeModal();
+  renderList(data.id);
 }
 
 function renderList(flashId){
@@ -280,33 +241,51 @@ function renderList(flashId){
     div.className="memo";
     if(m.id===flashId) div.classList.add("flash");
 
-    div.innerHTML=`
-      <input type="checkbox">
-      <div onclick="editMemo(${m.id})">
-        IN HL[${m.HL||""}] #[${m.HASH||""}]
-      </div>
-    `;
+    const hasIn=m["IN-c7"];
+    const hasOut=m["OUT-c7"];
+
+    if(hasIn && hasOut){
+      div.innerHTML=`
+        <div>IN  7C ${m["IN-c7"]||""} HL ${m.HL||""}</div>
+        <div>OUT 7C ${m["OUT-c7"]||""} # ${m.HASH||""}</div>
+      `;
+    }else{
+      const type=hasIn?"IN":"OUT";
+      div.innerHTML=`
+        <div>
+        7C ${m[`${type}-c7`]||""}
+        HL ${m.HL||""}
+        # ${m.HASH||""}
+        </div>
+      `;
+    }
+
     memoList.appendChild(div);
   });
 }
 
-function editMemo(id){
-  editId=id;
-  const m=memos.find(x=>x.id===id);
-  modal.style.display="flex";
-  inChk.checked=!!m["INBOUND-c7"];
-  outChk.checked=!!m["OUTBOUND-c7"];
-  renderSections();
-  document.querySelectorAll("[data-k]").forEach(i=>{
-    if(i.tagName==="SPAN") i.textContent=m[i.dataset.k]||"--:--";
-    else i.value=m[i.dataset.k]||"";
-  });
+/* 사진 */
+function addPhoto(){photoInput.click();}
+photoInput.onchange=e=>{
+  const f=e.target.files[0];
+  const r=new FileReader();
+  r.onload=()=>{
+    photo=r.result;
+    localStorage.setItem("jas_photo",photo);
+  };
+  r.readAsDataURL(f);
+};
+
+function openPhoto(){
+  if(!photo) return;
+  photoImg.src=photo;
+  photoLayer.style.display="flex";
 }
+function closePhoto(){photoLayer.style.display="none";}
 
 function deleteSelected(){
-  const c=[...document.querySelectorAll(".memo input")];
-  memos=memos.filter((_,i)=>!c[i].checked);
-  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  memos=[];
+  localStorage.removeItem("jas_memos");
   renderList();
 }
 
