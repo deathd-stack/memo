@@ -26,6 +26,8 @@ input[data-long]{width:100%;}
 .section{background:#f7f7f7;padding:12px;border-radius:14px;margin-top:14px;}
 textarea{width:100%;height:80px;border-radius:12px;padding:8px;border:1px solid #ccc;}
 
+.time{color:red;font-weight:900;margin-top:6px;}
+
 #photoLayer{position:fixed;inset:0;background:black;display:none;
 justify-content:center;align-items:center;}
 #photoLayer img{max-width:100%;max-height:100%;}
@@ -82,11 +84,9 @@ let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
-/* 숫자 고정 */
-function format(val,len){
-  val=(val||"").replace(/[^0-9]/g,'');
-  if(!val) return "";
-  return val.slice(0,len).padStart(len,"0");
+/* 숫자 제한 */
+function onlyNum(val,len){
+  return (val||"").replace(/[^0-9]/g,'').slice(0,len);
 }
 
 document.addEventListener("input",e=>{
@@ -94,15 +94,24 @@ document.addEventListener("input",e=>{
   if(!k) return;
 
   if(k==="HL"){
-    e.target.value=format(e.target.value,4);
+    e.target.value=onlyNum(e.target.value,4);
     document.querySelectorAll('[data-k="HL"]').forEach(i=>i.value=e.target.value);
   }
   if(k==="HASH"){
-    e.target.value=format(e.target.value,3);
+    e.target.value=onlyNum(e.target.value,3);
     document.querySelectorAll('[data-k="HASH"]').forEach(i=>i.value=e.target.value);
   }
   if(k.includes("-c7")){
-    e.target.value=format(e.target.value,4);
+    e.target.value=onlyNum(e.target.value,4);   // ✅ 7C 4자리 고정
+  }
+  if(k.includes("-cob")){
+    e.target.value=onlyNum(e.target.value,3);
+  }
+  if(k.includes("-d")||k.includes("-bb")||k.includes("-w")||k.includes("-c")){
+    e.target.value=onlyNum(e.target.value,2);
+  }
+  if(k.includes("-tt")||k.includes("-tb")){
+    e.target.value=onlyNum(e.target.value,4);
   }
 });
 
@@ -173,6 +182,7 @@ function saveMemo(){
   });
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
+  data.time=new Date().toLocaleTimeString().slice(0,5);
 
   if(editId){
     memos[memos.findIndex(m=>m.id===editId)]=data;
@@ -196,8 +206,8 @@ function renderList(flashId){
 
     if(m.hasIn && m.hasOut){
       content=`
-        <div>IN  7C ${m["INBOUND-c7"]||""} HL ${m.HL||""}</div>
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m.HASH||""}</div>
+        <div>IN  7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>
+        <div>OUT 7C ${m["OUTBOUND-c7"]||""}</div>
       `;
     }else if(m.hasIn){
       content=`<div>7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
@@ -210,6 +220,7 @@ function renderList(flashId){
         <input type="checkbox" data-id="${m.id}">
         <div style="flex:1;" onclick="editMemo(${m.id})">
           ${content}
+          <div class="time">${m.time||""}</div>
         </div>
       </div>
     `;
