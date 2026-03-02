@@ -2,50 +2,64 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>JAS MEMO VER 1.2.X</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+<title>JAS MEMO VER 2</title>
 
 <style>
 body{
   margin:0;
-  background:#ff9f1c;
-  font-family:system-ui;
-  font-size:1.15rem;
+  font-family:system-ui,-apple-system;
+  background:#ff9f1c url("./jas-bg.png") center / cover no-repeat fixed;
   font-weight:600;
 }
+
 header{
   text-align:center;
-  padding:16px;
-  font-size:2.1rem; /* 기본보다 +10 이상 */
-  font-weight:900;
-}
-.controls{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-}
-button{
-  padding:10px 16px;
-  border:none;
-  border-radius:12px;
-  background:#fff;
-  font-weight:800;
-}
-#memoList{padding:12px;}
-.memo{
-  background:#fff;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-.memo-title{
+  padding:20px;
+  font-size:2.4rem;
   font-weight:900;
   cursor:pointer;
 }
+
+.controls{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:14px;
+  background:#fff;
+  font-weight:900;
+  font-size:1.1rem;
+}
+
+#memoList{ padding:12px; }
+
+.memo{
+  background:#fff;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.memo-lines{
+  font-weight:900;
+  line-height:1.5;
+}
+
+.memo-lines div{
+  white-space:nowrap;
+}
+
+/* modal */
 .modal{
   position:fixed;
   inset:0;
@@ -54,243 +68,250 @@ button{
   justify-content:center;
   align-items:center;
 }
+
 .box{
   background:#fff;
   width:95%;
   max-height:90vh;
   overflow:auto;
-  border-radius:16px;
+  border-radius:18px;
   padding:16px;
 }
+
 .row{
   display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
   margin-bottom:6px;
 }
+
 input{
-  width:64px;
+  width:72px;
   text-align:center;
   font-weight:800;
   font-size:1rem;
 }
-.cmpt{
+
+input[data-long]{ width:260px; }
+
+.section{ margin-top:16px; }
+
+.section-title{
   display:flex;
-  gap:8px;
-  margin-bottom:4px;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
 }
-.cmpt label{width:90px;}
-.red{
+
+.time{
   color:red;
   font-weight:900;
   cursor:pointer;
-  margin-bottom:8px;
 }
+
 textarea{
   width:100%;
   height:70px;
-  font-weight:700;
   margin-top:6px;
+  font-weight:700;
 }
-.section-title{
-  font-weight:900;
-  margin-top:12px;
-}
-.hidden{display:none}
 
-/* 사진 */
-#photoViewer{
+/* photo */
+#photoLayer{
   position:fixed;
   inset:0;
   background:black;
   display:none;
   justify-content:center;
   align-items:center;
+  z-index:999;
 }
-#photoViewer img{
+
+#photoLayer img{
   max-width:100%;
   max-height:100%;
-  touch-action:manipulation;
+  transform:scale(1);
 }
 </style>
 </head>
 
 <body>
 
-<header>JAS MEMO VER 1.2.X</header>
+<header onclick="openPhoto()">JAS MEMO VER 2</header>
 
 <div class="controls">
-  <button onclick="newMemo()">메모 추가</button>
-  <button onclick="deleteSelected()">메모 삭제</button>
-  <button onclick="addPhoto()">사진 추가</button>
+  <button onclick="newMemo()">ADD</button>
+  <button onclick="deleteSelected()">DELETE</button>
+  <button onclick="addPhoto()">PHOTO</button>
 </div>
 
 <div id="memoList"></div>
+<input type="file" id="photoInput" accept="image/*" hidden>
 
-<!-- 메모 모달 -->
+<!-- MODAL -->
 <div class="modal" id="modal">
-<div class="box">
-  <div class="row">
-    <label><input type="checkbox" id="inChk"> INBOUND</label>
-    <label><input type="checkbox" id="outChk"> OUTBOUND</label>
-  </div>
+  <div class="box">
 
-  <div class="red" id="time" onclick="setTime()" ondblclick="editTime()">--:--</div>
+    <div class="row" style="justify-content:center">
+      <input type="checkbox" id="inChk"> INBOUND
+      <span style="width:30px"></span>
+      <input type="checkbox" id="outChk"> OUTBOUND
+    </div>
 
-  <div id="sections"></div>
+    <div id="sections"></div>
 
-  <textarea id="note" placeholder="특이사항"></textarea>
+    <div class="row">
+      <button onclick="saveMemo()">SAVE</button>
+      <button onclick="closeModal()">CLOSE</button>
+    </div>
 
-  <div class="row">
-    <button onclick="saveMemo()">저장</button>
-    <button onclick="closeModal()">닫기</button>
   </div>
 </div>
-</div>
 
-<!-- 사진 -->
-<div id="photoViewer" ondblclick="hidePhoto()">
+<!-- PHOTO -->
+<div id="photoLayer" ondblclick="closePhoto()">
   <img id="photoImg">
 </div>
 
 <script>
-let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
-let editId=null;
-let photo=null;
+const modal = document.getElementById("modal");
+const sections = document.getElementById("sections");
+const memoList = document.getElementById("memoList");
+const photoInput = document.getElementById("photoInput");
+const photoLayer = document.getElementById("photoLayer");
+const photoImg = document.getElementById("photoImg");
 
-/* 숫자 자동 이동 */
-document.addEventListener("input",e=>{
-  if(e.target.tagName!=="INPUT")return;
-  const max=e.target.maxLength;
-  if(max>0 && e.target.value.length>=max){
-    const inputs=[...document.querySelectorAll("input")];
-    const i=inputs.indexOf(e.target);
-    if(inputs[i+1]) inputs[i+1].focus();
-  }
-});
+let memos = JSON.parse(localStorage.getItem("jas_memos")||"[]");
+let editId=null;
+let photo = localStorage.getItem("jas_photo");
+let scale=1;
+
+function now(){
+  const d=new Date();
+  return d.toLocaleTimeString("ko-KR",{hour12:false,hour:"2-digit",minute:"2-digit"});
+}
 
 function newMemo(){
   editId=null;
-  modal.style.display="flex";
   inChk.checked=false;
   outChk.checked=false;
-  time.textContent="--:--";
   sections.innerHTML="";
-  note.value="";
+  modal.style.display="flex";
 }
 
-function closeModal(){modal.style.display="none";}
+function closeModal(){ modal.style.display="none"; }
 
-inChk.onchange=outChk.onchange=renderSections;
+inChk.onchange = outChk.onchange = renderSections;
 
 function renderSections(){
   sections.innerHTML="";
-  if(inChk.checked) sections.innerHTML+=section("INBOUND");
-  if(outChk.checked) sections.innerHTML+=section("OUTBOUND");
+  if(inChk.checked) sections.append(makeSection("INBOUND"));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND"));
 }
 
-function section(type){
-return `
-<div class="section-title">${type}</div>
-<div class="row">
-<label>7C</label><input maxlength="4" data-k="${type}-c7">
-<label>HL</label><input maxlength="4" data-k="${type}-hl">
-</div>
-${[1,2,3,4].map(i=>`
-<div class="cmpt">
-<label>CMPT ${i}</label>
-<input data-k="${type}-cmpt${i}">
-</div>`).join("")}
-<div class="row">
-<label>T</label><input maxlength="3" data-k="${type}-t">
-<label>D</label><input maxlength="2" data-k="${type}-d">
-<label>B</label><input maxlength="2" data-k="${type}-b">
-</div>
-<div class="row">
-<label>W</label><input maxlength="2" data-k="${type}-w">
-<label>C</label><input maxlength="3" data-k="${type}-c">
-<label>COB</label><input maxlength="3" data-k="${type}-cob">
-</div>
-${type==="OUTBOUND"?`
-<div class="row">
-<label>T/T</label><input maxlength="4" data-k="tt">
-<label>T/B</label><input maxlength="4" data-k="tb">
-</div>`:""}
-`;
+function makeSection(type){
+  const d=document.createElement("div");
+  d.className="section";
+  d.innerHTML=`
+    <div class="section-title">
+      ${type}
+      <span class="time" onclick="this.textContent=now()">--:--</span>
+    </div>
+
+    <div class="row">
+      7C <input maxlength="4" inputmode="numeric" data-k="${type}-c7">
+      HL <input maxlength="4" inputmode="numeric" data-k="HL">
+    </div>
+
+    ${[1,2,3,4].map(i=>`
+      <div class="row">
+        CMPT ${i}
+        <input data-long data-k="${type}-cmpt${i}">
+      </div>`).join("")}
+
+    <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
+  `;
+  return d;
 }
 
-function setTime(){
-const d=new Date();
-time.textContent=d.toLocaleTimeString("ko-KR",{hour12:false,hour:"2-digit",minute:"2-digit"});
-}
-function editTime(){
-const t=prompt("시간 수정",time.textContent);
-if(t) time.textContent=t;
-}
+/* HL 동기화 */
+document.addEventListener("input",e=>{
+  if(e.target.dataset.k==="HL"){
+    document.querySelectorAll('[data-k="HL"]').forEach(i=>{
+      if(i!==e.target) i.value=e.target.value;
+    });
+  }
+});
 
+/* SAVE */
 function saveMemo(){
-const data={id:editId??Date.now(),time:time.textContent,note:note.value};
-document.querySelectorAll("[data-k]").forEach(i=>data[i.dataset.k]=i.value);
-if(editId){
-const idx=memos.findIndex(m=>m.id===editId);
-memos[idx]=data;
-}else memos.push(data);
-localStorage.setItem("jas_memos",JSON.stringify(memos));
-closeModal(); renderList();
+  const data={id:editId??Date.now()};
+  document.querySelectorAll("[data-k]").forEach(i=>{
+    data[i.dataset.k]=i.value;
+  });
+
+  editId
+    ? memos[memos.findIndex(m=>m.id===editId)] = data
+    : memos.push(data);
+
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  closeModal(); renderList();
 }
 
 function renderList(){
-memoList.innerHTML="";
-memos.forEach(m=>{
-let title="";
-if(m["INBOUND-c7"]) title+=`7C[${m["INBOUND-c7"]}] HL[${m["INBOUND-hl"]}] `;
-if(m["OUTBOUND-c7"]) title+=`7C[${m["OUTBOUND-c7"]}]`;
-memoList.innerHTML+=`
-<div class="memo">
-<input type="checkbox">
-<div class="memo-title" onclick="editMemo(${m.id})">${title}</div>
-</div>`;
-});
+  memoList.innerHTML="";
+  memos.forEach(m=>{
+    memoList.innerHTML+=`
+      <div class="memo">
+        <input type="checkbox">
+        <div class="memo-lines" onclick="editMemo(${m.id})">
+          ${m["INBOUND-c7"] ? `<div>IN 7C[${m["INBOUND-c7"]}] HL[${m.HL||""}]</div>` : ""}
+          ${m["OUTBOUND-c7"] ? `<div>OUT 7C[${m["OUTBOUND-c7"]}]</div>` : ""}
+        </div>
+      </div>`;
+  });
 }
 
 function editMemo(id){
-editId=id;
-const m=memos.find(x=>x.id===id);
-modal.style.display="flex";
-time.textContent=m.time;
-note.value=m.note||"";
-inChk.checked=!!m["INBOUND-c7"];
-outChk.checked=!!m["OUTBOUND-c7"];
-renderSections();
-document.querySelectorAll("[data-k]").forEach(i=>{
-i.value=m[i.dataset.k]||"";
-});
+  editId=id;
+  const m=memos.find(x=>x.id===id);
+  modal.style.display="flex";
+  inChk.checked=!!m["INBOUND-c7"];
+  outChk.checked=!!m["OUTBOUND-c7"];
+  renderSections();
+  document.querySelectorAll("[data-k]").forEach(i=>{
+    i.value=m[i.dataset.k]||"";
+  });
 }
 
+/* DELETE */
 function deleteSelected(){
-const checks=[...document.querySelectorAll(".memo input")];
-memos=memos.filter((_,i)=>!checks[i].checked);
-localStorage.setItem("jas_memos",JSON.stringify(memos));
-renderList();
+  const c=[...document.querySelectorAll(".memo input")];
+  memos=memos.filter((_,i)=>!c[i].checked);
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  renderList();
 }
 
-/* 사진 */
-function addPhoto(){
-const f=document.createElement("input");
-f.type="file"; f.accept="image/*";
-f.onchange=e=>{
-const r=new FileReader();
-r.onload=()=>{photo=r.result; showPhoto();}
-r.readAsDataURL(e.target.files[0]);
+/* PHOTO */
+function addPhoto(){ photoInput.click(); }
+photoInput.onchange=e=>{
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ photo=r.result; localStorage.setItem("jas_photo",photo); };
+  r.readAsDataURL(f);
 };
-f.click();
+
+function openPhoto(){
+  if(!photo) return;
+  scale=1;
+  photoImg.src=photo;
+  photoImg.style.transform="scale(1)";
+  photoLayer.style.display="flex";
 }
-function showPhoto(){
-photoImg.src=photo;
-photoViewer.style.display="flex";
-}
-function hidePhoto(){
-photoViewer.style.display="none";
+function closePhoto(){
+  photoLayer.style.display="none";
+  scale=1;
 }
 
 renderList();
