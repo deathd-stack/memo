@@ -6,117 +6,24 @@
 <title>JAS MEMO VER 2</title>
 
 <style>
-body{
-  margin:0;
-  font-family:-apple-system;
-  background:#ff9f1c;
-  font-weight:600;
-}
-
-header{
-  text-align:center;
-  padding:22px;
-  font-size:2.6rem;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.controls{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin-bottom:14px;
-}
-
-button{
-  padding:10px 16px;
-  border:none;
-  border-radius:16px;
-  background:#fff;
-  font-weight:900;
-}
-
-.memo{
-  background:#fff;
-  margin:12px;
-  padding:14px;
-  border-radius:18px;
-  box-shadow:0 6px 14px rgba(0,0,0,.15);
-  transition:.3s;
-}
-
-.memo.flash{
-  animation:flash .6s;
-}
-
-@keyframes flash{
-  50%{background:#ffe8b5;transform:scale(1.04);}
-}
-
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  justify-content:center;
-  align-items:flex-end;
-}
-
-.box{
-  background:#fff;
-  width:100%;
-  max-height:92vh;
-  overflow:auto;
-  border-radius:28px 28px 0 0;
-  padding:18px;
-}
-
-.row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-  align-items:center;
-}
-
-input{
-  width:70px;
-  padding:6px;
-  font-weight:800;
-  border-radius:10px;
-  border:1px solid #ccc;
-}
-
-input[data-long]{width:100%;}
-
-.section{
-  background:#f7f7f7;
-  padding:12px;
-  border-radius:14px;
-  margin-top:14px;
-}
-
-textarea{
-  width:100%;
-  height:80px;
-  border-radius:12px;
-  padding:8px;
-  border:1px solid #ccc;
-}
-
-#photoLayer{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-
-#photoLayer img{
-  max-width:100%;
-  max-height:100%;
-}
+body{margin:0;font-family:-apple-system;background:#ff9f1c;font-weight:600;}
+header{text-align:center;padding:22px;font-size:2.6rem;font-weight:900;cursor:pointer;}
+.controls{display:flex;justify-content:center;gap:14px;margin-bottom:14px;}
+button{padding:10px 16px;border:none;border-radius:16px;background:#fff;font-weight:900;}
+.memo{background:#fff;margin:12px;padding:14px;border-radius:18px;
+box-shadow:0 6px 14px rgba(0,0,0,.15);transition:.3s;}
+.memo.flash{animation:flash .6s;}
+@keyframes flash{50%{background:#ffe8b5;transform:scale(1.04);}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);
+display:none;justify-content:center;align-items:flex-end;}
+.box{background:#fff;width:100%;max-height:92vh;overflow:auto;
+border-radius:28px 28px 0 0;padding:18px;}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
+input{width:70px;padding:6px;font-weight:800;border-radius:10px;border:1px solid #ccc;}
+.section{background:#f7f7f7;padding:12px;border-radius:14px;margin-top:14px;}
+#photoLayer{position:fixed;inset:0;background:black;display:none;
+justify-content:center;align-items:center;}
+#photoLayer img{max-width:100%;max-height:100%;}
 </style>
 </head>
 
@@ -134,7 +41,7 @@ textarea{
 <input type="file" id="photoInput" accept="image/*" hidden>
 
 <div class="modal" id="modal">
-<div class="box" id="box">
+<div class="box">
 
 <div class="row" style="justify-content:center">
   <input type="checkbox" id="inChk"> INBOUND
@@ -163,43 +70,48 @@ const memoList=document.getElementById("memoList");
 const photoInput=document.getElementById("photoInput");
 const photoLayer=document.getElementById("photoLayer");
 const photoImg=document.getElementById("photoImg");
+const inChk=document.getElementById("inChk");
+const outChk=document.getElementById("outChk");
 
 let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
-/* 숫자 + 자리수 고정 */
-function formatNumber(val,len){
+/* 숫자 고정 */
+function format(val,len){
   val=val.replace(/[^0-9]/g,'');
   if(!val) return "";
   return val.slice(0,len).padStart(len,"0");
 }
 
-/* 공유 */
+/* 입력 제한 + 공유 */
 document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
-  if(k==="HL"||k==="HASH"){
-    const len=k==="HL"?4:3;
-    e.target.value=formatNumber(e.target.value,len);
-    document.querySelectorAll(`[data-k="${k}"]`)
-      .forEach(i=>{if(i!==e.target)i.value=e.target.value;});
+  if(!k) return;
+
+  if(k==="HL"){
+    e.target.value=format(e.target.value,4);
+    document.querySelectorAll('[data-k="HL"]').forEach(i=>i.value=e.target.value);
   }
-  if(k?.includes("-c7")){
-    e.target.value=formatNumber(e.target.value,4);
+  if(k==="HASH"){
+    e.target.value=format(e.target.value,3);
+    document.querySelectorAll('[data-k="HASH"]').forEach(i=>i.value=e.target.value);
+  }
+  if(k.includes("-c7")){
+    e.target.value=format(e.target.value,4);
   }
 });
 
-/* 섹션 */
+/* 섹션 생성 */
 function makeSection(type){
   const d=document.createElement("div");
   d.className="section";
-
   d.innerHTML=`
-  <div class="row">
-    7C <input data-k="${type}-c7" inputmode="numeric">
-    HL <input data-k="HL" inputmode="numeric">
-    # <input data-k="HASH" inputmode="numeric">
-  </div>
+    <div class="row">
+      7C <input data-k="${type}-c7">
+      HL <input data-k="HL">
+      # <input data-k="HASH">
+    </div>
   `;
   return d;
 }
@@ -220,20 +132,27 @@ function newMemo(){
 
 function closeModal(){modal.style.display="none";}
 
+/* 저장 */
 function saveMemo(){
   const data={id:editId??Date.now()};
   document.querySelectorAll("[data-k]").forEach(i=>{
     data[i.dataset.k]=i.value;
   });
-  editId
-    ? memos[memos.findIndex(m=>m.id===editId)]=data
-    : memos.push(data);
+  data.hasIn=inChk.checked;
+  data.hasOut=outChk.checked;
+
+  if(editId){
+    memos[memos.findIndex(m=>m.id===editId)]=data;
+  }else{
+    memos.push(data);
+  }
 
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeModal();
   renderList(data.id);
 }
 
+/* 리스트 */
 function renderList(flashId){
   memoList.innerHTML="";
   memos.forEach(m=>{
@@ -241,27 +160,55 @@ function renderList(flashId){
     div.className="memo";
     if(m.id===flashId) div.classList.add("flash");
 
-    const hasIn=m["IN-c7"];
-    const hasOut=m["OUT-c7"];
+    let content="";
 
-    if(hasIn && hasOut){
-      div.innerHTML=`
+    if(m.hasIn && m.hasOut){
+      content=`
         <div>IN  7C ${m["IN-c7"]||""} HL ${m.HL||""}</div>
         <div>OUT 7C ${m["OUT-c7"]||""} # ${m.HASH||""}</div>
       `;
-    }else{
-      const type=hasIn?"IN":"OUT";
-      div.innerHTML=`
-        <div>
-        7C ${m[`${type}-c7`]||""}
-        HL ${m.HL||""}
-        # ${m.HASH||""}
-        </div>
-      `;
+    }else if(m.hasIn){
+      content=`<div>7C ${m["IN-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+    }else if(m.hasOut){
+      content=`<div>7C ${m["OUT-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
     }
+
+    div.innerHTML=`
+      <div style="display:flex;gap:8px;">
+        <input type="checkbox" data-id="${m.id}">
+        <div style="flex:1;" onclick="editMemo(${m.id})">
+          ${content}
+        </div>
+      </div>
+    `;
 
     memoList.appendChild(div);
   });
+}
+
+/* 수정 불러오기 */
+function editMemo(id){
+  const m=memos.find(x=>x.id===id);
+  editId=id;
+  modal.style.display="flex";
+  inChk.checked=m.hasIn;
+  outChk.checked=m.hasOut;
+  inChk.onchange();
+
+  setTimeout(()=>{
+    document.querySelectorAll("[data-k]").forEach(i=>{
+      i.value=m[i.dataset.k]||"";
+    });
+  },50);
+}
+
+/* 선택 삭제 */
+function deleteSelected(){
+  const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
+  const ids=[...checks].map(c=>Number(c.dataset.id));
+  memos=memos.filter(m=>!ids.includes(m.id));
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  renderList();
 }
 
 /* 사진 */
@@ -275,19 +222,8 @@ photoInput.onchange=e=>{
   };
   r.readAsDataURL(f);
 };
-
-function openPhoto(){
-  if(!photo) return;
-  photoImg.src=photo;
-  photoLayer.style.display="flex";
-}
+function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
 function closePhoto(){photoLayer.style.display="none";}
-
-function deleteSelected(){
-  memos=[];
-  localStorage.removeItem("jas_memos");
-  renderList();
-}
 
 renderList();
 </script>
