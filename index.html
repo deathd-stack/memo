@@ -14,13 +14,18 @@ button{padding:10px 16px;border:none;border-radius:16px;background:#fff;font-wei
 box-shadow:0 6px 14px rgba(0,0,0,.15);transition:.3s;}
 .memo.flash{animation:flash .6s;}
 @keyframes flash{50%{background:#ffe8b5;transform:scale(1.04);}}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);
 display:none;justify-content:center;align-items:flex-end;}
 .box{background:#fff;width:100%;max-height:92vh;overflow:auto;
 border-radius:28px 28px 0 0;padding:18px;}
+
 .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;align-items:center;}
 input{width:70px;padding:6px;font-weight:800;border-radius:10px;border:1px solid #ccc;}
+input[data-long]{width:100%;}
 .section{background:#f7f7f7;padding:12px;border-radius:14px;margin-top:14px;}
+textarea{width:100%;height:80px;border-radius:12px;padding:8px;border:1px solid #ccc;}
+
 #photoLayer{position:fixed;inset:0;background:black;display:none;
 justify-content:center;align-items:center;}
 #photoLayer img{max-width:100%;max-height:100%;}
@@ -79,12 +84,11 @@ let editId=null;
 
 /* 숫자 고정 */
 function format(val,len){
-  val=val.replace(/[^0-9]/g,'');
+  val=(val||"").replace(/[^0-9]/g,'');
   if(!val) return "";
   return val.slice(0,len).padStart(len,"0");
 }
 
-/* 입력 제한 + 공유 */
 document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
   if(!k) return;
@@ -102,24 +106,54 @@ document.addEventListener("input",e=>{
   }
 });
 
-/* 섹션 생성 */
+/* 섹션 */
 function makeSection(type){
   const d=document.createElement("div");
   d.className="section";
+
+  const extraOutbound = type==="OUTBOUND" ? `
+    <div class="row">
+      T/T <input data-k="${type}-tt">
+      T/B <input data-k="${type}-tb">
+    </div>
+  ` : "";
+
   d.innerHTML=`
     <div class="row">
       7C <input data-k="${type}-c7">
       HL <input data-k="HL">
       # <input data-k="HASH">
     </div>
+
+    ${[1,2,3,4].map(i=>`
+      <div class="row">
+        CMPT ${i}
+        <input data-long data-k="${type}-cmpt${i}">
+      </div>`).join("")}
+
+    <div class="row">
+      T <input data-k="${type}-t">
+      D <input data-k="${type}-d">
+      BB <input data-k="${type}-bb">
+    </div>
+
+    <div class="row">
+      W <input data-k="${type}-w">
+      C <input data-k="${type}-c">
+      COB <input data-k="${type}-cob">
+    </div>
+
+    ${extraOutbound}
+
+    <textarea data-k="${type}-note" placeholder="특이사항 (${type})"></textarea>
   `;
   return d;
 }
 
 inChk.onchange=outChk.onchange=()=>{
   sections.innerHTML="";
-  if(inChk.checked) sections.append(makeSection("IN"));
-  if(outChk.checked) sections.append(makeSection("OUT"));
+  if(inChk.checked) sections.append(makeSection("INBOUND"));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND"));
 };
 
 function newMemo(){
@@ -132,7 +166,6 @@ function newMemo(){
 
 function closeModal(){modal.style.display="none";}
 
-/* 저장 */
 function saveMemo(){
   const data={id:editId??Date.now()};
   document.querySelectorAll("[data-k]").forEach(i=>{
@@ -152,7 +185,6 @@ function saveMemo(){
   renderList(data.id);
 }
 
-/* 리스트 */
 function renderList(flashId){
   memoList.innerHTML="";
   memos.forEach(m=>{
@@ -164,13 +196,13 @@ function renderList(flashId){
 
     if(m.hasIn && m.hasOut){
       content=`
-        <div>IN  7C ${m["IN-c7"]||""} HL ${m.HL||""}</div>
-        <div>OUT 7C ${m["OUT-c7"]||""} # ${m.HASH||""}</div>
+        <div>IN  7C ${m["INBOUND-c7"]||""} HL ${m.HL||""}</div>
+        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m.HASH||""}</div>
       `;
     }else if(m.hasIn){
-      content=`<div>7C ${m["IN-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      content=`<div>7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
     }else if(m.hasOut){
-      content=`<div>7C ${m["OUT-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      content=`<div>7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
     }
 
     div.innerHTML=`
@@ -181,12 +213,10 @@ function renderList(flashId){
         </div>
       </div>
     `;
-
     memoList.appendChild(div);
   });
 }
 
-/* 수정 불러오기 */
 function editMemo(id){
   const m=memos.find(x=>x.id===id);
   editId=id;
@@ -202,7 +232,6 @@ function editMemo(id){
   },50);
 }
 
-/* 선택 삭제 */
 function deleteSelected(){
   const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
   const ids=[...checks].map(c=>Number(c.dataset.id));
