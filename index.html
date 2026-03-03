@@ -6,234 +6,290 @@
 <title>JAS MEMO VER 2</title>
 
 <style>
-body{margin:0;font-family:-apple-system;background:#ff9f1c;font-weight:600;}
-header{text-align:center;padding:22px;font-size:2.4rem;font-weight:900;cursor:pointer;}
+  body{
+    margin:0;
+    font-family:-apple-system, system-ui;
+    background:#ff9f1c;
+    font-weight:600;
+  }
 
-.controls{display:flex;justify-content:center;gap:14px;margin-bottom:12px;}
-button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weight:900;}
+  header{
+    text-align:center;
+    padding:22px;
+    font-size:2.4rem;
+    font-weight:900;
+    cursor:pointer;
+  }
 
-/* 컴팩트 카드 */
-.memo{
-  background:#fff;
-  margin:8px 10px;
-  padding:10px 12px;
-  border-radius:14px;
-  box-shadow:0 3px 8px rgba(0,0,0,.12);
-  font-size:14px;
-  line-height:1.35;
-}
-.memo.flash{animation:flash .5s;}
-@keyframes flash{50%{background:#ffe8b5;transform:scale(1.02);}}
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin-bottom:12px;
+  }
+  button{
+    padding:8px 14px;
+    border:none;
+    border-radius:18px;
+    background:#fff;
+    font-weight:900;
+    cursor:pointer;
+  }
 
-.time-red{
-  color:red;
-  font-weight:900;
-  font-size:13px;
-  margin-left:8px;
-  white-space:nowrap;
-}
+  /* ===== 리스트 카드 (두번째 사진 느낌) ===== */
+  .memo{
+    background:rgba(255,255,255,.78);
+    margin:10px 12px;
+    padding:14px 14px;
+    border-radius:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+    font-size:15px;
+    line-height:1.35;
+    backdrop-filter: blur(6px);
+  }
+  .memo.flash{animation:flash .5s;}
+  @keyframes flash{50%{background:#ffe8b5;transform:scale(1.02);}}
 
-.check-line{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  align-items:center;
-  margin-bottom:12px;
-  white-space:nowrap;
-}
-.check-line label{
-  display:flex;
-  align-items:center;
-  gap:6px;           /* 체크칸-글자 간격 좁힘 */
-  font-size:14px;
-  font-weight:900;
-}
+  .memoRow{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .memoRow input[type="checkbox"]{
+    width:22px;height:22px;margin-top:4px;
+  }
+  .memoBody{flex:1;cursor:pointer;}
+  .pillLine{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:6px 0;
+  }
+  .pill{
+    background:#111;
+    color:#fff;
+    font-weight:900;
+    font-size:13px;
+    padding:6px 12px;
+    border-radius:999px;
+    min-width:44px;
+    text-align:center;
+  }
+  .pillText{
+    background:rgba(0,0,0,.07);
+    border-radius:999px;
+    padding:8px 12px;
+    font-weight:900;
+    letter-spacing:.2px;
+    white-space:nowrap;
+  }
 
-.modal{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  justify-content:center;
-  align-items:flex-end;
-}
-.box{
-  background:#fff;
-  width:100%;
-  max-height:92vh;
-  overflow:auto;
-  border-radius:24px 24px 0 0;
-  padding:16px;
-}
+  /* ===== 모달 ===== */
+  .modal{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:flex-end;
+    z-index:100;
+  }
+  .box{
+    background:#fff;
+    width:100%;
+    max-height:92vh;
+    overflow:auto;
+    border-radius:24px 24px 0 0;
+    padding:16px;
+  }
 
-.row{
-  display:flex;
-  gap:8px;
-  flex-wrap:nowrap;
-  margin-bottom:8px;
-  align-items:center;
-  white-space:nowrap;
-}
+  .check-line{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    align-items:center;
+    margin-bottom:12px;
+    white-space:nowrap;
+  }
+  .check-line label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:900;
+  }
 
-input{
-  padding:6px 8px;
-  font-weight:900;
-  border-radius:8px;
-  border:1px solid #ccc;
-  font-size:16px; /* iOS 자동 줌 방지 */
-  box-sizing:border-box;
-}
+  .section{
+    background:#f7f7f7;
+    padding:12px;
+    border-radius:14px;
+    margin-top:10px;
+  }
 
-input[data-4]{width:72px;text-align:center;}
-input[data-3]{width:62px;text-align:center;}
-input[data-2]{width:54px;text-align:center;}
-input[data-long]{flex:1;text-align:left;padding-left:10px;}
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .section-title{
+    font-size:15px;
+    font-weight:900;
+  }
 
-.section{
-  background:#f7f7f7;
-  padding:10px;
-  border-radius:12px;
-  margin-top:10px;
-}
+  .row{
+    display:flex;
+    gap:10px;
+    flex-wrap:nowrap;
+    align-items:center;
+    white-space:nowrap;
+    margin-bottom:10px;
+  }
 
-.section-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:6px;
-}
-.section-title{
-  font-size:14px;
-  font-weight:900;
-}
-.time-btn{
-  color:red;
-  font-weight:900;
-  font-size:13px;
-  cursor:pointer;
-  user-select:none;
-}
+  input{
+    padding:8px 10px;
+    font-weight:900;
+    border-radius:10px;
+    border:1px solid #cfcfcf;
+    font-size:16px; /* iOS 자동줌 방지 */
+    box-sizing:border-box;
+  }
+  input[data-4]{width:78px;text-align:center;}
+  input[data-3]{width:66px;text-align:center;}
+  input[data-2]{width:58px;text-align:center;}
+  input[data-long]{flex:1;text-align:left;padding-left:12px;}
 
-.subgrid{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:6px;
-}
+  textarea{
+    width:100%;
+    height:64px;
+    border-radius:12px;
+    padding:10px;
+    border:1px solid #cfcfcf;
+    font-size:16px;
+    font-weight:700;
+    box-sizing:border-box;
+    resize:none;
+  }
 
-textarea{
-  width:100%;
-  height:60px;
-  border-radius:10px;
-  padding:8px;
-  border:1px solid #ccc;
-  font-size:16px;
-  font-weight:700;
-  box-sizing:border-box;
-}
+  /* EXTRA: 가로로 추가되게 */
+  .extra-wrap{
+    margin-top:10px;
+    background:#fff;
+    border-radius:12px;
+    padding:10px;
+    border:1px solid #e6e6e6;
+  }
+  .extra-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .extra-top .title{
+    font-weight:900;
+  }
+  .extraBox{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .extra-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#fafafa;
+    border:1px solid #e6e6e6;
+    padding:8px;
+    border-radius:12px;
+  }
+  .extra-row select{
+    height:36px;
+    font-size:14px;
+    font-weight:900;
+    border-radius:10px;
+    border:1px solid #cfcfcf;
+    padding:0 10px;
+    background:#fff;
+  }
+  .extra-row input{
+    height:36px;
+    padding:6px 10px;
+  }
+  .smallbtn{
+    padding:8px 12px;
+    border-radius:14px;
+    font-weight:900;
+  }
 
-.smallbtn{
-  padding:8px 12px;
-  border-radius:12px;
-  font-weight:900;
-}
+  /* 사진 */
+  #photoLayer{
+    position:fixed;
+    inset:0;
+    background:black;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:200;
+  }
+  #photoLayer img{
+    max-width:100%;
+    max-height:100%;
+  }
 
-.extra-wrap{
-  margin-top:8px;
-  background:#fff;
-  border-radius:10px;
-  padding:8px;
-  border:1px solid #e6e6e6;
-}
-.extra-row{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  margin-top:6px;
-}
-.extra-row select{
-  height:34px;
-  font-size:14px;
-  font-weight:900;
-  border-radius:8px;
-  border:1px solid #ccc;
-  padding:0 8px;
-}
-.extra-row input{
-  height:34px;
-}
+  /* EQUIPMENT (바탕화면 전용) */
+  #equipBtn{
+    position:fixed;
+    left:12px;
+    bottom:12px;
+    z-index:50;
+    background:#fff;
+    border:none;
+    border-radius:16px;
+    padding:10px 14px;
+    font-weight:900;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+  }
+  #equipBadge{
+    position:fixed;
+    top:10px;
+    right:10px;
+    z-index:60;
+    background:rgba(0,0,0,.85);
+    color:#fff;
+    padding:8px 10px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:900;
+    line-height:1.3;
+    min-width:110px;
+    text-align:right;
+    display:none;
+  }
 
-/* 사진 */
-#photoLayer{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-#photoLayer img{
-  max-width:100%;
-  max-height:100%;
-}
-
-/* EQUIPMENT 버튼(왼쪽 아래) */
-#equipBtn{
-  position:fixed;
-  left:10px;
-  bottom:12px;
-  z-index:50;
-  background:#fff;
-  border:none;
-  border-radius:14px;
-  padding:10px 14px;
-  font-weight:900;
-  box-shadow:0 3px 10px rgba(0,0,0,.15);
-}
-
-/* 우측 상단 작은 표시(배지) */
-#equipBadge{
-  position:fixed;
-  top:10px;
-  right:10px;
-  z-index:60;
-  background:rgba(0,0,0,.85);
-  color:#fff;
-  padding:8px 10px;
-  border-radius:12px;
-  font-size:12px;
-  font-weight:900;
-  line-height:1.3;
-  min-width:96px;
-  text-align:right;
-  display:none;
-}
-
-/* EQUIPMENT 모달 */
-#equipModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  justify-content:center;
-  align-items:flex-end;
-  z-index:80;
-}
-#equipBox{
-  background:#fff;
-  width:100%;
-  max-height:70vh;
-  overflow:auto;
-  border-radius:24px 24px 0 0;
-  padding:16px;
-}
-.equipRow{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-bottom:10px;
-  white-space:nowrap;
-}
-.equipRow b{min-width:70px;}
+  #equipModal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:flex-end;
+    z-index:250;
+  }
+  #equipBox{
+    background:#fff;
+    width:100%;
+    max-height:70vh;
+    overflow:auto;
+    border-radius:24px 24px 0 0;
+    padding:16px;
+  }
+  .equipRow{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-bottom:12px;
+    white-space:nowrap;
+  }
+  .equipRow b{min-width:70px;}
 </style>
 </head>
 
@@ -252,7 +308,6 @@ textarea{
 
 <!-- 우측 상단 장비 표시 -->
 <div id="equipBadge"></div>
-
 <!-- 왼쪽 아래 장비 버튼 -->
 <button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
 
@@ -315,6 +370,7 @@ const outChk=document.getElementById("outChk");
 
 const equipBadge=document.getElementById("equipBadge");
 const equipModal=document.getElementById("equipModal");
+const equipBtn=document.getElementById("equipBtn");
 const tug1=document.getElementById("tug1");
 const tug2=document.getElementById("tug2");
 const belt=document.getElementById("belt");
@@ -324,9 +380,7 @@ let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
 /* ===== util ===== */
-function onlyNum(val,len){
-  return (val||"").replace(/[^0-9]/g,'').slice(0,len);
-}
+function onlyNum(val,len){ return (val||"").replace(/[^0-9]/g,'').slice(0,len); }
 function pad(val,len){
   const v=onlyNum(val,len);
   return v ? v.padStart(len,"0") : "";
@@ -337,30 +391,68 @@ function nowTime(){
          d.getMinutes().toString().padStart(2,"0");
 }
 
-/* ===== 입력 제한 + 자리수 반영 ===== */
+/* ===== 입력 제한 + HL/# 공유 동기화 ===== */
 document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
   if(!k) return;
 
-  if(k.endsWith("-c7")) e.target.value=onlyNum(e.target.value,4);
-  if(k.endsWith("-HL")) e.target.value=onlyNum(e.target.value,4);
-  if(k.endsWith("-HASH")) e.target.value=onlyNum(e.target.value,3);
+  // 7C/HL/# 자리수
+  if(k.endsWith("-c7")) e.target.value = onlyNum(e.target.value,4);
+  if(k === "HL") e.target.value = onlyNum(e.target.value,4);
+  if(k === "HASH") e.target.value = onlyNum(e.target.value,3);
 
-  if(k.endsWith("-t")) e.target.value=onlyNum(e.target.value,3);
-  if(k.endsWith("-d")) e.target.value=onlyNum(e.target.value,2);
-  if(k.endsWith("-bb")) e.target.value=onlyNum(e.target.value,2);
+  // T/D/BB
+  if(k.endsWith("-t")) e.target.value = onlyNum(e.target.value,3);
+  if(k.endsWith("-d")) e.target.value = onlyNum(e.target.value,2);
+  if(k.endsWith("-bb")) e.target.value = onlyNum(e.target.value,2);
 
-  if(k.endsWith("-tt")) e.target.value=onlyNum(e.target.value,4);
-  if(k.endsWith("-tb")) e.target.value=onlyNum(e.target.value,4);
+  // T/T, T/B
+  if(k.endsWith("-tt")) e.target.value = onlyNum(e.target.value,4);
+  if(k.endsWith("-tb")) e.target.value = onlyNum(e.target.value,4);
 
-  if(k.startsWith("extraVal-")) e.target.value=onlyNum(e.target.value,3);
+  // EXTRA value(3자리)
+  if(k.startsWith("extraVal-")) e.target.value = onlyNum(e.target.value,3);
+
+  // HL 공유
+  if(k==="HL"){
+    document.querySelectorAll('[data-k="HL"]').forEach(el=>{
+      if(el!==e.target) el.value=e.target.value;
+    });
+  }
+  // HASH 공유
+  if(k==="HASH"){
+    document.querySelectorAll('[data-k="HASH"]').forEach(el=>{
+      if(el!==e.target) el.value=e.target.value;
+    });
+  }
 });
+
+/* ===== EXTRA ===== */
+const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
+function makeExtraRow(type, key="", val=""){
+  const row=document.createElement("div");
+  row.className="extra-row";
+  row.innerHTML=`
+    <select data-extra-type="${type}">
+      ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
+    </select>
+    <input data-3 inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+    <button type="button" class="smallbtn" onclick="this.closest('.extra-row').remove()">-</button>
+  `;
+  return row;
+}
+function addExtraRow(type){
+  const box=document.getElementById(type+"-EXTRAS");
+  if(!box) return;
+  box.appendChild(makeExtraRow(type,"W",""));
+}
 
 /* ===== 섹션 생성 ===== */
 function makeSection(type, memoData){
   const d=document.createElement("div");
   d.className="section";
 
+  // 저장된 TIME
   const savedTime = memoData ? (memoData[type+"-TIME"]||"") : "";
 
   d.innerHTML=`
@@ -371,15 +463,9 @@ function makeSection(type, memoData){
 
     <div class="row">
       7C <input data-4 inputmode="numeric" data-k="${type}-c7" maxlength="4" placeholder="0000">
-      HL <input data-4 inputmode="numeric" data-k="${type}-HL" maxlength="4" placeholder="0000">
-      # <input data-3 inputmode="numeric" data-k="${type}-HASH" maxlength="3" placeholder="000">
+      HL <input data-4 inputmode="numeric" data-k="HL" maxlength="4" placeholder="0000">
+      # <input data-3 inputmode="numeric" data-k="HASH" maxlength="3" placeholder="000">
       <span class="time-red" id="${type}-TIMESHOWN"></span>
-    </div>
-
-    <div class="row">
-      T <input data-3 inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000">
-      D <input data-2 inputmode="numeric" data-k="${type}-d" maxlength="2" placeholder="00">
-      BB <input data-2 inputmode="numeric" data-k="${type}-bb" maxlength="2" placeholder="00">
     </div>
 
     ${[1,2,3,4].map(i=>`
@@ -387,6 +473,13 @@ function makeSection(type, memoData){
         CMPT ${i}
         <input data-long data-k="${type}-cmpt${i}" placeholder="TEXT">
       </div>`).join("")}
+
+    <!-- ✅ T/D/BB 를 CMPT4 아래로 이동 -->
+    <div class="row">
+      T <input data-3 inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000">
+      D <input data-2 inputmode="numeric" data-k="${type}-d" maxlength="2" placeholder="00">
+      BB <input data-2 inputmode="numeric" data-k="${type}-bb" maxlength="2" placeholder="00">
+    </div>
 
     ${type==="OUTBOUND" ? `
       <div class="row">
@@ -396,11 +489,11 @@ function makeSection(type, memoData){
     ` : ""}
 
     <div class="extra-wrap">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-weight:900;">EXTRA</div>
+      <div class="extra-top">
+        <div class="title">EXTRA</div>
         <button type="button" class="smallbtn" onclick="addExtraRow('${type}')">+</button>
       </div>
-      <div id="${type}-EXTRAS"></div>
+      <div class="extraBox" id="${type}-EXTRAS"></div>
     </div>
 
     <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
@@ -412,15 +505,21 @@ function makeSection(type, memoData){
   shown.textContent = savedTime || "";
 
   btn.onclick = ()=>{
-    const t=nowTime();
-    shown.textContent=t;
-    // 즉시 반영(편집 중 저장까지는 안해도 됨)
+    shown.textContent = nowTime();
   };
   btn.ondblclick = ()=>{
     const cur = shown.textContent || nowTime();
     const t = prompt("TIME (HH:MM 24H)", cur);
-    if(t) shown.textContent=t;
+    if(t) shown.textContent = t;
   };
+
+  // CMPT1,2 기본값 F 복구(새 메모일 때만)
+  if(!memoData){
+    const c1 = d.querySelector(`[data-k="${type}-cmpt1"]`);
+    const c2 = d.querySelector(`[data-k="${type}-cmpt2"]`);
+    if(c1) c1.value = "F";
+    if(c2) c2.value = "F";
+  }
 
   // 기존 extras 불러오기
   const extrasBox = d.querySelector(`#${type}-EXTRAS`);
@@ -430,27 +529,6 @@ function makeSection(type, memoData){
   });
 
   return d;
-}
-
-/* EXTRA row */
-const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
-
-function makeExtraRow(type, key="", val=""){
-  const row=document.createElement("div");
-  row.className="extra-row";
-  row.innerHTML=`
-    <select data-extra-type="${type}">
-      ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
-    </select>
-    <input data-3 inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-    <button type="button" class="smallbtn" onclick="this.parentElement.remove()">-</button>
-  `;
-  return row;
-}
-function addExtraRow(type){
-  const box=document.getElementById(type+"-EXTRAS");
-  if(!box) return;
-  box.appendChild(makeExtraRow(type,"W",""));
 }
 
 /* 체크 변경 -> 섹션 렌더 */
@@ -467,51 +545,60 @@ function newMemo(){
   outChk.checked=false;
   sections.innerHTML="";
   modal.style.display="flex";
+
+  // 바탕화면 전용 숨김
+  equipBtn.style.display="none";
+  equipBadge.style.display="none";
 }
 function closeModal(){
   modal.style.display="none";
   editId=null;
+
+  // 바탕화면 전용 다시 표시
+  equipBtn.style.display="block";
+  updateEquipBadge();
 }
 
 /* ===== 저장 ===== */
 function saveMemo(){
   const data={id:editId??Date.now()};
-
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
 
-  // 각 섹션 값 저장
+  // HL/# 공유 저장(전역)
+  const hlGlobal = document.querySelector('[data-k="HL"]')?.value || "";
+  const hashGlobal = document.querySelector('[data-k="HASH"]')?.value || "";
+  data.HL = pad(hlGlobal,4);
+  data.HASH = pad(hashGlobal,3);
+
   ["INBOUND","OUTBOUND"].forEach(type=>{
     if(!(type==="INBOUND"?data.hasIn:data.hasOut)) return;
 
-    // 기본 필드
-    const get = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
-    const c7 = get("c7")?.value || "";
-    const hl = get("HL")?.value || "";
-    const hash = get("HASH")?.value || "";
+    // 7C
+    data[type+"-c7"] = pad(document.querySelector(`[data-k="${type}-c7"]`)?.value,4);
 
-    data[type+"-c7"]=pad(c7,4);
-    data[type+"-HL"]=pad(hl,4);
-    data[type+"-HASH"]=pad(hash,3);
-
-    data[type+"-t"]=pad(document.querySelector(`[data-k="${type}-t"]`)?.value,3);
-    data[type+"-d"]=pad(document.querySelector(`[data-k="${type}-d"]`)?.value,2);
-    data[type+"-bb"]=pad(document.querySelector(`[data-k="${type}-bb"]`)?.value,2);
-
+    // CMPT
     [1,2,3,4].forEach(i=>{
-      data[type+`-cmpt${i}`]=document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+      data[type+`-cmpt${i}`] = document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
     });
 
+    // T/D/BB
+    data[type+"-t"]  = pad(document.querySelector(`[data-k="${type}-t"]`)?.value,3);
+    data[type+"-d"]  = pad(document.querySelector(`[data-k="${type}-d"]`)?.value,2);
+    data[type+"-bb"] = pad(document.querySelector(`[data-k="${type}-bb"]`)?.value,2);
+
+    // OUTBOUND만 T/T T/B
     if(type==="OUTBOUND"){
-      data[type+"-tt"]=pad(document.querySelector(`[data-k="${type}-tt"]`)?.value,4);
-      data[type+"-tb"]=pad(document.querySelector(`[data-k="${type}-tb"]`)?.value,4);
+      data[type+"-tt"] = pad(document.querySelector(`[data-k="${type}-tt"]`)?.value,4);
+      data[type+"-tb"] = pad(document.querySelector(`[data-k="${type}-tb"]`)?.value,4);
     }
 
-    data[type+"-note"]=document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+    // NOTE
+    data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
 
-    // TIME(섹션 오른쪽 TIME 버튼 결과)
-    const tShown = document.getElementById(type+"-TIMESHOWN");
-    data[type+"-TIME"]=tShown ? (tShown.textContent||"") : "";
+    // TIME
+    const shown = document.getElementById(type+"-TIMESHOWN");
+    data[type+"-TIME"] = shown ? (shown.textContent||"") : "";
 
     // EXTRAS
     const extras=[];
@@ -537,7 +624,7 @@ function saveMemo(){
   renderList(data.id);
 }
 
-/* ===== 리스트 출력 ===== */
+/* ===== 리스트 출력(두번째 사진 스타일) ===== */
 function renderList(flashId){
   memoList.innerHTML="";
   memos.forEach(m=>{
@@ -545,24 +632,44 @@ function renderList(flashId){
     div.className="memo";
     if(m.id===flashId) div.classList.add("flash");
 
+    const HL = m.HL || "";
+    const HASH = m.HASH || "";
+
     let content="";
 
     if(m.hasIn && m.hasOut){
-      // 둘 다: IN 줄 + OUT 줄
-      content += `<div><b>IN</b> 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]</div>`;
-      content += `<div><b>OUT</b> 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>`;
+      content += `
+        <div class="pillLine">
+          <span class="pill">IN</span>
+          <span class="pillText">7C[${m["INBOUND-c7"]||""}] HL[${HL}]</span>
+        </div>
+        <div class="pillLine">
+          <span class="pill">OUT</span>
+          <span class="pillText">7C[${m["OUTBOUND-c7"]||""}] #[${HASH}]</span>
+        </div>
+      `;
     }else if(m.hasIn){
-      content += `<div><b>IN</b> 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]</div>`;
+      content += `
+        <div class="pillLine">
+          <span class="pill">IN</span>
+          <span class="pillText">7C[${m["INBOUND-c7"]||""}] HL[${HL}] #[${HASH}]</span>
+        </div>
+      `;
     }else if(m.hasOut){
-      content += `<div><b>OUT</b> 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>`;
+      content += `
+        <div class="pillLine">
+          <span class="pill">OUT</span>
+          <span class="pillText">7C[${m["OUTBOUND-c7"]||""}] HL[${HL}] #[${HASH}]</span>
+        </div>
+      `;
     }else{
-      content += `<div>(EMPTY)</div>`;
+      content += `<div class="pillLine"><span class="pill">-</span><span class="pillText">(EMPTY)</span></div>`;
     }
 
     div.innerHTML=`
-      <div style="display:flex;gap:8px;align-items:flex-start;">
-        <input type="checkbox" data-id="${m.id}" style="margin-top:3px;">
-        <div style="flex:1;cursor:pointer;" onclick="editMemo(${m.id})">
+      <div class="memoRow">
+        <input type="checkbox" data-id="${m.id}">
+        <div class="memoBody" onclick="editMemo(${m.id})">
           ${content}
         </div>
       </div>
@@ -578,6 +685,10 @@ function editMemo(id){
   editId=id;
 
   modal.style.display="flex";
+  // 바탕화면 전용 숨김
+  equipBtn.style.display="none";
+  equipBadge.style.display="none";
+
   inChk.checked=!!m.hasIn;
   outChk.checked=!!m.hasOut;
 
@@ -585,8 +696,11 @@ function editMemo(id){
   if(inChk.checked) sections.append(makeSection("INBOUND", m));
   if(outChk.checked) sections.append(makeSection("OUTBOUND", m));
 
-  // 값 채우기
   setTimeout(()=>{
+    // HL/# 공유 값 채우기
+    document.querySelectorAll('[data-k="HL"]').forEach(el=>el.value = m.HL || "");
+    document.querySelectorAll('[data-k="HASH"]').forEach(el=>el.value = m.HASH || "");
+
     ["INBOUND","OUTBOUND"].forEach(type=>{
       if(!(type==="INBOUND"?m.hasIn:m.hasOut)) return;
 
@@ -596,17 +710,15 @@ function editMemo(id){
       };
 
       setV("c7", m[type+"-c7"]);
-      setV("HL", m[type+"-HL"]);
-      setV("HASH", m[type+"-HASH"]);
-
-      setV("t", m[type+"-t"]);
-      setV("d", m[type+"-d"]);
-      setV("bb", m[type+"-bb"]);
 
       [1,2,3,4].forEach(i=>{
         const el=document.querySelector(`[data-k="${type}-cmpt${i}"]`);
         if(el) el.value=m[type+`-cmpt${i}`]||"";
       });
+
+      setV("t", m[type+"-t"]);
+      setV("d", m[type+"-d"]);
+      setV("bb", m[type+"-bb"]);
 
       if(type==="OUTBOUND"){
         const tt=document.querySelector(`[data-k="${type}-tt"]`);
@@ -620,6 +732,8 @@ function editMemo(id){
 
       const shown=document.getElementById(type+"-TIMESHOWN");
       if(shown) shown.textContent=m[type+"-TIME"]||"";
+
+      // extras는 makeSection에서 이미 로드됨
     });
   },30);
 }
@@ -648,7 +762,7 @@ photoInput.onchange=e=>{
 function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
 function closePhoto(){photoLayer.style.display="none";}
 
-/* ===== EQUIPMENT ===== */
+/* ===== EQUIPMENT (바탕화면 전용) ===== */
 function openEquip(){
   const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
   tug1.value=pad(eq.tug1,2);
