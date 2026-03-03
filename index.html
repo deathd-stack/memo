@@ -69,11 +69,12 @@ input{
   font-weight:800;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:16px;
+  font-size:16px; /* 🔥 자동 줌 방지 */
 }
 
 input[data-4]{width:64px;}
 input[data-3]{width:52px;}
+input[data-2]{width:40px;}
 input[data-long]{flex:1;}
 
 .section{
@@ -170,11 +171,8 @@ document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
   if(!k) return;
 
-  if(k.includes("c7")||k.includes("HL"))
-    e.target.value=onlyNum(e.target.value,4);
-
-  if(k.includes("HASH"))
-    e.target.value=onlyNum(e.target.value,3);
+  if(k.includes("c7")||k==="HL") e.target.value=onlyNum(e.target.value,4);
+  if(k==="HASH") e.target.value=onlyNum(e.target.value,3);
 });
 
 function makeSection(type){
@@ -186,8 +184,8 @@ function makeSection(type){
 
     <div class="row">
       7C <input data-4 data-k="${type}-c7">
-      HL <input data-4 data-k="${type}-HL">
-      # <input data-3 data-k="${type}-HASH">
+      HL <input data-4 data-k="HL">
+      # <input data-3 data-k="HASH">
     </div>
 
     ${[1,2,3,4].map(i=>`
@@ -221,7 +219,9 @@ function saveMemo(){
 
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
-  data.savedTime=nowTime();
+
+  if(inChk.checked) data.INBOUND_time=nowTime();
+  if(outChk.checked) data.OUTBOUND_time=nowTime();
 
   if(editId)
     memos[memos.findIndex(m=>m.id===editId)]=data;
@@ -241,22 +241,22 @@ function renderList(flashId){
     if(m.id===flashId) div.classList.add("flash");
 
     let content="";
+    let time="";
 
     if(m.hasIn && m.hasOut){
       content=`
-        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m["INBOUND-HL"]||""}</div>
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m["OUTBOUND-HASH"]||""}</div>
+        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""}</div>
+        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m.HASH||""}</div>
       `;
+      time=m.OUTBOUND_time||m.INBOUND_time||"";
     }
     else if(m.hasIn){
-      content=`
-        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m["INBOUND-HL"]||""} # ${m["INBOUND-HASH"]||""}</div>
-      `;
+      content=`<div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      time=m.INBOUND_time||"";
     }
     else if(m.hasOut){
-      content=`
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} HL ${m["OUTBOUND-HL"]||""} # ${m["OUTBOUND-HASH"]||""}</div>
-      `;
+      content=`<div>OUT 7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      time=m.OUTBOUND_time||"";
     }
 
     div.innerHTML=`
@@ -265,7 +265,7 @@ function renderList(flashId){
         <div style="flex:1;" onclick="editMemo(${m.id})">
           ${content}
         </div>
-        <div class="time-red">${m.savedTime||""}</div>
+        <div class="time-red">${time}</div>
       </div>
     `;
     memoList.appendChild(div);
@@ -285,11 +285,6 @@ function editMemo(id){
       i.value=m[i.dataset.k]||"";
     });
   },50);
-}
-
-function closeModal(){
-  modal.style.display="none";
-  editId=null;
 }
 
 function deleteSelected(){
