@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>JAS MEMO VER 2</title>
 
 <style>
@@ -12,36 +12,31 @@ header{text-align:center;padding:22px;font-size:2.4rem;font-weight:900;cursor:po
 .controls{display:flex;justify-content:center;gap:14px;margin-bottom:12px;}
 button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weight:900;}
 
-/* 🔥 컴팩트 카드 */
 .memo{
   background:#fff;
   margin:8px 10px;
   padding:10px 12px;
   border-radius:14px;
   box-shadow:0 3px 8px rgba(0,0,0,.12);
-  transition:.2s;
   font-size:14px;
   line-height:1.3;
 }
 .memo.flash{animation:flash .5s;}
 @keyframes flash{50%{background:#ffe8b5;transform:scale(1.02);}}
 
-.memo strong{font-size:12px;}
-.memo div{margin:2px 0;}
+.time-red{
+  color:red;
+  font-weight:900;
+  font-size:13px;
+  float:right;
+}
 
 .check-line{
   display:flex;
   justify-content:center;
   gap:18px;
   align-items:center;
-  white-space:nowrap;
   margin-bottom:12px;
-}
-.check-line label{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  font-size:14px;
 }
 
 .modal{
@@ -60,20 +55,27 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
   padding:16px;
 }
 
-.row{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:6px;align-items:center;}
+.row{
+  display:flex;
+  gap:6px;
+  flex-wrap:nowrap;
+  margin-bottom:6px;
+  align-items:center;
+  white-space:nowrap;
+}
 
 input{
-  padding:4px 6px;
+  padding:6px;
   font-weight:800;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:13px;
+  font-size:16px; /* 🔥 자동 줌 방지 */
 }
 
 input[data-4]{width:64px;}
 input[data-3]{width:52px;}
 input[data-2]{width:40px;}
-input[data-long]{width:100%;}
+input[data-long]{flex:1;}
 
 .section{
   background:#f7f7f7;
@@ -83,7 +85,7 @@ input[data-long]{width:100%;}
 }
 
 .section-title{
-  font-size:13px;
+  font-size:14px;
   font-weight:900;
   margin-bottom:4px;
 }
@@ -94,15 +96,7 @@ textarea{
   border-radius:10px;
   padding:6px;
   border:1px solid #ccc;
-  font-size:13px;
-}
-
-.time-inline{
-  color:red;
-  font-weight:900;
-  font-size:13px;
-  margin-left:6px;
-  cursor:pointer;
+  font-size:16px;
 }
 
 #photoLayer{
@@ -177,25 +171,13 @@ document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
   if(!k) return;
 
-  if(k==="HL") e.target.value=onlyNum(e.target.value,4);
+  if(k.includes("c7")||k==="HL") e.target.value=onlyNum(e.target.value,4);
   if(k==="HASH") e.target.value=onlyNum(e.target.value,3);
-  if(k.includes("-c7")) e.target.value=onlyNum(e.target.value,4);
-  if(k.includes("-cob")) e.target.value=onlyNum(e.target.value,3);
-  if(k.includes("-d")||k.includes("-bb")||k.includes("-w")||k.includes("-c"))
-    e.target.value=onlyNum(e.target.value,2);
-  if(k.includes("-tt")||k.includes("-tb"))
-    e.target.value=onlyNum(e.target.value,4);
 });
 
 function makeSection(type){
   const d=document.createElement("div");
   d.className="section";
-
-  const extraOutbound = type==="OUTBOUND" ? `
-    <div class="row">
-      T/T <input data-4 data-k="${type}-tt">
-      T/B <input data-4 data-k="${type}-tb">
-    </div>` : "";
 
   d.innerHTML=`
     <div class="section-title">${type}</div>
@@ -204,8 +186,6 @@ function makeSection(type){
       7C <input data-4 data-k="${type}-c7">
       HL <input data-4 data-k="HL">
       # <input data-3 data-k="HASH">
-      <span class="time-inline" id="${type}-time"
-        ondblclick="editTime('${type}')"></span>
     </div>
 
     ${[1,2,3,4].map(i=>`
@@ -213,20 +193,6 @@ function makeSection(type){
         CMPT ${i}
         <input data-long data-k="${type}-cmpt${i}">
       </div>`).join("")}
-
-    <div class="row">
-      T <input data-2 data-k="${type}-t">
-      D <input data-2 data-k="${type}-d">
-      BB <input data-2 data-k="${type}-bb">
-    </div>
-
-    <div class="row">
-      W <input data-2 data-k="${type}-w">
-      C <input data-2 data-k="${type}-c">
-      COB <input data-3 data-k="${type}-cob">
-    </div>
-
-    ${extraOutbound}
 
     <textarea data-k="${type}-note"></textarea>
   `;
@@ -239,16 +205,6 @@ inChk.onchange=outChk.onchange=()=>{
   if(outChk.checked) sections.append(makeSection("OUTBOUND"));
 };
 
-function newMemo(){
-  editId=null;
-  inChk.checked=false;
-  outChk.checked=false;
-  sections.innerHTML="";
-  modal.style.display="flex";
-}
-
-function closeModal(){modal.style.display="none";}
-
 function nowTime(){
   const d=new Date();
   return d.getHours().toString().padStart(2,"0")+":"+
@@ -258,23 +214,14 @@ function nowTime(){
 function saveMemo(){
   const data={id:editId??Date.now()};
   document.querySelectorAll("[data-k]").forEach(i=>{
-    if(i.dataset.k.includes("c7"))
-      data[i.dataset.k]=i.value.padStart(4,"0");
-    else if(i.dataset.k==="HL")
-      data[i.dataset.k]=i.value.padStart(4,"0");
-    else if(i.dataset.k==="HASH")
-      data[i.dataset.k]=i.value.padStart(3,"0");
-    else
-      data[i.dataset.k]=i.value;
+    data[i.dataset.k]=i.value;
   });
 
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
 
-  if(inChk.checked)
-    data["INBOUND-time"]=data["INBOUND-time"]||nowTime();
-  if(outChk.checked)
-    data["OUTBOUND-time"]=data["OUTBOUND-time"]||nowTime();
+  if(inChk.checked) data.INBOUND_time=nowTime();
+  if(outChk.checked) data.OUTBOUND_time=nowTime();
 
   if(editId)
     memos[memos.findIndex(m=>m.id===editId)]=data;
@@ -286,18 +233,6 @@ function saveMemo(){
   renderList(data.id);
 }
 
-function editTime(type){
-  const newTime=prompt("시간 수정 (HH:MM 24시간)");
-  if(!newTime) return;
-  document.getElementById(type+"-time").innerText=newTime;
-
-  const m=memos.find(x=>x.id===editId);
-  if(m){
-    m[type+"-time"]=newTime;
-    localStorage.setItem("jas_memos",JSON.stringify(memos));
-  }
-}
-
 function renderList(flashId){
   memoList.innerHTML="";
   memos.forEach(m=>{
@@ -306,15 +241,22 @@ function renderList(flashId){
     if(m.id===flashId) div.classList.add("flash");
 
     let content="";
+    let time="";
 
-    if(m.hasIn){
-      content+=`<div><strong>INBOUND</strong></div>
-      <div>7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+    if(m.hasIn && m.hasOut){
+      content=`
+        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""}</div>
+        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m.HASH||""}</div>
+      `;
+      time=m.OUTBOUND_time||m.INBOUND_time||"";
     }
-
-    if(m.hasOut){
-      content+=`<div style="margin-top:4px;"><strong>OUTBOUND</strong></div>
-      <div>7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+    else if(m.hasIn){
+      content=`<div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      time=m.INBOUND_time||"";
+    }
+    else if(m.hasOut){
+      content=`<div>OUT 7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
+      time=m.OUTBOUND_time||"";
     }
 
     div.innerHTML=`
@@ -323,7 +265,9 @@ function renderList(flashId){
         <div style="flex:1;" onclick="editMemo(${m.id})">
           ${content}
         </div>
-      </div>`;
+        <div class="time-red">${time}</div>
+      </div>
+    `;
     memoList.appendChild(div);
   });
 }
@@ -340,10 +284,6 @@ function editMemo(id){
     document.querySelectorAll("[data-k]").forEach(i=>{
       i.value=m[i.dataset.k]||"";
     });
-    if(m["INBOUND-time"])
-      document.getElementById("INBOUND-time").innerText=m["INBOUND-time"];
-    if(m["OUTBOUND-time"])
-      document.getElementById("OUTBOUND-time").innerText=m["OUTBOUND-time"];
   },50);
 }
 
