@@ -12,6 +12,7 @@ header{text-align:center;padding:22px;font-size:2.4rem;font-weight:900;cursor:po
 .controls{display:flex;justify-content:center;gap:14px;margin-bottom:12px;}
 button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weight:900;}
 
+/* 컴팩트 카드 */
 .memo{
   background:#fff;
   margin:8px 10px;
@@ -19,7 +20,7 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
   border-radius:14px;
   box-shadow:0 3px 8px rgba(0,0,0,.12);
   font-size:14px;
-  line-height:1.3;
+  line-height:1.35;
 }
 .memo.flash{animation:flash .5s;}
 @keyframes flash{50%{background:#ffe8b5;transform:scale(1.02);}}
@@ -28,15 +29,24 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
   color:red;
   font-weight:900;
   font-size:13px;
-  float:right;
+  margin-left:8px;
+  white-space:nowrap;
 }
 
 .check-line{
   display:flex;
   justify-content:center;
-  gap:18px;
+  gap:14px;
   align-items:center;
   margin-bottom:12px;
+  white-space:nowrap;
+}
+.check-line label{
+  display:flex;
+  align-items:center;
+  gap:6px;           /* 체크칸-글자 간격 좁힘 */
+  font-size:14px;
+  font-weight:900;
 }
 
 .modal{
@@ -57,25 +67,26 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
 
 .row{
   display:flex;
-  gap:6px;
+  gap:8px;
   flex-wrap:nowrap;
-  margin-bottom:6px;
+  margin-bottom:8px;
   align-items:center;
   white-space:nowrap;
 }
 
 input{
-  padding:6px;
-  font-weight:800;
+  padding:6px 8px;
+  font-weight:900;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:16px; /* 🔥 자동 줌 방지 */
+  font-size:16px; /* iOS 자동 줌 방지 */
+  box-sizing:border-box;
 }
 
-input[data-4]{width:64px;}
-input[data-3]{width:52px;}
-input[data-2]{width:40px;}
-input[data-long]{flex:1;}
+input[data-4]{width:72px;text-align:center;}
+input[data-3]{width:62px;text-align:center;}
+input[data-2]{width:54px;text-align:center;}
+input[data-long]{flex:1;text-align:left;padding-left:10px;}
 
 .section{
   background:#f7f7f7;
@@ -84,21 +95,74 @@ input[data-long]{flex:1;}
   margin-top:10px;
 }
 
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:6px;
+}
 .section-title{
   font-size:14px;
   font-weight:900;
-  margin-bottom:4px;
+}
+.time-btn{
+  color:red;
+  font-weight:900;
+  font-size:13px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.subgrid{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:6px;
 }
 
 textarea{
   width:100%;
   height:60px;
   border-radius:10px;
-  padding:6px;
+  padding:8px;
   border:1px solid #ccc;
   font-size:16px;
+  font-weight:700;
+  box-sizing:border-box;
 }
 
+.smallbtn{
+  padding:8px 12px;
+  border-radius:12px;
+  font-weight:900;
+}
+
+.extra-wrap{
+  margin-top:8px;
+  background:#fff;
+  border-radius:10px;
+  padding:8px;
+  border:1px solid #e6e6e6;
+}
+.extra-row{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:6px;
+}
+.extra-row select{
+  height:34px;
+  font-size:14px;
+  font-weight:900;
+  border-radius:8px;
+  border:1px solid #ccc;
+  padding:0 8px;
+}
+.extra-row input{
+  height:34px;
+}
+
+/* 사진 */
 #photoLayer{
   position:fixed;
   inset:0;
@@ -111,6 +175,65 @@ textarea{
   max-width:100%;
   max-height:100%;
 }
+
+/* EQUIPMENT 버튼(왼쪽 아래) */
+#equipBtn{
+  position:fixed;
+  left:10px;
+  bottom:12px;
+  z-index:50;
+  background:#fff;
+  border:none;
+  border-radius:14px;
+  padding:10px 14px;
+  font-weight:900;
+  box-shadow:0 3px 10px rgba(0,0,0,.15);
+}
+
+/* 우측 상단 작은 표시(배지) */
+#equipBadge{
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:60;
+  background:rgba(0,0,0,.85);
+  color:#fff;
+  padding:8px 10px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:900;
+  line-height:1.3;
+  min-width:96px;
+  text-align:right;
+  display:none;
+}
+
+/* EQUIPMENT 모달 */
+#equipModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:flex-end;
+  z-index:80;
+}
+#equipBox{
+  background:#fff;
+  width:100%;
+  max-height:70vh;
+  overflow:auto;
+  border-radius:24px 24px 0 0;
+  padding:16px;
+}
+.equipRow{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+  white-space:nowrap;
+}
+.equipRow b{min-width:70px;}
 </style>
 </head>
 
@@ -127,26 +250,57 @@ textarea{
 <div id="memoList"></div>
 <input type="file" id="photoInput" accept="image/*" hidden>
 
+<!-- 우측 상단 장비 표시 -->
+<div id="equipBadge"></div>
+
+<!-- 왼쪽 아래 장비 버튼 -->
+<button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
+
+<!-- 메모 모달 -->
 <div class="modal" id="modal">
-<div class="box">
+  <div class="box">
 
-<div class="check-line">
-  <label><input type="checkbox" id="inChk"> INBOUND</label>
-  <label><input type="checkbox" id="outChk"> OUTBOUND</label>
+    <div class="check-line">
+      <label><input type="checkbox" id="inChk"> INBOUND</label>
+      <label><input type="checkbox" id="outChk"> OUTBOUND</label>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="row">
+      <button class="smallbtn" onclick="saveMemo()">SAVE</button>
+      <button class="smallbtn" onclick="closeModal()">CLOSE</button>
+    </div>
+
+  </div>
 </div>
 
-<div id="sections"></div>
-
-<div class="row">
-  <button onclick="saveMemo()">SAVE</button>
-  <button onclick="closeModal()">CLOSE</button>
-</div>
-
-</div>
-</div>
-
+<!-- 사진 레이어 -->
 <div id="photoLayer" ondblclick="closePhoto()">
   <img id="photoImg">
+</div>
+
+<!-- 장비 모달 -->
+<div id="equipModal" ondblclick="closeEquip()">
+  <div id="equipBox" onclick="event.stopPropagation()">
+    <div style="font-weight:900;font-size:16px;margin-bottom:12px;">EQUIPMENT</div>
+
+    <div class="equipRow">
+      <b>TUG</b>
+      <input id="tug1" data-2 inputmode="numeric" placeholder="00" maxlength="2">
+      <input id="tug2" data-2 inputmode="numeric" placeholder="00" maxlength="2">
+    </div>
+
+    <div class="equipRow">
+      <b>BELT</b>
+      <input id="belt" data-2 inputmode="numeric" placeholder="00" maxlength="2">
+    </div>
+
+    <div class="row">
+      <button class="smallbtn" onclick="saveEquip()">SAVE</button>
+      <button class="smallbtn" onclick="closeEquip()">CLOSE</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -159,80 +313,231 @@ const photoImg=document.getElementById("photoImg");
 const inChk=document.getElementById("inChk");
 const outChk=document.getElementById("outChk");
 
+const equipBadge=document.getElementById("equipBadge");
+const equipModal=document.getElementById("equipModal");
+const tug1=document.getElementById("tug1");
+const tug2=document.getElementById("tug2");
+const belt=document.getElementById("belt");
+
 let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
 let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
+/* ===== util ===== */
 function onlyNum(val,len){
   return (val||"").replace(/[^0-9]/g,'').slice(0,len);
 }
-
-document.addEventListener("input",e=>{
-  const k=e.target.dataset.k;
-  if(!k) return;
-
-  if(k.includes("c7")||k==="HL") e.target.value=onlyNum(e.target.value,4);
-  if(k==="HASH") e.target.value=onlyNum(e.target.value,3);
-});
-
-function makeSection(type){
-  const d=document.createElement("div");
-  d.className="section";
-
-  d.innerHTML=`
-    <div class="section-title">${type}</div>
-
-    <div class="row">
-      7C <input data-4 data-k="${type}-c7">
-      HL <input data-4 data-k="HL">
-      # <input data-3 data-k="HASH">
-    </div>
-
-    ${[1,2,3,4].map(i=>`
-      <div class="row">
-        CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}">
-      </div>`).join("")}
-
-    <textarea data-k="${type}-note"></textarea>
-  `;
-  return d;
+function pad(val,len){
+  const v=onlyNum(val,len);
+  return v ? v.padStart(len,"0") : "";
 }
-
-inChk.onchange=outChk.onchange=()=>{
-  sections.innerHTML="";
-  if(inChk.checked) sections.append(makeSection("INBOUND"));
-  if(outChk.checked) sections.append(makeSection("OUTBOUND"));
-};
-
 function nowTime(){
   const d=new Date();
   return d.getHours().toString().padStart(2,"0")+":"+
          d.getMinutes().toString().padStart(2,"0");
 }
 
+/* ===== 입력 제한 + 자리수 반영 ===== */
+document.addEventListener("input",e=>{
+  const k=e.target.dataset.k;
+  if(!k) return;
+
+  if(k.endsWith("-c7")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-HL")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-HASH")) e.target.value=onlyNum(e.target.value,3);
+
+  if(k.endsWith("-t")) e.target.value=onlyNum(e.target.value,3);
+  if(k.endsWith("-d")) e.target.value=onlyNum(e.target.value,2);
+  if(k.endsWith("-bb")) e.target.value=onlyNum(e.target.value,2);
+
+  if(k.endsWith("-tt")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-tb")) e.target.value=onlyNum(e.target.value,4);
+
+  if(k.startsWith("extraVal-")) e.target.value=onlyNum(e.target.value,3);
+});
+
+/* ===== 섹션 생성 ===== */
+function makeSection(type, memoData){
+  const d=document.createElement("div");
+  d.className="section";
+
+  const savedTime = memoData ? (memoData[type+"-TIME"]||"") : "";
+
+  d.innerHTML=`
+    <div class="section-head">
+      <div class="section-title">${type}</div>
+      <div class="time-btn" id="${type}-TIMEBTN">TIME</div>
+    </div>
+
+    <div class="row">
+      7C <input data-4 inputmode="numeric" data-k="${type}-c7" maxlength="4" placeholder="0000">
+      HL <input data-4 inputmode="numeric" data-k="${type}-HL" maxlength="4" placeholder="0000">
+      # <input data-3 inputmode="numeric" data-k="${type}-HASH" maxlength="3" placeholder="000">
+      <span class="time-red" id="${type}-TIMESHOWN"></span>
+    </div>
+
+    <div class="row">
+      T <input data-3 inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000">
+      D <input data-2 inputmode="numeric" data-k="${type}-d" maxlength="2" placeholder="00">
+      BB <input data-2 inputmode="numeric" data-k="${type}-bb" maxlength="2" placeholder="00">
+    </div>
+
+    ${[1,2,3,4].map(i=>`
+      <div class="row">
+        CMPT ${i}
+        <input data-long data-k="${type}-cmpt${i}" placeholder="TEXT">
+      </div>`).join("")}
+
+    ${type==="OUTBOUND" ? `
+      <div class="row">
+        T/T <input data-4 inputmode="numeric" data-k="${type}-tt" maxlength="4" placeholder="0000">
+        T/B <input data-4 inputmode="numeric" data-k="${type}-tb" maxlength="4" placeholder="0000">
+      </div>
+    ` : ""}
+
+    <div class="extra-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-weight:900;">EXTRA</div>
+        <button type="button" class="smallbtn" onclick="addExtraRow('${type}')">+</button>
+      </div>
+      <div id="${type}-EXTRAS"></div>
+    </div>
+
+    <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
+  `;
+
+  // TIME 버튼 동작
+  const btn = d.querySelector(`#${type}-TIMEBTN`);
+  const shown = d.querySelector(`#${type}-TIMESHOWN`);
+  shown.textContent = savedTime || "";
+
+  btn.onclick = ()=>{
+    const t=nowTime();
+    shown.textContent=t;
+    // 즉시 반영(편집 중 저장까지는 안해도 됨)
+  };
+  btn.ondblclick = ()=>{
+    const cur = shown.textContent || nowTime();
+    const t = prompt("TIME (HH:MM 24H)", cur);
+    if(t) shown.textContent=t;
+  };
+
+  // 기존 extras 불러오기
+  const extrasBox = d.querySelector(`#${type}-EXTRAS`);
+  const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
+  extras.forEach(ex=>{
+    extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val));
+  });
+
+  return d;
+}
+
+/* EXTRA row */
+const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
+
+function makeExtraRow(type, key="", val=""){
+  const row=document.createElement("div");
+  row.className="extra-row";
+  row.innerHTML=`
+    <select data-extra-type="${type}">
+      ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
+    </select>
+    <input data-3 inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+    <button type="button" class="smallbtn" onclick="this.parentElement.remove()">-</button>
+  `;
+  return row;
+}
+function addExtraRow(type){
+  const box=document.getElementById(type+"-EXTRAS");
+  if(!box) return;
+  box.appendChild(makeExtraRow(type,"W",""));
+}
+
+/* 체크 변경 -> 섹션 렌더 */
+inChk.onchange=outChk.onchange=()=>{
+  sections.innerHTML="";
+  if(inChk.checked) sections.append(makeSection("INBOUND", null));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND", null));
+};
+
+/* ===== 메모 추가/닫기 ===== */
+function newMemo(){
+  editId=null;
+  inChk.checked=false;
+  outChk.checked=false;
+  sections.innerHTML="";
+  modal.style.display="flex";
+}
+function closeModal(){
+  modal.style.display="none";
+  editId=null;
+}
+
+/* ===== 저장 ===== */
 function saveMemo(){
   const data={id:editId??Date.now()};
-  document.querySelectorAll("[data-k]").forEach(i=>{
-    data[i.dataset.k]=i.value;
-  });
 
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
 
-  if(inChk.checked) data.INBOUND_time=nowTime();
-  if(outChk.checked) data.OUTBOUND_time=nowTime();
+  // 각 섹션 값 저장
+  ["INBOUND","OUTBOUND"].forEach(type=>{
+    if(!(type==="INBOUND"?data.hasIn:data.hasOut)) return;
 
-  if(editId)
-    memos[memos.findIndex(m=>m.id===editId)]=data;
-  else
+    // 기본 필드
+    const get = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
+    const c7 = get("c7")?.value || "";
+    const hl = get("HL")?.value || "";
+    const hash = get("HASH")?.value || "";
+
+    data[type+"-c7"]=pad(c7,4);
+    data[type+"-HL"]=pad(hl,4);
+    data[type+"-HASH"]=pad(hash,3);
+
+    data[type+"-t"]=pad(document.querySelector(`[data-k="${type}-t"]`)?.value,3);
+    data[type+"-d"]=pad(document.querySelector(`[data-k="${type}-d"]`)?.value,2);
+    data[type+"-bb"]=pad(document.querySelector(`[data-k="${type}-bb"]`)?.value,2);
+
+    [1,2,3,4].forEach(i=>{
+      data[type+`-cmpt${i}`]=document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+    });
+
+    if(type==="OUTBOUND"){
+      data[type+"-tt"]=pad(document.querySelector(`[data-k="${type}-tt"]`)?.value,4);
+      data[type+"-tb"]=pad(document.querySelector(`[data-k="${type}-tb"]`)?.value,4);
+    }
+
+    data[type+"-note"]=document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+
+    // TIME(섹션 오른쪽 TIME 버튼 결과)
+    const tShown = document.getElementById(type+"-TIMESHOWN");
+    data[type+"-TIME"]=tShown ? (tShown.textContent||"") : "";
+
+    // EXTRAS
+    const extras=[];
+    const box=document.getElementById(type+"-EXTRAS");
+    if(box){
+      [...box.querySelectorAll(".extra-row")].forEach(r=>{
+        const key = r.querySelector("select")?.value || "";
+        const val = onlyNum(r.querySelector("input")?.value,3);
+        if(key && val) extras.push({key, val:val.padStart(3,"0")});
+      });
+    }
+    data[type+"-EXTRAS"]=extras;
+  });
+
+  if(editId){
+    memos[memos.findIndex(m=>m.id===editId)] = data;
+  }else{
     memos.push(data);
+  }
 
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeModal();
   renderList(data.id);
 }
 
+/* ===== 리스트 출력 ===== */
 function renderList(flashId){
   memoList.innerHTML="";
   memos.forEach(m=>{
@@ -241,52 +546,85 @@ function renderList(flashId){
     if(m.id===flashId) div.classList.add("flash");
 
     let content="";
-    let time="";
 
     if(m.hasIn && m.hasOut){
-      content=`
-        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""}</div>
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m.HASH||""}</div>
-      `;
-      time=m.OUTBOUND_time||m.INBOUND_time||"";
-    }
-    else if(m.hasIn){
-      content=`<div>IN 7C ${m["INBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
-      time=m.INBOUND_time||"";
-    }
-    else if(m.hasOut){
-      content=`<div>OUT 7C ${m["OUTBOUND-c7"]||""} HL ${m.HL||""} # ${m.HASH||""}</div>`;
-      time=m.OUTBOUND_time||"";
+      // 둘 다: IN 줄 + OUT 줄
+      content += `<div><b>IN</b> 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]</div>`;
+      content += `<div><b>OUT</b> 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>`;
+    }else if(m.hasIn){
+      content += `<div><b>IN</b> 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]</div>`;
+    }else if(m.hasOut){
+      content += `<div><b>OUT</b> 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>`;
+    }else{
+      content += `<div>(EMPTY)</div>`;
     }
 
     div.innerHTML=`
-      <div style="display:flex;gap:6px;">
-        <input type="checkbox" data-id="${m.id}">
-        <div style="flex:1;" onclick="editMemo(${m.id})">
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <input type="checkbox" data-id="${m.id}" style="margin-top:3px;">
+        <div style="flex:1;cursor:pointer;" onclick="editMemo(${m.id})">
           ${content}
         </div>
-        <div class="time-red">${time}</div>
       </div>
     `;
     memoList.appendChild(div);
   });
 }
 
+/* ===== 수정(불러오기) ===== */
 function editMemo(id){
   const m=memos.find(x=>x.id===id);
+  if(!m) return;
   editId=id;
-  modal.style.display="flex";
-  inChk.checked=m.hasIn;
-  outChk.checked=m.hasOut;
-  inChk.onchange();
 
+  modal.style.display="flex";
+  inChk.checked=!!m.hasIn;
+  outChk.checked=!!m.hasOut;
+
+  sections.innerHTML="";
+  if(inChk.checked) sections.append(makeSection("INBOUND", m));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND", m));
+
+  // 값 채우기
   setTimeout(()=>{
-    document.querySelectorAll("[data-k]").forEach(i=>{
-      i.value=m[i.dataset.k]||"";
+    ["INBOUND","OUTBOUND"].forEach(type=>{
+      if(!(type==="INBOUND"?m.hasIn:m.hasOut)) return;
+
+      const setV=(k,val)=>{
+        const el=document.querySelector(`[data-k="${type}-${k}"]`);
+        if(el) el.value=val||"";
+      };
+
+      setV("c7", m[type+"-c7"]);
+      setV("HL", m[type+"-HL"]);
+      setV("HASH", m[type+"-HASH"]);
+
+      setV("t", m[type+"-t"]);
+      setV("d", m[type+"-d"]);
+      setV("bb", m[type+"-bb"]);
+
+      [1,2,3,4].forEach(i=>{
+        const el=document.querySelector(`[data-k="${type}-cmpt${i}"]`);
+        if(el) el.value=m[type+`-cmpt${i}`]||"";
+      });
+
+      if(type==="OUTBOUND"){
+        const tt=document.querySelector(`[data-k="${type}-tt"]`);
+        const tb=document.querySelector(`[data-k="${type}-tb"]`);
+        if(tt) tt.value=m[type+"-tt"]||"";
+        if(tb) tb.value=m[type+"-tb"]||"";
+      }
+
+      const note=document.querySelector(`[data-k="${type}-note"]`);
+      if(음표) note.value=m[type+"-note"]||"";
+
+      const shown=document.getElementById(type+"-TIMESHOWN");
+      if(shown) shown.textContent=m[type+"-TIME"]||"";
     });
-  },50);
+  },30);
 }
 
+/* ===== 삭제 ===== */
 function deleteSelected(){
   const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
   const ids=[...checks].map(c=>Number(c.dataset.id));
@@ -295,10 +633,11 @@ function deleteSelected(){
   renderList();
 }
 
-/* 사진 */
+/* ===== 사진 ===== */
 function addPhoto(){photoInput.click();}
 photoInput.onchange=e=>{
   const f=e.target.files[0];
+  if(!f) return;
   const r=new FileReader();
   r.onload=()=>{
     photo=r.result;
@@ -309,7 +648,38 @@ photoInput.onchange=e=>{
 function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
 function closePhoto(){photoLayer.style.display="none";}
 
+/* ===== EQUIPMENT ===== */
+function openEquip(){
+  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
+  tug1.value=pad(eq.tug1,2);
+  tug2.value=pad(eq.tug2,2);
+  belt.value=pad(eq.belt,2);
+  equipModal.style.display="flex";
+}
+function closeEquip(){equipModal.style.display="none";}
+function saveEquip(){
+  const eq={
+    tug1: pad(tug1.value,2),
+    tug2: pad(tug2.value,2),
+    belt: pad(belt.value,2)
+  };
+  localStorage.setItem("jas_equipment",JSON.stringify(eq));
+  updateEquipBadge();
+  closeEquip();
+}
+function updateEquipBadge(){
+  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
+  if(!eq.tug1 && !eq.tug2 && !eq.belt){
+    equipBadge.style.display="none";
+    return;
+  }
+  equipBadge.innerHTML = `TUG ${eq.tug1||"00"}/${eq.tug2||"00"}<br>BELT ${eq.belt||"00"}`;
+  equipBadge.style.display="block";
+}
+
+/* init */
 renderList();
+updateEquipBadge();
 </script>
 
 </body>
