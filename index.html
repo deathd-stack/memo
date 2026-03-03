@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>JAS MEMO VER 2</title>
+<title>JAS MEMO VER 3</title>
 
 <style>
 body{margin:0;font-family:-apple-system;background:#ff9f1c;font-weight:600;}
@@ -19,16 +19,14 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
   border-radius:14px;
   box-shadow:0 3px 8px rgba(0,0,0,.12);
   font-size:14px;
-  line-height:1.3;
+  line-height:1.4;
 }
-.memo.flash{animation:flash .5s;}
-@keyframes flash{50%{background:#ffe8b5;transform:scale(1.02);}}
 
-.time-red{
+.time-btn{
   color:red;
   font-weight:900;
   font-size:13px;
-  float:right;
+  cursor:pointer;
 }
 
 .check-line{
@@ -58,7 +56,6 @@ button{padding:8px 14px;border:none;border-radius:14px;background:#fff;font-weig
 .row{
   display:flex;
   gap:6px;
-  flex-wrap:nowrap;
   margin-bottom:6px;
   align-items:center;
   white-space:nowrap;
@@ -97,34 +94,19 @@ textarea{
   border:1px solid #ccc;
   font-size:16px;
 }
-
-#photoLayer{
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-#photoLayer img{
-  max-width:100%;
-  max-height:100%;
-}
 </style>
 </head>
 
 <body>
 
-<header ondblclick="openPhoto()">JAS MEMO VER 2</header>
+<header>JAS MEMO VER 3</header>
 
 <div class="controls">
   <button onclick="newMemo()">ADD</button>
   <button onclick="deleteSelected()">DELETE</button>
-  <button onclick="addPhoto()">PHOTO</button>
 </div>
 
 <div id="memoList"></div>
-<input type="file" id="photoInput" accept="image/*" hidden>
 
 <div class="modal" id="modal">
 <div class="box">
@@ -144,22 +126,14 @@ textarea{
 </div>
 </div>
 
-<div id="photoLayer" ondblclick="closePhoto()">
-  <img id="photoImg">
-</div>
-
 <script>
 const modal=document.getElementById("modal");
 const sections=document.getElementById("sections");
 const memoList=document.getElementById("memoList");
-const photoInput=document.getElementById("photoInput");
-const photoLayer=document.getElementById("photoLayer");
-const photoImg=document.getElementById("photoImg");
 const inChk=document.getElementById("inChk");
 const outChk=document.getElementById("outChk");
 
 let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
-let photo=localStorage.getItem("jas_photo");
 let editId=null;
 
 function onlyNum(val,len){
@@ -169,12 +143,8 @@ function onlyNum(val,len){
 document.addEventListener("input",e=>{
   const k=e.target.dataset.k;
   if(!k) return;
-
-  if(k.includes("c7")||k.includes("HL"))
-    e.target.value=onlyNum(e.target.value,4);
-
-  if(k.includes("HASH"))
-    e.target.value=onlyNum(e.target.value,3);
+  if(k.includes("c7")||k.includes("HL")) e.target.value=onlyNum(e.target.value,4);
+  if(k.includes("HASH")) e.target.value=onlyNum(e.target.value,3);
 });
 
 function makeSection(type){
@@ -183,19 +153,11 @@ function makeSection(type){
 
   d.innerHTML=`
     <div class="section-title">${type}</div>
-
     <div class="row">
       7C <input data-4 data-k="${type}-c7">
       HL <input data-4 data-k="${type}-HL">
       # <input data-3 data-k="${type}-HASH">
     </div>
-
-    ${[1,2,3,4].map(i=>`
-      <div class="row">
-        CMPT ${i}
-        <input data-long data-k="${type}-cmpt${i}">
-      </div>`).join("")}
-
     <textarea data-k="${type}-note"></textarea>
   `;
   return d;
@@ -221,7 +183,7 @@ function saveMemo(){
 
   data.hasIn=inChk.checked;
   data.hasOut=outChk.checked;
-  data.savedTime=nowTime();
+  data.savedTime = data.savedTime || "";
 
   if(editId)
     memos[memos.findIndex(m=>m.id===editId)]=data;
@@ -230,46 +192,70 @@ function saveMemo(){
 
   localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeModal();
-  renderList(data.id);
+  renderList();
 }
 
-function renderList(flashId){
+function renderList(){
   memoList.innerHTML="";
   memos.forEach(m=>{
     const div=document.createElement("div");
     div.className="memo";
-    if(m.id===flashId) div.classList.add("flash");
 
+    let titleTop="";
     let content="";
 
     if(m.hasIn && m.hasOut){
+      titleTop="INBOUND / OUTBOUND";
       content=`
-        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m["INBOUND-HL"]||""}</div>
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} # ${m["OUTBOUND-HASH"]||""}</div>
+        <div>IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]</div>
+        <div>OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>
       `;
     }
     else if(m.hasIn){
+      titleTop="INBOUND";
       content=`
-        <div>IN 7C ${m["INBOUND-c7"]||""} HL ${m["INBOUND-HL"]||""} # ${m["INBOUND-HASH"]||""}</div>
+        <div>7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]</div>
       `;
     }
     else if(m.hasOut){
+      titleTop="OUTBOUND";
       content=`
-        <div>OUT 7C ${m["OUTBOUND-c7"]||""} HL ${m["OUTBOUND-HL"]||""} # ${m["OUTBOUND-HASH"]||""}</div>
+        <div>7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]</div>
       `;
     }
 
     div.innerHTML=`
-      <div style="display:flex;gap:6px;">
-        <input type="checkbox" data-id="${m.id}">
-        <div style="flex:1;" onclick="editMemo(${m.id})">
-          ${content}
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>${titleTop}</div>
+        <div class="time-btn" onclick="handleTime(${m.id},this)">
+          ${m.savedTime ? m.savedTime : "TIME"}
         </div>
-        <div class="time-red">${m.savedTime||""}</div>
+      </div>
+
+      <div onclick="editMemo(${m.id})">
+        ${content}
       </div>
     `;
+
     memoList.appendChild(div);
   });
+}
+
+function handleTime(id,el){
+  const memo=memos.find(m=>m.id===id);
+
+  if(!memo.savedTime){
+    memo.savedTime=nowTime();
+    el.innerText=memo.savedTime;
+  }else{
+    const newTime=prompt("시간 수정 (HH:MM)",memo.savedTime);
+    if(newTime) {
+      memo.savedTime=newTime;
+      el.innerText=newTime;
+    }
+  }
+
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
 }
 
 function editMemo(id){
@@ -300,19 +286,13 @@ function deleteSelected(){
   renderList();
 }
 
-/* 사진 */
-function addPhoto(){photoInput.click();}
-photoInput.onchange=e=>{
-  const f=e.target.files[0];
-  const r=new FileReader();
-  r.onload=()=>{
-    photo=r.result;
-    localStorage.setItem("jas_photo",photo);
-  };
-  r.readAsDataURL(f);
-};
-function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
-function closePhoto(){photoLayer.style.display="none";}
+function newMemo(){
+  editId=null;
+  modal.style.display="flex";
+  inChk.checked=false;
+  outChk.checked=false;
+  sections.innerHTML="";
+}
 
 renderList();
 </script>
