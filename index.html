@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.3</title>
+<title>JAS MEMO VER 4.4</title>
 
 <style>
   :root{
@@ -18,23 +18,33 @@
     --blue:#2f7df6;
     --red:#e20000;
     --line:#cfcfcf;
+
+    /* ✅ 전체 크기 3분의2 */
+    --s: .66;
   }
+
   *{box-sizing:border-box}
-  html, body{ width:100%; overflow-x:hidden; }
+  html, body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;            /* ✅ 가로 밀림 방지 */
+    overscroll-behavior-x:none;   /* ✅ iOS 좌우 튕김 방지 */
+  }
+
   body{
     margin:0;
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-weight:700;
-    background:radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
-              linear-gradient(180deg,var(--bg1),var(--bg2));
+    background:
+      radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
     min-height:100vh;
-    overflow-x:hidden;
   }
 
-  /* HOME HEADER */
+  /* ====== HOME HEADER ====== */
   header{
     text-align:center;
-    padding:22px 14px 10px;
+    padding:calc(22px * var(--s)) calc(14px * var(--s)) calc(10px * var(--s));
     user-select:none;
     cursor:pointer;
   }
@@ -42,53 +52,53 @@
     display:flex;
     justify-content:center;
     align-items:baseline;
-    gap:10px;
+    gap:calc(10px * var(--s));
     flex-wrap:wrap;
   }
   .titleMain{
-    font-size:42px;
+    font-size:calc(42px * var(--s));
     font-weight:1000;
     letter-spacing:-1px;
     color:#111;
   }
   .titleVer{
-    font-size:18px;
+    font-size:calc(18px * var(--s));
     font-weight:1000;
     color:#111;
     opacity:.9;
   }
 
-  /* TOP BUTTONS */
+  /* ====== TOP BUTTONS ====== */
   .controls{
     display:flex;
     justify-content:center;
-    gap:14px;
-    padding:8px 14px 8px;
+    gap:calc(14px * var(--s));
+    padding:calc(8px * var(--s)) calc(14px * var(--s));
   }
   button{
     border:none;
-    border-radius:22px;
+    border-radius:calc(22px * var(--s));
     background:#fff;
-    padding:14px 22px;
+    padding:calc(14px * var(--s)) calc(22px * var(--s));
     font-weight:1000;
     color:var(--blue);
-    font-size:18px;
+    font-size:calc(18px * var(--s));
     box-shadow:0 10px 20px rgba(0,0,0,.18);
+    cursor:pointer;
   }
   button:active{transform:scale(.99)}
 
-  /* LIST */
+  /* ====== LIST ====== */
   #memoList{
-    padding:10px 14px 120px;
+    padding:calc(10px * var(--s)) calc(14px * var(--s)) calc(110px * var(--s));
     max-width:780px;
     margin:0 auto;
-    overflow-x:hidden;
   }
   .memoCard{
     background:rgba(246,231,215,.92);
-    border-radius:24px;
-    padding:14px 12px;
-    margin:12px 0;
+    border-radius:calc(24px * var(--s));
+    padding:calc(14px * var(--s)) calc(12px * var(--s));
+    margin:calc(12px * var(--s)) 0;
     box-shadow:0 16px 26px rgba(0,0,0,.18);
     border:2px solid rgba(255,255,255,.45);
     overflow:hidden;
@@ -96,101 +106,109 @@
   }
   .memoRow{
     display:flex;
-    gap:10px;
+    gap:calc(10px * var(--s));
     align-items:flex-start;
-    min-width:0;
+    max-width:100%;
   }
   .selBox{
-    width:30px;
-    height:30px;
-    border-radius:10px;
+    width:calc(30px * var(--s));
+    height:calc(30px * var(--s));
+    border-radius:calc(10px * var(--s));
     border:2px solid rgba(0,0,0,.25);
     background:#fff;
     appearance:none;
-    margin-top:8px;
+    margin-top:calc(8px * var(--s));
     flex:0 0 auto;
   }
   .selBox:checked{
-    background:linear-gradient(#fff,#fff),
+    background:
+      linear-gradient(#fff,#fff),
       radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
   }
+
   .lines{
     flex:1;
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:calc(10px * var(--s));
     cursor:pointer;
     min-width:0;
+    max-width:100%;
   }
   .line{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:calc(10px * var(--s));
     min-width:0;
+    max-width:100%;
   }
   .tagPill{
     background:#111;
     color:#fff;
     border-radius:999px;
-    padding:9px 12px;
+    padding:calc(9px * var(--s)) calc(12px * var(--s));
     font-weight:1000;
-    font-size:16px;
-    min-width:70px;
+    font-size:calc(16px * var(--s));
+    min-width:calc(70px * var(--s));
     text-align:center;
     flex:0 0 auto;
+    letter-spacing:.5px;
   }
   .textPill{
     background:rgba(210,199,188,.45);
     border-radius:999px;
-    padding:10px 14px;
+    padding:calc(10px * var(--s)) calc(14px * var(--s));
     font-weight:1000;
-    font-size:18px;
+    font-size:calc(18px * var(--s));
     color:#111;
     flex:1;
     min-width:0;
+    max-width:100%;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
+
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
 
-  /* EQUIP HOME */
+  /* ====== EQUIP HOME ====== */
   #equipBtn{
     position:fixed;
-    left:14px;
-    bottom:18px;
+    left:calc(14px * var(--s));
+    bottom:calc((14px + env(safe-area-inset-bottom)) * 1);
     z-index:20;
     border:none;
-    border-radius:18px;
+    border-radius:calc(18px * var(--s));
     background:#fff;
-    padding:12px 18px;
+    padding:calc(12px * var(--s)) calc(18px * var(--s));
     font-weight:1000;
     color:var(--blue);
-    font-size:16px;
+    font-size:calc(16px * var(--s));
     box-shadow:0 12px 22px rgba(0,0,0,.18);
   }
+
+  /* ✅ 동그라미친 빈 공간 제거: min-width 제거 + padding 조정 */
   #equipBadge{
     position:fixed;
-    right:14px;
-    bottom:18px;
+    right:calc(14px * var(--s));
+    bottom:calc((14px + env(safe-area-inset-bottom)) * 1);
     z-index:20;
     background:rgba(0,0,0,.86);
     color:#fff;
-    border-radius:20px;
-    padding:12px 14px;
+    border-radius:calc(20px * var(--s));
+    padding:calc(12px * var(--s)) calc(14px * var(--s));
     font-weight:1000;
-    line-height:1.15;
+    line-height:1.12;
     text-align:right;
-    min-width:170px;
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
-    overflow:hidden;
+    max-width:calc(240px * var(--s));
   }
-  #equipBadge .b1{font-size:18px;}
-  #equipBadge .b2{font-size:18px; opacity:.95;}
+  #equipBadge .b1{font-size:calc(18px * var(--s));}
+  #equipBadge .b2{font-size:calc(18px * var(--s)); opacity:.95;}
 
-  /* MODAL */
+  /* ====== MODAL ====== */
   .modal{
     position:fixed;
     inset:0;
@@ -206,27 +224,27 @@
     width:100%;
     max-width:820px;
     background:#fff;
-    border-radius:26px 26px 0 0;
-    padding:10px 14px 16px;
+    border-radius:calc(26px * var(--s)) calc(26px * var(--s)) 0 0;
+    padding:calc(10px * var(--s)) calc(14px * var(--s)) calc(16px * var(--s));
     max-height:92vh;
     overflow:auto;
-    overflow-x:hidden; /* ✅ 옆으로 밀림 방지 */
-    transform:translateY(0);
-    will-change:transform;
+    overflow-x:hidden;          /* ✅ 가로 밀림 방지 */
     -webkit-overflow-scrolling:touch;
     pointer-events:auto;
+    transform:translateY(0);
+    will-change:transform;
   }
 
   .dragArea{
-    padding:6px 0 8px;
+    padding:calc(6px * var(--s)) 0 calc(8px * var(--s));
     position:sticky;
     top:0;
     background:#fff;
     z-index:2;
   }
   .drag-handle{
-    width:60px;
-    height:7px;
+    width:calc(60px * var(--s));
+    height:calc(7px * var(--s));
     background:#cfcfcf;
     border-radius:999px;
     margin:0 auto;
@@ -236,50 +254,52 @@
     text-align:center;
     font-weight:1000;
     color:#111;
-    padding:6px 0 10px;
+    padding:calc(6px * var(--s)) 0 calc(10px * var(--s));
     cursor:pointer;
     user-select:none;
   }
-  .modalTitleTap .m1{font-size:18px;}
-  .modalTitleTap .m2{font-size:12px; opacity:.55; margin-top:2px;}
+  .modalTitleTap .m1{font-size:calc(18px * var(--s));}
+  .modalTitleTap .m2{font-size:calc(12px * var(--s)); opacity:.55; margin-top:2px;}
 
   .check-line{
     display:flex;
     justify-content:center;
-    gap:18px;
+    gap:calc(18px * var(--s));
     align-items:center;
-    padding:6px 0 10px;
+    padding:calc(6px * var(--s)) 0 calc(10px * var(--s));
     white-space:nowrap;
   }
   .check-line label{
     display:flex;
     align-items:center;
-    gap:8px;
-    font-size:16px;
+    gap:calc(8px * var(--s));
+    font-size:calc(16px * var(--s));
     font-weight:1000;
   }
   .check-line input[type="checkbox"]{
-    width:22px;height:22px;
+    width:calc(22px * var(--s));
+    height:calc(22px * var(--s));
     accent-color:var(--blue);
   }
 
   .section{
     background:#f2f2f2;
-    border-radius:16px;
-    padding:12px 12px;
-    margin:10px 0;
+    border-radius:calc(16px * var(--s));
+    padding:calc(12px * var(--s));
+    margin:calc(10px * var(--s)) 0;
     overflow:hidden;
     border:1px solid #e6e6e6;
+    max-width:100%;
   }
   .sectionHead{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:10px;
-    gap:10px;
+    margin-bottom:calc(10px * var(--s));
+    gap:calc(10px * var(--s));
   }
   .sectionTitle{
-    font-size:24px;
+    font-size:calc(24px * var(--s));
     font-weight:1000;
     letter-spacing:.3px;
   }
@@ -287,152 +307,154 @@
   .timeWrap{
     display:flex;
     align-items:baseline;
-    gap:10px;
+    gap:calc(10px * var(--s));
     white-space:nowrap;
   }
   .timeBtn{
     border:none;
     background:transparent;
     box-shadow:none;
-    padding:4px 8px;
+    padding:calc(4px * var(--s)) calc(8px * var(--s));
     margin:0;
     font-weight:1000;
-    font-size:16px;
+    font-size:calc(16px * var(--s));
     color:#111;
-    border-radius:10px;
+    border-radius:calc(10px * var(--s));
   }
   .timeBtn:active{background:rgba(226,27,27,.08);}
   .timeVal{
     font-weight:1000;
-    font-size:22px;
+    font-size:calc(22px * var(--s));
     color:var(--red);
-    min-width:64px;
+    min-width:calc(64px * var(--s));
     text-align:right;
   }
 
   .row{
     display:flex;
     align-items:center;
-    gap:10px;
-    margin:10px 0;
+    gap:calc(10px * var(--s));
+    margin:calc(10px * var(--s)) 0;
     flex-wrap:nowrap;
     min-width:0;
+    max-width:100%;
   }
   .lab{
-    font-size:20px;
+    font-size:calc(20px * var(--s));
     font-weight:1000;
-    min-width:40px;
+    min-width:calc(40px * var(--s));
     color:#111;
     white-space:nowrap;
   }
 
   input, textarea, select{
-    font-size:16px;
+    font-size:calc(16px * var(--s));
     font-weight:1000;
     border:2px solid var(--line);
-    border-radius:16px;
-    padding:10px 10px;
+    border-radius:calc(16px * var(--s));
+    padding:calc(10px * var(--s));
     outline:none;
     background:#fff;
     max-width:100%;
   }
-  input{height:48px}
+  input{
+    height:calc(48px * var(--s));
+  }
   textarea{
     width:100%;
-    height:76px;
+    height:calc(76px * var(--s));
     resize:none;
     font-weight:800;
   }
 
-  .w4,.w3,.w2,.wT{ text-align:center; width:100%; min-width:0; }
-  .w4{font-size:20px;}
-  .w3{font-size:20px;}
-  .w2{font-size:20px;}
-  .wT{font-size:20px;}
+  .w4,.w3,.w2,.wT{ text-align:center; width:100%; }
+  .w4{font-size:calc(20px * var(--s));}
+  .w3{font-size:calc(20px * var(--s));}
+  .w2{font-size:calc(20px * var(--s));}
+  .wT{font-size:calc(20px * var(--s));}
 
   .long{
     flex:1;
     min-width:0;
-    font-size:16px;
+    font-size:calc(16px * var(--s));
     font-weight:1000;
-    padding-left:14px;
+    padding-left:calc(14px * var(--s));
   }
 
   .extraBox{
     background:#fff;
     border:2px solid #e2e2e2;
-    border-radius:16px;
-    padding:12px;
-    margin-top:10px;
-    overflow:hidden;
+    border-radius:calc(16px * var(--s));
+    padding:calc(12px * var(--s));
+    margin-top:calc(10px * var(--s));
   }
   .extraHead{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:10px;
+    margin-bottom:calc(10px * var(--s));
   }
   .extraTitle{
-    font-size:20px;
+    font-size:calc(20px * var(--s));
     font-weight:1000;
     letter-spacing:.4px;
   }
   .iconBtn{
-    width:48px;
-    height:48px;
-    border-radius:16px;
+    width:calc(48px * var(--s));
+    height:calc(48px * var(--s));
+    border-radius:calc(16px * var(--s));
     border:none;
     background:#fff;
     box-shadow:0 8px 18px rgba(0,0,0,.10);
     color:var(--blue);
-    font-size:28px;
+    font-size:calc(28px * var(--s));
     font-weight:1000;
   }
   .extraRow{
     display:flex;
-    gap:10px;
+    gap:calc(10px * var(--s));
     align-items:center;
-    margin-top:10px;
-    min-width:0;
+    margin-top:calc(10px * var(--s));
+    max-width:100%;
   }
   .extraRow select{
-    width:130px;
-    height:48px;
-    font-size:16px;
+    width:calc(130px * var(--s));
+    height:calc(48px * var(--s));
+    font-size:calc(16px * var(--s));
     font-weight:1000;
   }
   .extraRow input{
-    width:130px;
-    height:48px;
-    font-size:20px;
+    width:calc(130px * var(--s));
+    height:calc(48px * var(--s));
+    font-size:calc(20px * var(--s));
     text-align:center;
   }
   .minusBtn{
-    width:60px;
-    height:48px;
-    border-radius:16px;
+    width:calc(60px * var(--s));
+    height:calc(48px * var(--s));
+    border-radius:calc(16px * var(--s));
     border:none;
     background:#eef1f7;
     color:var(--blue);
     font-weight:1000;
-    font-size:22px;
+    font-size:calc(22px * var(--s));
     box-shadow:none;
   }
 
   .bottomBtns{
     display:flex;
-    gap:18px;
-    padding:12px 6px 0;
+    gap:calc(18px * var(--s));
+    padding:calc(12px * var(--s)) calc(6px * var(--s)) 0;
     justify-content:flex-start;
   }
   .bottomBtns button{
-    padding:10px 14px;
-    font-size:16px;
+    padding:calc(10px * var(--s)) calc(14px * var(--s));
+    font-size:calc(16px * var(--s));
     box-shadow:none;
-    border-radius:14px;
+    border-radius:calc(14px * var(--s));
   }
 
-  /* PHOTO LAYER */
+  /* ====== PHOTO LAYER ====== */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -447,25 +469,54 @@
   /* ✅ 7C HL # 한줄 grid */
   .rowGrid3{
     display:grid;
-    grid-template-columns: 34px 1fr 34px 1fr 14px .95fr;
-    gap:10px;
+    grid-template-columns:
+      calc(34px * var(--s)) 1fr
+      calc(34px * var(--s)) 1fr
+      calc(14px * var(--s)) .95fr;
+    gap:calc(10px * var(--s));
     align-items:center;
-    margin:10px 0;
+    margin:calc(10px * var(--s)) 0;
     min-width:0;
+    max-width:100%;
   }
 
   /* ✅ T D BB 한줄 grid */
   .rowGridTDBB{
     display:grid;
-    grid-template-columns: 18px 1fr 18px .9fr 26px .9fr;
-    gap:10px;
+    grid-template-columns:
+      calc(18px * var(--s)) 1fr
+      calc(18px * var(--s)) .9fr
+      calc(26px * var(--s)) .9fr;
+    gap:calc(10px * var(--s));
     align-items:center;
-    margin:10px 0;
+    margin:calc(10px * var(--s)) 0;
     min-width:0;
+    max-width:100%;
   }
 
   .rowGrid3 input,
-  .rowGridTDBB input{ width:100%; min-width:0; }
+  .rowGridTDBB input{
+    width:100%;
+    min-width:0;
+  }
+
+  /* ✅ OUTBOUND T/T T/B 한줄 */
+  .rowGridTTTB{
+    display:grid;
+    grid-template-columns:
+      calc(46px * var(--s)) 1fr
+      calc(46px * var(--s)) 1fr;
+    gap:calc(10px * var(--s));
+    align-items:center;
+    margin:calc(10px * var(--s)) 0;
+    min-width:0;
+    max-width:100%;
+  }
+
+  /* ✅ iOS 폰트 자동 확대 방지(가로밀림 원인 중 하나) */
+  input, textarea, select, button{
+    -webkit-text-size-adjust:100%;
+  }
 </style>
 </head>
 
@@ -474,7 +525,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.3</div>
+    <div class="titleVer">VER 4.4</div>
   </div>
 </header>
 
@@ -491,7 +542,6 @@
 
 <input type="file" id="photoInput" accept="image/*" hidden />
 
-<!-- MEMO MODAL -->
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
     <div class="dragArea" id="dragArea">
@@ -517,28 +567,26 @@
   </div>
 </div>
 
-<!-- PHOTO -->
 <div id="photoLayer" ondblclick="closePhoto()" onclick="closePhoto()">
   <img id="photoImg" alt="photo" />
 </div>
 
-<!-- EQUIPMENT MODAL -->
 <div class="modal" id="equipModal" aria-hidden="true">
   <div class="box" style="max-height:70vh" onclick="event.stopPropagation()">
     <div class="dragArea">
       <div class="drag-handle"></div>
     </div>
 
-    <div style="font-weight:1000;font-size:20px;margin:6px 0 12px;">EQUIPMENT</div>
+    <div style="font-weight:1000;font-size:calc(20px * var(--s));margin:calc(6px * var(--s)) 0 calc(12px * var(--s));">EQUIPMENT</div>
 
     <div class="row">
-      <div class="lab" style="min-width:72px;">TUG</div>
+      <div class="lab" style="min-width:calc(72px * var(--s));">TUG</div>
       <input id="tug1" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
       <input id="tug2" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
     <div class="row">
-      <div class="lab" style="min-width:72px;">BELT</div>
+      <div class="lab" style="min-width:calc(72px * var(--s));">BELT</div>
       <input id="belt" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
@@ -574,7 +622,7 @@
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
 
-  // OUTBOUND HL/# 연동 상태(작성 중)
+  // ✅ INBOUND -> OUTBOUND HL/# 연동 (각 항목별로 끊을 수 있게)
   let outSyncHL = true;
   let outSyncHASH = true;
 
@@ -590,7 +638,7 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  // 숫자 입력 제한 + HL/# 연동
+  // ✅ 숫자 제한 + HL/# 공유
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
@@ -610,7 +658,7 @@
 
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
 
-    // INBOUND HL/# 바뀌면 OUTBOUND가 연동 상태일 때만 따라감
+    // ✅ INBOUND HL/# 입력 시 OUTBOUND가 연동 상태면 따라감
     if(outChk.checked){
       if(k === "INBOUND-HL" && outSyncHL){
         const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
@@ -622,7 +670,7 @@
       }
     }
 
-    // OUTBOUND쪽을 직접 만지면 연동 해제
+    // ✅ OUTBOUND를 직접 만지면 해당 항목만 연동 해제 (수정 가능)
     if(k === "OUTBOUND-HL") outSyncHL = false;
     if(k === "OUTBOUND-HASH") outSyncHASH = false;
   });
@@ -655,16 +703,16 @@
       </div>
 
       <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 1</div>
+        <div class="lab" style="min-width:calc(96px * var(--s));">CMPT 1</div>
         <input class="long" data-k="${type}-cmpt1" placeholder="TEXT" value="${cmpt1Default}">
       </div>
       <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 2</div>
+        <div class="lab" style="min-width:calc(96px * var(--s));">CMPT 2</div>
         <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${cmpt2Default}">
       </div>
       ${[3,4].map(i=>`
         <div class="row">
-          <div class="lab" style="min-width:96px;">CMPT ${i}</div>
+          <div class="lab" style="min-width:calc(96px * var(--s));">CMPT ${i}</div>
           <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT">
         </div>
       `).join("")}
@@ -679,10 +727,10 @@
       </div>
 
       ${type==="OUTBOUND" ? `
-        <div class="row">
-          <div class="lab" style="min-width:60px;">T/T</div>
+        <div class="rowGridTTTB">
+          <div class="lab">T/T</div>
           <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt">
-          <div class="lab" style="min-width:60px;">T/B</div>
+          <div class="lab">T/B</div>
           <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb">
         </div>
       ` : ""}
@@ -698,7 +746,6 @@
       <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
     `;
 
-    // TIME: 클릭=현재시간, 더블클릭=수정
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
     const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
     timeBtn.addEventListener("click", ()=>{ timeShown.textContent = nowTime(); });
@@ -734,16 +781,17 @@
     box.appendChild(makeExtraRow(type, "W", ""));
   }
 
-  // 체크 변경시 섹션 렌더
+  // ✅ 체크 변경시 섹션 렌더 + 연동 초기화
   inChk.onchange = outChk.onchange = ()=>{
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
     if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
 
-    // 둘 다 체크면 OUTBOUND HL/# 연동 ON
+    // 새 작성에서 둘 다 체크면 연동 ON
     outSyncHL = true;
     outSyncHASH = true;
 
+    // INBOUND 값이 이미 있으면 즉시 OUT에 복사
     if(inChk.checked && outChk.checked){
       const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
       const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
@@ -828,7 +876,7 @@
       data[type+"-EXTRAS"] = extras;
     });
 
-    // OUTBOUND HL/# 기본값 = INBOUND HL/# (비어있을 때만)
+    // ✅ 공유 기본값 보장: OUTBOUND HL/# 비어있으면 INBOUND 복사
     if(data.hasIn && data.hasOut){
       if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
       if(!data["OUTBOUND-HASH"]) data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || "";
@@ -846,77 +894,59 @@
     renderList(data.id);
   }
 
-  /* ✅✅✅ 여기 핵심: 표기 방식 고정 renderList */
+  // ✅ 표기 고정 (요구사항 그대로)
+  function buildLineText(m){
+    const inLineTwo = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
+    const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
+
+    const oneIn = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
+    const oneOut = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
+
+    // 둘 다 있으면 2줄 고정
+    if(m.hasIn && m.hasOut){
+      return [
+        {tag:"IN",  text: inLineTwo},
+        {tag:"OUT", text: outLineTwo}
+      ];
+    }
+
+    // 하나만 있으면 1줄(7C->HL-># 순서)
+    if(m.hasIn){
+      return [{tag:"IN", text: oneIn}];
+    }
+    if(m.hasOut){
+      return [{tag:"OUT", text: oneOut}];
+    }
+
+    return [{tag:"IN", text:"EMPTY"}];
+  }
+
   function renderList(flashId){
     memoList.innerHTML = "";
-
     memos.forEach(m=>{
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
-      // 값 준비
-      const in_c7 = m["INBOUND-c7"] || "";
-      const in_hl = m["INBOUND-HL"] || "";
-      const in_hash = m["INBOUND-HASH"] || "";
-
-      const out_c7 = m["OUTBOUND-c7"] || "";
-      const out_hl = m["OUTBOUND-HL"] || "";
-      const out_hash = m["OUTBOUND-HASH"] || "";
-
-      let linesHtml = "";
-
-      // ✅ IN+OUT 둘 다: 2줄 고정
-      if(m.hasIn && m.hasOut){
-        const inLine  = `7C[${in_c7}] HL[${in_hl}]`;
-        const outLine = `7C[${out_c7}] #[${out_hash}]`;
-
-        linesHtml = `
-          <div class="line">
-            <div class="tagPill">IN</div>
-            <div class="textPill">IN ${inLine}</div>
-          </div>
-          <div class="line">
-            <div class="tagPill">OUT</div>
-            <div class="textPill">OUT ${outLine}</div>
-          </div>
-        `;
-      }
-      // ✅ IN만: 1줄에 7C HL # 순서
-      else if(m.hasIn){
-        const one = `7C[${in_c7}] HL[${in_hl}] #[${in_hash}]`;
-        linesHtml = `
-          <div class="line">
-            <div class="tagPill">IN</div>
-            <div class="textPill">IN ${one}</div>
-          </div>
-        `;
-      }
-      // ✅ OUT만: 1줄에 7C HL # 순서
-      else if(m.hasOut){
-        const one = `7C[${out_c7}] HL[${out_hl}] #[${out_hash}]`;
-        linesHtml = `
-          <div class="line">
-            <div class="tagPill">OUT</div>
-            <div class="textPill">OUT ${one}</div>
-          </div>
-        `;
-      }
-      else{
-        linesHtml = `
-          <div class="line">
-            <div class="tagPill">IN</div>
-            <div class="textPill">EMPTY</div>
-          </div>
-        `;
-      }
+      const linesData = buildLineText(m);
+      const linesHTML = linesData.map(x =>
+        `<div class="line"><div class="tagPill">${x.tag}</div><div class="textPill">${x.text}</div></div>`
+      ).join("");
 
       card.innerHTML = `
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" onclick="editMemo(${m.id})">${linesHtml}</div>
+          <div class="lines" data-open="${m.id}">${linesHTML}</div>
         </div>
       `;
       memoList.appendChild(card);
+    });
+
+    // ✅ 클릭 이벤트를 JS로 묶어서 “안열림” 방지
+    memoList.querySelectorAll(".lines").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const id = Number(el.dataset.open);
+        editMemo(id);
+      });
     });
   }
 
@@ -934,6 +964,7 @@
 
     openModal();
 
+    // ✅ 수정 진입 시: 현재 값이 같으면 연동 ON, 다르면 OFF
     outSyncHL = true;
     outSyncHASH = true;
 
@@ -970,12 +1001,13 @@
         }
 
         const note = document.querySelector(`[data-k="${type}-note"]`);
-        if(음표) note.value = m[type+"-note"] || "";   /* ✅ 음표 버그 수정 */
+        if(음표) note.value = m[type+"-note"] || "";
 
         const shown = document.getElementById(type+"-TIMESHOWN");
         if(shown) shown.textContent = m[type+"-TIME"] || "";
       });
 
+      // ✅ 둘 다 있을 때: OUT 값이 비어있으면 IN에서 복사 + 연동 판별
       if(m.hasIn && m.hasOut){
         const inHL = document.querySelector(`[data-k="INBOUND-HL"]`)?.value || "";
         const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`)?.value || "";
