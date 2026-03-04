@@ -6,368 +6,461 @@
 <title>JAS MEMO VER 3.1</title>
 
 <style>
-/* ===== 배경/타이틀 (VER 3.1) ===== */
-body{
-  margin:0;
-  font-family:-apple-system, system-ui;
-  font-weight:600;
-  min-height:100vh;
-  background:linear-gradient(180deg,#ff8c00 0%,#ff7a00 40%,#ff6a00 70%,#ff5c00 100%);
-}
+  :root{
+    --bg1:#ff8a00;
+    --bg2:#ffb000;
+    --card:#f6eadf;
+    --pill:#e9ddd3;
+    --ink:#111;
+    --muted:#666;
+    --blue:#1690ff;
+    --shadow:0 14px 30px rgba(0,0,0,.22);
+    --radius:22px;
+  }
 
-header{
-  text-align:center;
-  padding:26px 10px 12px;
-  font-weight:900;
-  letter-spacing:1px;
-  cursor:pointer;
-  color:#111;
-}
+  body{
+    margin:0;
+    font-family:-apple-system, system-ui, Segoe UI, Roboto, sans-serif;
+    font-weight:600;
+    background:
+      radial-gradient(1200px 600px at 50% 0%, rgba(255,255,255,.10), transparent 55%),
+      linear-gradient(180deg, var(--bg2), var(--bg1));
+    min-height:100vh;
+    color:var(--ink);
+    overflow-x:hidden;
+  }
 
-.title-main{font-size:2.7rem;}
-.title-sub{font-size:1.35rem;margin-left:8px;}
+  /* ===== HEADER ===== */
+  header{
+    text-align:center;
+    padding:26px 14px 14px;
+    font-weight:1000;
+    letter-spacing:-0.5px;
+    cursor:pointer;
+    user-select:none;
+  }
+  header .title{
+    font-size:56px;
+    line-height:1;
+    font-weight:1000;
+  }
+  header .ver{
+    font-size:28px;           /* VER 3.1 = 반 크기 느낌 */
+    font-weight:1000;
+    margin-left:10px;
+    vertical-align:baseline;
+    opacity:.95;
+  }
 
-/* ===== 상단 버튼 ===== */
-.controls{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  margin:6px 0 14px;
-}
-button{
-  padding:10px 18px;
-  border:none;
-  border-radius:18px;
-  background:#fff;
-  font-weight:900;
-  font-size:1.05rem;
-  box-shadow:0 10px 22px rgba(0,0,0,.15);
-}
-button:active{transform:scale(.98);}
+  /* ===== TOP BUTTONS ===== */
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    padding:10px 14px 8px;
+  }
+  .controls button{
+    width:122px;
+    padding:12px 0;
+    border:none;
+    border-radius:18px;
+    background:rgba(255,255,255,.92);
+    font-weight:1000;
+    font-size:22px;
+    color:var(--blue);
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+  }
 
-/* ===== 카드(메모 리스트) - VER3 스타일 ===== */
-#memoList{padding:0 8px 120px;}
-.memo{
-  background:rgba(255,255,255,.82);
-  margin:12px 10px;
-  padding:14px 14px;
-  border-radius:22px;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  border:1px solid rgba(255,255,255,.6);
-  backdrop-filter: blur(4px);
-}
-.memo.flash{animation:flash .55s;}
-@keyframes flash{50%{background:#fff2c9;transform:scale(1.02);}}
+  /* ===== LIST ===== */
+  #memoList{ padding:10px 10px 110px; }
 
-.memoRow{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-}
-.memoCheck{
-  width:28px;
-  height:28px;
-  border-radius:999px;
-  transform:translateY(6px);
-}
-.memoBody{flex:1; cursor:pointer;}
-.pillLine{display:flex; gap:10px; align-items:center; margin:6px 0;}
-.pillTag{
-  background:#111;
-  color:#fff;
-  border-radius:999px;
-  padding:6px 12px;
-  font-weight:900;
-  font-size:13px;
-  min-width:40px;
-  text-align:center;
-  letter-spacing:.5px;
-}
-.pillText{
-  background:rgba(0,0,0,.06);
-  border-radius:999px;
-  padding:8px 12px;
-  font-weight:900;
-  font-size:18px;
-  letter-spacing:.3px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+  .memo{
+    background:rgba(255,255,255,.20);
+    border-radius:26px;
+    padding:14px;
+    margin:14px 8px;
+    box-shadow:var(--shadow);
+  }
+  .memo-inner{
+    background:rgba(246,234,223,.94);
+    border-radius:22px;
+    padding:16px 14px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+  }
 
-/* HL 옆 공항코드 동그라미 */
-.apCircle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:34px;
-  height:34px;
-  border-radius:999px;
-  font-size:12px;
-  font-weight:900;
-  background:#1f7aff;
-  color:#fff;
-  letter-spacing:.6px;
-}
+  .memo .check{
+    width:26px;height:26px;
+    border-radius:12px;
+    border:2px solid rgba(0,0,0,.18);
+    appearance:none;
+    background:#fff;
+    margin-top:4px;
+  }
+  .memo .check:checked{
+    background:#111;
+    box-shadow:inset 0 0 0 4px #fff;
+  }
 
-/* ===== 체크라인 (모달 상단 IN/OUT) ===== */
-.check-line{
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  align-items:center;
-  margin-bottom:12px;
-  white-space:nowrap;
-}
-.check-line label{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:16px;
-  font-weight:900;
-}
+  .memo-main{ flex:1; }
 
-/* ===== 모달 ===== */
-.modal{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  justify-content:center;
-  align-items:flex-end;
-  z-index:70;
-}
-.box{
-  background:#fff;
-  width:100%;
-  max-height:92vh;
-  overflow:auto;
-  border-radius:26px 26px 0 0;
-  padding:16px;
-}
+  .line{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:10px 0;
+  }
 
-/* ===== 섹션 UI (두번째 스샷 느낌) ===== */
-.section{
-  background:#f5f5f5;
-  padding:14px;
-  border-radius:18px;
-  margin-top:12px;
-  border:1px solid #e9e9e9;
-}
-.section-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
-.section-title{
-  font-size:22px;
-  font-weight:900;
-  letter-spacing:.5px;
-}
-.time-btn{
-  font-size:20px;
-  font-weight:900;
-  color:#111;
-  user-select:none;
-  cursor:pointer;
-}
-.time-red{
-  color:#ff1f1f;
-  font-weight:900;
-  font-size:18px;
-  margin-left:12px;
-  white-space:nowrap;
-}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:52px;
+    height:34px;
+    padding:0 12px;
+    border-radius:18px;
+    background:#111;
+    color:#fff;
+    font-weight:1000;
+    letter-spacing:.5px;
+  }
 
-/* 입력줄 */
-.row{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  align-items:center;
-  margin-bottom:12px;
-}
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    height:36px;
+    padding:0 14px;
+    border-radius:18px;
+    background:var(--pill);
+    font-weight:1000;
+    letter-spacing:.2px;
+    flex:1;
+    min-width:0;
+  }
 
-/* iOS 자동줌 방지 */
-input, textarea, select{font-size:16px;}
+  .pill span{ white-space:nowrap; }
+  .pill .grow{ flex:1; min-width:0; }
 
-.label{
-  min-width:62px;
-  font-weight:900;
-  font-size:22px;
-  letter-spacing:.5px;
-  color:#111;
-}
-.smallLabel{min-width:30px;}
+  /* 공항코드 동그라미(요청한 위치) */
+  .apt-circle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:44px;
+    height:32px;
+    border-radius:18px;
+    background:#111;
+    color:#fff;
+    font-weight:1000;
+    letter-spacing:.6px;
+    font-size:14px;
+    flex:0 0 auto;
+  }
 
-input{
-  padding:10px 12px;
-  font-weight:900;
-  border-radius:18px;
-  border:2px solid #d7d7d7;
-  background:#fff;
-  box-sizing:border-box;
-  text-align:center;
-}
+  .memo-title-click{
+    cursor:pointer;
+  }
 
-/* 자리수에 맞는 폭 */
-input[data-4]{width:120px;}
-input[data-3]{width:110px;}
-input[data-2]{width:100px;}
-input[data-long]{flex:1; min-width:200px; text-align:left; padding-left:16px;}
+  .memo.flash{ animation:flash .55s; }
+  @keyframes flash{
+    50%{ transform:scale(1.015); filter:brightness(1.03); }
+  }
 
-input::placeholder{color:#b8b8b8; font-weight:900;}
+  /* ===== MODAL ===== */
+  .modal{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    justify-content:center;
+    align-items:flex-end;
+    z-index:70;
+  }
+  .box{
+    width:100%;
+    max-height:92vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:26px 26px 0 0;
+    padding:16px;
+  }
 
-textarea{
-  width:100%;
-  height:72px;
-  border-radius:18px;
-  padding:14px 14px;
-  border:2px solid #d7d7d7;
-  font-weight:900;
-  box-sizing:border-box;
-}
-textarea::placeholder{color:#b8b8b8; font-weight:900;}
+  .check-line{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    align-items:center;
+    margin-bottom:12px;
+    white-space:nowrap;
+  }
+  .check-line label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:1000;
+    font-size:18px;
+  }
+  .check-line input{
+    width:22px; height:22px;
+  }
 
-.smallbtn{
-  padding:10px 16px;
-  border-radius:16px;
-  font-weight:900;
-  background:#fff;
-  border:none;
-  box-shadow:0 10px 22px rgba(0,0,0,.12);
-}
+  .section{
+    background:#f3f3f3;
+    border-radius:18px;
+    padding:14px;
+    margin-top:12px;
+  }
 
-/* EXTRA 박스 - 세로로(한 줄에 하나씩) */
-.extra-wrap{
-  margin-top:10px;
-  background:#fff;
-  border-radius:18px;
-  padding:14px;
-  border:2px solid #e6e6e6;
-}
-.extra-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
-}
-.extra-title{
-  font-size:22px;
-  font-weight:900;
-}
-.extra-plus{
-  font-size:22px;
-  font-weight:900;
-  color:#1f7aff;
-  cursor:pointer;
-  user-select:none;
-}
-.extra-list{display:flex; flex-direction:column; gap:12px;}
-.extra-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-.extra-row select{
-  height:54px;
-  border-radius:18px;
-  border:2px solid #d7d7d7;
-  padding:0 14px;
-  font-weight:900;
-  min-width:120px;
-  background:#efeff4;
-}
-.extra-row input{
-  height:54px;
-  flex:0 0 120px;
-}
-.extra-minus{
-  width:54px;
-  height:54px;
-  border-radius:18px;
-  border:none;
-  font-weight:900;
-  background:#efeff4;
-  box-shadow:none;
-}
+  .section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .section-title{
+    font-size:22px;
+    font-weight:1000;
+    letter-spacing:.3px;
+  }
 
-/* ===== 사진 ===== */
-#photoLayer{
-  position:fixed; inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:999;
-}
-#photoLayer img{max-width:100%; max-height:100%;}
+  .time-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:1000;
+  }
+  .time-head .time-btn{
+    color:var(--ink);
+    font-weight:1000;
+    letter-spacing:.3px;
+    user-select:none;
+    cursor:pointer;
+  }
+  .time-head .time-val{
+    color:#e30000;
+    font-weight:1000;
+    font-size:24px;
+    letter-spacing:.5px;
+    min-width:70px;
+    text-align:right;
+  }
 
-/* ===== EQUIPMENT: 바탕화면에서만(메모 모달엔 안 보이게), 배지는 우하단 ===== */
-#equipBtn{
-  position:fixed;
-  left:12px;
-  bottom:14px;
-  z-index:40;
-  background:#fff;
-  border:none;
-  border-radius:18px;
-  padding:12px 18px;
-  font-weight:900;
-  box-shadow:0 10px 22px rgba(0,0,0,.15);
-}
+  /* 입력줄 공통 */
+  .row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:nowrap;
+    margin:10px 0;
+    white-space:nowrap;
+  }
 
-#equipBadge{
-  position:fixed;
-  right:12px;
-  bottom:14px;
-  z-index:40;
-  background:rgba(0,0,0,.85);
-  color:#fff;
-  padding:10px 14px;
-  border-radius:18px;
-  font-size:14px;
-  font-weight:900;
-  line-height:1.25;
-  min-width:140px;
-  text-align:right;
-  display:none;
-}
+  /* ✅ 동그라미 친 # 줄 포함: 7C / HL / # 한줄 고정 */
+  .row.topline{
+    flex-wrap:nowrap;
+    gap:14px;
+  }
 
-/* EQUIPMENT 모달 */
-#equipModal{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  justify-content:center;
-  align-items:flex-end;
-  z-index:80;
-}
-#equipBox{
-  background:#fff;
-  width:100%;
-  max-height:70vh;
-  overflow:auto;
-  border-radius:26px 26px 0 0;
-  padding:16px;
-}
-.equipRow{
-  display:flex;
-  gap:14px;
-  align-items:center;
-  margin-bottom:14px;
-  white-space:nowrap;
-}
-.equipRow b{min-width:80px; font-size:20px;}
+  .lbl{
+    font-weight:1000;
+    font-size:20px;
+    width:40px;
+  }
+  .lbl.small{ width:26px; }
+
+  input, textarea, select{
+    font-size:16px; /* iOS 자동 줌 방지 */
+    font-weight:900;
+    border-radius:16px;
+    border:2px solid rgba(0,0,0,.18);
+    padding:12px 12px;
+    box-sizing:border-box;
+    background:#fff;
+    outline:none;
+  }
+  input::placeholder, textarea::placeholder{ color:#bdbdbd; font-weight:900; }
+
+  /* 자리수 맞춘 폭 */
+  input[data-4]{ width:110px; text-align:center; }
+  input[data-3]{ width:96px; text-align:center; }
+  input[data-2]{ width:82px; text-align:center; }
+  input[data-long]{ flex:1; width:auto; text-align:left; padding-left:18px; }
+
+  textarea{
+    width:100%;
+    height:74px;
+    padding:14px 14px;
+    font-weight:800;
+  }
+
+  /* CMPT 라인 */
+  .cmpt .lbl{ width:92px; }
+  .cmpt{ gap:14px; }
+
+  /* ✅ T D BB 한줄 (요청: 한줄로) */
+  .tdbb .lbl{ width:24px; }
+  .tdbb{ gap:14px; }
+
+  /* OUTBOUND T/T T/B 한줄 */
+  .tttb .lbl{ width:48px; }
+
+  /* EXTRA (요청: 다시 세로로) */
+  .extra-wrap{
+    margin-top:12px;
+    background:#fff;
+    border-radius:18px;
+    border:2px solid rgba(0,0,0,.10);
+    padding:12px;
+  }
+  .extra-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  .extra-head .ttl{
+    font-weight:1000;
+    font-size:22px;
+    letter-spacing:.3px;
+  }
+  .extra-head .plus{
+    font-weight:1000;
+    font-size:26px;
+    color:var(--blue);
+    cursor:pointer;
+    user-select:none;
+  }
+
+  .extra-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin:10px 0;
+  }
+  .extra-row select{
+    width:120px;
+    text-align:center;
+    font-weight:1000;
+  }
+  .extra-row input{
+    width:110px;
+    text-align:center;
+  }
+  .extra-row .minus{
+    width:54px;
+    height:52px;
+    border-radius:18px;
+    border:none;
+    background:#eef0f6;
+    font-weight:1000;
+    font-size:22px;
+    color:var(--blue);
+  }
+
+  /* SAVE/CLOSE */
+  .bottom-actions{
+    display:flex;
+    gap:80px;
+    justify-content:flex-start;
+    padding:10px 10px 18px;
+    color:var(--blue);
+    font-weight:1000;
+    font-size:22px;
+  }
+  .bottom-actions button{
+    border:none;
+    background:transparent;
+    color:var(--blue);
+    font-weight:1000;
+    font-size:22px;
+    padding:8px 0;
+  }
+
+  /* ===== PHOTO ===== */
+  #photoLayer{
+    position:fixed; inset:0;
+    background:#000;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:90;
+  }
+  #photoLayer img{ max-width:100%; max-height:100%; }
+
+  /* ===== EQUIPMENT (홈 화면에서만 보이게) ===== */
+  #equipBtn{
+    position:fixed;
+    left:16px;
+    bottom:22px;
+    z-index:60;
+    background:rgba(255,255,255,.92);
+    border:none;
+    border-radius:18px;
+    padding:14px 18px;
+    font-weight:1000;
+    color:var(--blue);
+    box-shadow:0 10px 20px rgba(0,0,0,.18);
+  }
+  #equipBadge{
+    position:fixed;
+    right:16px;
+    bottom:22px;     /* ✅ 오른쪽 아래 */
+    z-index:60;
+    background:rgba(0,0,0,.82);
+    color:#fff;
+    border-radius:18px;
+    padding:14px 18px;
+    font-weight:1000;
+    font-size:18px;
+    line-height:1.25;
+    min-width:168px;
+    text-align:right;
+    box-shadow:0 10px 20px rgba(0,0,0,.22);
+    display:none;
+  }
+
+  body.modal-open #equipBtn,
+  body.modal-open #equipBadge{
+    display:none !important; /* ✅ 모달 열리면 숨김 */
+  }
+
+  /* EQUIPMENT modal */
+  #equipModal{
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    justify-content:center;
+    align-items:flex-end;
+    z-index:95;
+  }
+  #equipBox{
+    width:100%;
+    max-height:70vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:26px 26px 0 0;
+    padding:16px;
+  }
+  .equipRow{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin:12px 0;
+  }
+  .equipRow b{
+    width:90px;
+    font-size:20px;
+    letter-spacing:.5px;
+  }
 </style>
 </head>
 
 <body>
 
 <header ondblclick="openPhoto()">
-  <span class="title-main">JAS MEMO</span>
-  <span class="title-sub">VER 3.1</span>
+  <span class="title">JAS MEMO</span>
+  <span class="ver">VER 3.1</span>
 </header>
 
 <div class="controls">
@@ -379,14 +472,13 @@ textarea::placeholder{color:#b8b8b8; font-weight:900;}
 <div id="memoList"></div>
 <input type="file" id="photoInput" accept="image/*" hidden>
 
-<!-- 바탕화면 장비 표시 -->
-<div id="equipBadge"></div>
+<!-- 홈 화면만: EQUIPMENT -->
 <button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
+<div id="equipBadge"></div>
 
 <!-- 메모 모달 -->
 <div class="modal" id="modal">
   <div class="box">
-
     <div class="check-line">
       <label><input type="checkbox" id="inChk"> INBOUND</label>
       <label><input type="checkbox" id="outChk"> OUTBOUND</label>
@@ -394,121 +486,128 @@ textarea::placeholder{color:#b8b8b8; font-weight:900;}
 
     <div id="sections"></div>
 
-    <div class="row" style="justify-content:flex-start; gap:24px; margin-top:18px;">
-      <button class="smallbtn" onclick="saveMemo()">SAVE</button>
-      <button class="smallbtn" onclick="closeModal()">CLOSE</button>
+    <div class="bottom-actions">
+      <button onclick="saveMemo()">SAVE</button>
+      <button onclick="closeModal()">CLOSE</button>
     </div>
-
   </div>
 </div>
 
-<!-- 사진 레이어 -->
+<!-- 사진 -->
 <div id="photoLayer" ondblclick="closePhoto()">
-  <img id="photoImg">
+  <img id="photoImg" alt="">
 </div>
 
 <!-- 장비 모달 -->
 <div id="equipModal" ondblclick="closeEquip()">
   <div id="equipBox" onclick="event.stopPropagation()">
-    <div style="font-weight:900;font-size:22px;margin-bottom:14px;">EQUIPMENT</div>
+    <div style="font-weight:1000;font-size:22px;margin-bottom:14px;">EQUIPMENT</div>
 
     <div class="equipRow">
       <b>TUG</b>
-      <input id="tug1" data-2 inputmode="numeric" placeholder="00" maxlength="2">
-      <input id="tug2" data-2 inputmode="numeric" placeholder="00" maxlength="2">
+      <input id="tug1" data-2 inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="tug2" data-2 inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
     <div class="equipRow">
       <b>BELT</b>
-      <input id="belt" data-2 inputmode="numeric" placeholder="00" maxlength="2">
+      <input id="belt" data-2 inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
-    <div class="row" style="justify-content:flex-start; gap:24px;">
-      <button class="smallbtn" onclick="saveEquip()">SAVE</button>
-      <button class="smallbtn" onclick="closeEquip()">CLOSE</button>
+    <div class="bottom-actions" style="gap:80px;padding-left:0;">
+      <button onclick="saveEquip()">SAVE</button>
+      <button onclick="closeEquip()">CLOSE</button>
     </div>
   </div>
 </div>
 
 <script>
-const modal=document.getElementById("modal");
-const sections=document.getElementById("sections");
-const memoList=document.getElementById("memoList");
-const photoInput=document.getElementById("photoInput");
-const photoLayer=document.getElementById("photoLayer");
-const photoImg=document.getElementById("photoImg");
-const inChk=document.getElementById("inChk");
-const outChk=document.getElementById("outChk");
-
-const equipBadge=document.getElementById("equipBadge");
-const equipModal=document.getElementById("equipModal");
-const tug1=document.getElementById("tug1");
-const tug2=document.getElementById("tug2");
-const belt=document.getElementById("belt");
-
-let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
-let photo=localStorage.getItem("jas_photo");
-let editId=null;
-
-/* ==========================
-   공항코드 자동매칭 테이블
-   - ICN 기준: 반대편 공항만 표시하려면 여기만 채우면 됨
-   - 예시만 넣어둠 (필요한 편명으로 계속 추가)
-========================== */
-const FLIGHT_TO_AP = {
-  // "1404":"NRT",
-  // "1603":"MNL",
-  // "1704":"KIX",
-  // "1431":"BKK",
-  // "1802":"TPE",
+/* =========================================================
+   ✅ 자동 매칭(반대편 공항코드) - ICN 기준 "상대 공항"만 표시
+   - 아래 테이블은 네가 자주 쓰는 것만 적어두고 계속 늘리면 됨.
+   - 키 = 7C 편명(4자리), 값 = 공항코드(3자리)
+========================================================= */
+const FLIGHT_TO_APT = {
+  // 예시(필요한 것만 계속 추가)
+  "1104":"NRT",
+  "1404":"NRT",
+  "1431":"KIX",
+  "1603":"KIX",
+  "1704":"KIX",
+  "1802":"CJU"
 };
 
+const modal = document.getElementById("modal");
+const sections = document.getElementById("sections");
+const memoList = document.getElementById("memoList");
+const photoInput = document.getElementById("photoInput");
+const photoLayer = document.getElementById("photoLayer");
+const photoImg = document.getElementById("photoImg");
+const inChk = document.getElementById("inChk");
+const outChk = document.getElementById("outChk");
+
+const equipBadge = document.getElementById("equipBadge");
+const equipModal = document.getElementById("equipModal");
+const tug1 = document.getElementById("tug1");
+const tug2 = document.getElementById("tug2");
+const belt = document.getElementById("belt");
+
+let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
+let photo = localStorage.getItem("jas_photo");
+let editId = null;
+
 /* ===== util ===== */
-function onlyNum(val,len){
-  return (val||"").replace(/[^0-9]/g,'').slice(0,len);
-}
-function pad(val,len){
-  const v=onlyNum(val,len);
-  return v ? v.padStart(len,"0") : "";
+function onlyNum(val, len){ return (val||"").replace(/[^0-9]/g,'').slice(0, len); }
+function pad(val, len){
+  const v = onlyNum(val, len);
+  return v ? v.padStart(len, "0") : "";
 }
 function nowTime(){
-  const d=new Date();
-  return d.getHours().toString().padStart(2,"0")+":"+
-         d.getMinutes().toString().padStart(2,"0");
+  const d = new Date();
+  return d.getHours().toString().padStart(2,"0")+":"+d.getMinutes().toString().padStart(2,"0");
 }
-function guessAirportFromC7(c7){
-  const key = onlyNum(c7,4);
-  return FLIGHT_TO_AP[key] || "";
+function autoAptFrom7c(v4){
+  const key = onlyNum(v4,4);
+  return (key && FLIGHT_TO_APT[key]) ? FLIGHT_TO_APT[key] : "";
 }
 
-/* ===== 입력 제한 + (HL/# 공유) ===== */
-document.addEventListener("input",e=>{
-  const k=e.target.dataset.k;
+/* ===== 입력 제한 + 자리수 반영 ===== */
+document.addEventListener("input", (e)=>{
+  const k = e.target.dataset.k;
   if(!k) return;
 
-  // 숫자 제한
-  if(k.endsWith("-c7")) e.target.value=onlyNum(e.target.value,4);
-  if(k === "HL") e.target.value=onlyNum(e.target.value,4);
-  if(k === "HASH") e.target.value=onlyNum(e.target.value,3);
+  if(k.endsWith("-c7")){
+    e.target.value = onlyNum(e.target.value, 4);
+    // 자동 공항코드 세팅(있으면)
+    const type = k.split("-")[0];
+    const apt = autoAptFrom7c(e.target.value);
+    const aptEl = document.querySelector(`[data-k="${type}-APT"]`);
+    if(aptEl && !aptEl.value) aptEl.value = apt;
+  }
 
-  if(k.endsWith("-t")) e.target.value=onlyNum(e.target.value,3);
-  if(k.endsWith("-d")) e.target.value=onlyNum(e.target.value,2);
-  if(k.endsWith("-bb")) e.target.value=onlyNum(e.target.value,2);
-  if(k.endsWith("-tt")) e.target.value=onlyNum(e.target.value,4);
-  if(k.endsWith("-tb")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-HL")) e.target.value = onlyNum(e.target.value, 4);
+  if(k.endsWith("-HASH")) e.target.value = onlyNum(e.target.value, 3);
 
-  if(k.startsWith("extraVal-")) e.target.value=onlyNum(e.target.value,3);
+  if(k.endsWith("-t")) e.target.value = onlyNum(e.target.value, 3);
+  if(k.endsWith("-d")) e.target.value = onlyNum(e.target.value, 2);
+  if(k.endsWith("-bb")) e.target.value = onlyNum(e.target.value, 2);
 
-  // HL 공유
-  if(k === "HL"){
-    document.querySelectorAll('[data-k="HL"]').forEach(inp=>{
-      if(inp !== e.target) inp.value = e.target.value;
+  if(k.endsWith("-tt")) e.target.value = onlyNum(e.target.value, 4);
+  if(k.endsWith("-tb")) e.target.value = onlyNum(e.target.value, 4);
+
+  if(k.startsWith("extraVal-")) e.target.value = onlyNum(e.target.value, 3);
+
+  // ✅ HL / # 공유(둘다 같은 값)
+  if(k.endsWith("-HL")){
+    const v = e.target.value;
+    document.querySelectorAll(`[data-k="INBOUND-HL"],[data-k="OUTBOUND-HL"]`).forEach(el=>{
+      if(el !== e.target) el.value = v;
     });
   }
-  // # 공유
-  if(k === "HASH"){
-    document.querySelectorAll('[data-k="HASH"]').forEach(inp=>{
-      if(inp !== e.target) inp.value = e.target.value;
+  if(k.endsWith("-HASH")){
+    const v = e.target.value;
+    document.querySelectorAll(`[data-k="INBOUND-HASH"],[data-k="OUTBOUND-HASH"]`).forEach(el=>{
+      if(el !== e.target) el.value = v;
     });
   }
 });
@@ -517,96 +616,95 @@ document.addEventListener("input",e=>{
 const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
 
 function makeExtraRow(type, key="W", val=""){
-  const row=document.createElement("div");
-  row.className="extra-row";
-  row.innerHTML=`
-    <select data-extra-type="${type}">
+  const row = document.createElement("div");
+  row.className = "extra-row";
+  row.innerHTML = `
+    <select>
       ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
     </select>
     <input data-3 inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-    <button type="button" class="extra-minus" onclick="this.parentElement.remove()">-</button>
+    <button type="button" class="minus" onclick="this.parentElement.remove()">-</button>
   `;
   return row;
 }
 function addExtraRow(type){
-  const box=document.getElementById(type+"-EXTRAS");
+  const box = document.getElementById(type+"-EXTRAS");
   if(!box) return;
   box.appendChild(makeExtraRow(type,"W",""));
 }
 
-/* ===== 섹션 생성 (CMPT1/2 기본 F, T/D/BB는 CMPT4 밑) ===== */
+/* ===== 섹션 생성 ===== */
 function makeSection(type, memoData){
-  const d=document.createElement("div");
-  d.className="section";
+  const d = document.createElement("div");
+  d.className = "section";
 
-  // 시간(저장값)
   const savedTime = memoData ? (memoData[type+"-TIME"]||"") : "";
+  const savedApt  = memoData ? (memoData[type+"-APT"]||"")  : "";
 
-  // (공유) HL / HASH 저장값
-  const sharedHL = memoData ? (memoData["HL"] || memoData["INBOUND-HL"] || memoData["OUTBOUND-HL"] || "") : "";
-  const sharedHASH = memoData ? (memoData["HASH"] || memoData["INBOUND-HASH"] || memoData["OUTBOUND-HASH"] || "") : "";
-
-  d.innerHTML=`
+  d.innerHTML = `
     <div class="section-head">
       <div class="section-title">${type}</div>
-      <div style="display:flex;align-items:center;gap:12px;">
+      <div class="time-head">
         <div class="time-btn" id="${type}-TIMEBTN">TIME</div>
-        <div class="time-red" id="${type}-TIMESHOWN">${savedTime||""}</div>
+        <div class="time-val" id="${type}-TIMESHOWN">${savedTime||""}</div>
       </div>
     </div>
 
-    <div class="row">
-      <div class="label smallLabel">7C</div>
+    <!-- ✅ 동그라미(1): 7C / HL / # 한줄 -->
+    <div class="row topline">
+      <div class="lbl">7C</div>
       <input data-4 inputmode="numeric" data-k="${type}-c7" maxlength="4" placeholder="0000">
-
-      <div class="label smallLabel">HL</div>
-      <input data-4 inputmode="numeric" data-k="HL" maxlength="4" placeholder="0000" value="${onlyNum(sharedHL,4)}">
-
-      <div class="label smallLabel">#</div>
-      <input data-3 inputmode="numeric" data-k="HASH" maxlength="3" placeholder="000" value="${onlyNum(sharedHASH,3)}">
+      <div class="lbl">HL</div>
+      <input data-4 inputmode="numeric" data-k="${type}-HL" maxlength="4" placeholder="0000">
+      <div class="lbl small">#</div>
+      <input data-3 inputmode="numeric" data-k="${type}-HASH" maxlength="3" placeholder="000">
+      <!-- 공항코드(수동도 가능) -->
+      <input data-3 style="width:86px;text-align:center;" maxlength="3" placeholder="APT" data-k="${type}-APT" value="${savedApt}">
     </div>
 
     ${[1,2,3,4].map(i=>`
-      <div class="row">
-        <div class="label">CMPT ${i}</div>
-        <input data-long data-k="${type}-cmpt${i}" placeholder="TEXT" value="${
-          memoData ? (memoData[type+`-cmpt${i}`]||"") : (i<=2 ? "F" : "")
-        }">
+      <div class="row cmpt">
+        <div class="lbl">CMPT ${i}</div>
+        <input data-long data-k="${type}-cmpt${i}" placeholder="TEXT">
       </div>`).join("")}
 
-    <!-- T/D/BB는 CMPT4 밑 -->
-    <div class="row">
-      <div class="label smallLabel">T</div>
-      <input data-3 inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000">
-
-      <div class="label smallLabel">D</div>
+    <!-- ✅ T D BB = CMPT 4 밑 -->
+    <div class="row tdbb">
+      <div class="lbl">T</div>
+      <input data-3 inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000" style="width:96px;">
+      <div class="lbl">D</div>
       <input data-2 inputmode="numeric" data-k="${type}-d" maxlength="2" placeholder="00">
-
-      <div class="label">BB</div>
+      <div class="lbl">BB</div>
       <input data-2 inputmode="numeric" data-k="${type}-bb" maxlength="2" placeholder="00">
     </div>
 
     ${type==="OUTBOUND" ? `
-      <div class="row">
-        <div class="label">T/T</div>
+      <div class="row tttb">
+        <div class="lbl">T/T</div>
         <input data-4 inputmode="numeric" data-k="${type}-tt" maxlength="4" placeholder="0000">
-        <div class="label">T/B</div>
+        <div class="lbl">T/B</div>
         <input data-4 inputmode="numeric" data-k="${type}-tb" maxlength="4" placeholder="0000">
       </div>
     ` : ""}
 
     <div class="extra-wrap">
       <div class="extra-head">
-        <div class="extra-title">EXTRA</div>
-        <div class="extra-plus" onclick="addExtraRow('${type}')">+</div>
+        <div class="ttl">EXTRA</div>
+        <div class="plus" onclick="addExtraRow('${type}')">+</div>
       </div>
-      <div class="extra-list" id="${type}-EXTRAS"></div>
+      <div id="${type}-EXTRAS"></div>
     </div>
 
     <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
   `;
 
-  // TIME 버튼: 클릭=현재시간 저장(표시), 더블클릭=수정
+  // ✅ CMPT 1,2 기본값 F (삭제 가능)
+  const c1 = d.querySelector(`[data-k="${type}-cmpt1"]`);
+  const c2 = d.querySelector(`[data-k="${type}-cmpt2"]`);
+  if(c1 && !memoData) c1.value = "F";
+  if(c2 && !memoData) c2.value = "F";
+
+  // TIME 버튼 동작
   const btn = d.querySelector(`#${type}-TIMEBTN`);
   const shown = d.querySelector(`#${type}-TIMESHOWN`);
   btn.onclick = ()=>{
@@ -615,125 +713,97 @@ function makeSection(type, memoData){
   btn.ondblclick = ()=>{
     const cur = shown.textContent || nowTime();
     const t = prompt("TIME (HH:MM 24H)", cur);
-    if(t) shown.textContent=t;
+    if(t) shown.textContent = t;
   };
 
-  // 기존 값 채우기
-  if(memoData){
-    const setV=(dk,val)=>{
-      const el=d.querySelector(`[data-k="${dk}"]`);
-      if(el) el.value = (val ?? "");
-    };
-
-    // 7C
-    setV(`${type}-c7`, memoData[type+"-c7"] || memoData[type+"-c7"] || "");
-    // CMPT/수치/노트
-    [1,2,3,4].forEach(i=>setV(`${type}-cmpt${i}`, memoData[type+`-cmpt${i}`]||""));
-    setV(`${type}-t`, memoData[type+"-t"]||"");
-    setV(`${type}-d`, memoData[type+"-d"]||"");
-    setV(`${type}-bb`, memoData[type+"-bb"]||"");
-    if(type==="OUTBOUND"){
-      setV(`${type}-tt`, memoData[type+"-tt"]||"");
-      setV(`${type}-tb`, memoData[type+"-tb"]||"");
-    }
-    setV(`${type}-note`, memoData[type+"-note"]||"");
-
-    // EXTRAS
-    const extrasBox = d.querySelector(`#${type}-EXTRAS`);
-    const extras = memoData[type+"-EXTRAS"] || [];
-    extras.forEach(ex=>{
-      extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val));
-    });
-  }else{
-    // 기본 EXTRA 1줄 (원하면 빼도 됨)
-    const extrasBox = d.querySelector(`#${type}-EXTRAS`);
-    extrasBox.appendChild(makeExtraRow(type,"W",""));
-  }
+  // 기존 extras 불러오기
+  const extrasBox = d.querySelector(`#${type}-EXTRAS`);
+  const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
+  extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
   return d;
 }
 
 /* 체크 변경 -> 섹션 렌더 */
 inChk.onchange = outChk.onchange = ()=>{
-  sections.innerHTML="";
+  sections.innerHTML = "";
   if(inChk.checked) sections.append(makeSection("INBOUND", null));
   if(outChk.checked) sections.append(makeSection("OUTBOUND", null));
 };
 
-/* ===== 메모 추가/닫기 ===== */
+/* ===== 모달 열/닫기 ===== */
 function newMemo(){
-  editId=null;
-  inChk.checked=false;
-  outChk.checked=false;
-  sections.innerHTML="";
-  modal.style.display="flex";
-  // 메모 모달에선 EQUIPMENT 숨김(바탕화면에서만)
-  document.getElementById("equipBtn").style.display="none";
-  document.getElementById("equipBadge").style.display="none";
+  editId = null;
+  inChk.checked = false;
+  outChk.checked = false;
+  sections.innerHTML = "";
+  modal.style.display = "flex";
+  document.body.classList.add("modal-open");
 }
 function closeModal(){
-  modal.style.display="none";
-  editId=null;
-  // 바탕화면 복귀 시 EQUIPMENT 복구
-  document.getElementById("equipBtn").style.display="block";
-  updateEquipBadge();
+  modal.style.display = "none";
+  editId = null;
+  document.body.classList.remove("modal-open");
 }
 
 /* ===== 저장 ===== */
 function saveMemo(){
-  const data={id:editId ?? Date.now()};
+  const data = { id: editId ?? Date.now() };
   data.hasIn = inChk.checked;
   data.hasOut = outChk.checked;
 
-  // 공유 HL / HASH
-  const hlEl = document.querySelector('[data-k="HL"]');
-  const hashEl = document.querySelector('[data-k="HASH"]');
-  data["HL"] = pad(hlEl ? hlEl.value : "", 4);
-  data["HASH"] = pad(hashEl ? hashEl.value : "", 3);
-
   ["INBOUND","OUTBOUND"].forEach(type=>{
-    const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
-    if(!enabled) return;
+    if(!(type==="INBOUND"?data.hasIn:data.hasOut)) return;
 
-    const c7El = document.querySelector(`[data-k="${type}-c7"]`);
-    data[type+"-c7"] = pad(c7El ? c7El.value : "", 4);
+    const v = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
 
-    data[type+"-t"]  = pad(document.querySelector(`[data-k="${type}-t"]`)?.value, 3);
-    data[type+"-d"]  = pad(document.querySelector(`[data-k="${type}-d"]`)?.value, 2);
-    data[type+"-bb"] = pad(document.querySelector(`[data-k="${type}-bb"]`)?.value, 2);
+    data[type+"-c7"]   = pad(v("c7")?.value,4);
+    data[type+"-HL"]   = pad(v("HL")?.value,4);
+    data[type+"-HASH"] = pad(v("HASH")?.value,3);
+
+    // 공항코드: 입력이 없으면 7C로 자동 매칭(있으면 유지)
+    const aptRaw = (v("APT")?.value || "").toUpperCase().replace(/[^A-Z]/g,'').slice(0,3);
+    data[type+"-APT"] = aptRaw || autoAptFrom7c(data[type+"-c7"]);
+
+    data[type+"-t"]  = pad(v("t")?.value,3);
+    data[type+"-d"]  = pad(v("d")?.value,2);
+    data[type+"-bb"] = pad(v("bb")?.value,2);
 
     [1,2,3,4].forEach(i=>{
-      data[type+`-cmpt${i}`] = document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+      data[type+`-cmpt${i}`] = v(`cmpt${i}`)?.value || "";
     });
 
     if(type==="OUTBOUND"){
-      data[type+"-tt"] = pad(document.querySelector(`[data-k="${type}-tt"]`)?.value, 4);
-      data[type+"-tb"] = pad(document.querySelector(`[data-k="${type}-tb"]`)?.value, 4);
+      data[type+"-tt"] = pad(v("tt")?.value,4);
+      data[type+"-tb"] = pad(v("tb")?.value,4);
     }
 
-    data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+    data[type+"-note"] = v("note")?.value || "";
 
-    // TIME
     const shown = document.getElementById(type+"-TIMESHOWN");
     data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
 
     // EXTRAS
-    const extras=[];
-    const box=document.getElementById(type+"-EXTRAS");
+    const extras = [];
+    const box = document.getElementById(type+"-EXTRAS");
     if(box){
       [...box.querySelectorAll(".extra-row")].forEach(r=>{
-        const key = r.querySelector("select")?.value || "";
+        const key = (r.querySelector("select")?.value || "").toUpperCase();
         const val = onlyNum(r.querySelector("input")?.value,3);
-        if(key && val){
-          extras.push({key, val:val.padStart(3,"0")});
-        }
+        if(key && val) extras.push({ key, val: val.padStart(3,"0") });
       });
     }
-    data[type+"-EXTRAS"]=extras;
-
-    // 공항코드(자동표시용) - 저장만 해둠(표시 자체는 리스트에서 자동)
-    data[type+"-AP"] = guessAirportFromC7(data[type+"-c7"]);
+    data[type+"-EXTRAS"] = extras;
   });
+
+  // HL/# 공유값 보정(둘 중 하나만 체크해도 저장값 유지)
+  if(data.hasIn && data.hasOut){
+    // 둘 다 있을 때 IN 값을 기준으로 OUT에 동일 적용
+    data["OUTBOUND-HL"] = data["INBOUND-HL"] || data["OUTBOUND-HL"];
+    data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || data["OUTBOUND-HASH"];
+    data["INBOUND-HL"] = data["OUTBOUND-HL"] || data["INBOUND-HL"];
+    data["INBOUND-HASH"] = data["OUTBOUND-HASH"] || data["INBOUND-HASH"];
+  }
 
   if(editId){
     memos[memos.findIndex(m=>m.id===editId)] = data;
@@ -746,178 +816,147 @@ function saveMemo(){
   renderList(data.id);
 }
 
-/* ===== 리스트 출력 (IN/OUT pill + HL 옆 공항코드 원) ===== */
+/* ===== 리스트 출력(요청한 형식 + 공항코드 동그라미) ===== */
+function lineHTML(tag, text, apt){
+  const aptCircle = apt ? `<span class="apt-circle">${apt}</span>` : `<span style="width:44px;display:inline-block;"></span>`;
+  return `
+    <div class="line">
+      <span class="tag">${tag}</span>
+      <span class="pill">
+        <span class="grow">${text}</span>
+        ${aptCircle}
+      </span>
+    </div>
+  `;
+}
+
 function renderList(flashId){
-  memoList.innerHTML="";
+  memoList.innerHTML = "";
   memos.forEach(m=>{
-    const div=document.createElement("div");
-    div.className="memo";
-    if(m.id===flashId) div.classList.add("flash");
+    const wrap = document.createElement("div");
+    wrap.className = "memo" + (m.id===flashId ? " flash" : "");
 
-    // 공항코드: 저장된 AP 우선, 없으면 테이블로 추정
-    const inAP  = m["INBOUND-AP"]  || guessAirportFromC7(m["INBOUND-c7"]||"");
-    const outAP = m["OUTBOUND-AP"] || guessAirportFromC7(m["OUTBOUND-c7"]||"");
-
-    const HL = m["HL"] || m["INBOUND-HL"] || m["OUTBOUND-HL"] || "";
-    const HASH = m["HASH"] || m["INBOUND-HASH"] || m["OUTBOUND-HASH"] || "";
-
-    let lines = "";
-
+    let html = "";
     if(m.hasIn && m.hasOut){
-      lines += `
-        <div class="pillLine">
-          <div class="pillTag">IN</div>
-          <div class="pillText">
-            7C[${m["INBOUND-c7"]||""}] HL[${HL||""}]
-            ${inAP ? `<span class="apCircle">${inAP}</span>` : ``}
-          </div>
-        </div>
-        <div class="pillLine">
-          <div class="pillTag">OUT</div>
-          <div class="pillText">
-            7C[${m["OUTBOUND-c7"]||""}] #[${HASH||""}]
-            ${outAP ? `<span class="apCircle">${outAP}</span>` : ``}
-          </div>
-        </div>
-      `;
+      html += lineHTML("IN",  `7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`, m["INBOUND-APT"]||"");
+      html += lineHTML("OUT", `7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`, m["OUTBOUND-APT"]||"");
     }else if(m.hasIn){
-      lines += `
-        <div class="pillLine">
-          <div class="pillTag">IN</div>
-          <div class="pillText">
-            7C[${m["INBOUND-c7"]||""}] HL[${HL||""}] #[${HASH||""}]
-            ${inAP ? `<span class="apCircle">${inAP}</span>` : ``}
-          </div>
-        </div>
-      `;
+      html += lineHTML("IN", `7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`, m["INBOUND-APT"]||"");
     }else if(m.hasOut){
-      lines += `
-        <div class="pillLine">
-          <div class="pillTag">OUT</div>
-          <div class="pillText">
-            7C[${m["OUTBOUND-c7"]||""}] HL[${HL||""}] #[${HASH||""}]
-            ${outAP ? `<span class="apCircle">${outAP}</span>` : ``}
-          </div>
-        </div>
-      `;
+      html += lineHTML("OUT", `7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`, m["OUTBOUND-APT"]||"");
     }else{
-      lines = `<div class="pillText">(EMPTY)</div>`;
+      html += `<div class="line"><span class="pill"><span class="grow">(EMPTY)</span></span></div>`;
     }
 
-    div.innerHTML = `
-      <div class="memoRow">
-        <input class="memoCheck" type="checkbox" data-id="${m.id}">
-        <div class="memoBody" onclick="editMemo(${m.id})">
-          ${lines}
+    wrap.innerHTML = `
+      <div class="memo-inner">
+        <input class="check" type="checkbox" data-id="${m.id}">
+        <div class="memo-main memo-title-click" onclick="editMemo(${m.id})">
+          ${html}
         </div>
       </div>
     `;
-
-    memoList.appendChild(div);
+    memoList.appendChild(wrap);
   });
 }
 
 /* ===== 수정(불러오기) ===== */
 function editMemo(id){
-  const m=memos.find(x=>x.id===id);
+  const m = memos.find(x=>x.id===id);
   if(!m) return;
-  editId=id;
+  editId = id;
 
-  modal.style.display="flex";
-  // 메모 모달에선 EQUIPMENT 숨김(바탕화면에서만)
-  document.getElementById("equipBtn").style.display="none";
-  document.getElementById("equipBadge").style.display="none";
+  modal.style.display = "flex";
+  document.body.classList.add("modal-open");
 
-  inChk.checked=!!m.hasIn;
-  outChk.checked=!!m.hasOut;
+  inChk.checked = !!m.hasIn;
+  outChk.checked = !!m.hasOut;
 
-  sections.innerHTML="";
+  sections.innerHTML = "";
   if(inChk.checked) sections.append(makeSection("INBOUND", m));
   if(outChk.checked) sections.append(makeSection("OUTBOUND", m));
 
-  // 값 세팅 (7C / HL / # 공유 포함)
   setTimeout(()=>{
-    const hlEls = document.querySelectorAll('[data-k="HL"]');
-    const hashEls = document.querySelectorAll('[data-k="HASH"]');
-    hlEls.forEach(el=>el.value = m["HL"] || m["INBOUND-HL"] || m["OUTBOUND-HL"] || "");
-    hashEls.forEach(el=>el.value = m["HASH"] || m["INBOUND-HASH"] || m["OUTBOUND-HASH"] || "");
-
     ["INBOUND","OUTBOUND"].forEach(type=>{
-      const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
-      if(!enabled) return;
+      if(!(type==="INBOUND"?m.hasIn:m.hasOut)) return;
 
-      const setV=(dk,val)=>{
-        const el=document.querySelector(`[data-k="${dk}"]`);
-        if(el) el.value = (val ?? "");
+      const setV=(k,val)=>{
+        const el = document.querySelector(`[data-k="${type}-${k}"]`);
+        if(el) el.value = val || "";
       };
 
-      setV(`${type}-c7`, m[type+"-c7"]||"");
-      setV(`${type}-t`,  m[type+"-t"]||"");
-      setV(`${type}-d`,  m[type+"-d"]||"");
-      setV(`${type}-bb`, m[type+"-bb"]||"");
+      setV("c7",   m[type+"-c7"]);
+      setV("HL",   m[type+"-HL"]);
+      setV("HASH", m[type+"-HASH"]);
+      setV("APT",  (m[type+"-APT"]||"").toUpperCase());
+
+      setV("t",  m[type+"-t"]);
+      setV("d",  m[type+"-d"]);
+      setV("bb", m[type+"-bb"]);
 
       [1,2,3,4].forEach(i=>{
-        setV(`${type}-cmpt${i}`, m[type+`-cmpt${i}`]||"");
+        const el = document.querySelector(`[data-k="${type}-cmpt${i}"]`);
+        if(el) el.value = m[type+`-cmpt${i}`] || "";
       });
 
       if(type==="OUTBOUND"){
-        setV(`${type}-tt`, m[type+"-tt"]||"");
-        setV(`${type}-tb`, m[type+"-tb"]||"");
+        setV("tt", m[type+"-tt"]);
+        setV("tb", m[type+"-tb"]);
       }
 
-      setV(`${type}-note`, m[type+"-note"]||"");
+      setV("note", m[type+"-note"]);
 
       const shown = document.getElementById(type+"-TIMESHOWN");
       if(shown) shown.textContent = m[type+"-TIME"] || "";
     });
-  },30);
+  }, 30);
 }
 
 /* ===== 삭제 ===== */
 function deleteSelected(){
-  const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
-  const ids=[...checks].map(c=>Number(c.dataset.id));
-  memos=memos.filter(m=>!ids.includes(m.id));
-  localStorage.setItem("jas_memos",JSON.stringify(memos));
+  const checks = document.querySelectorAll('.memo .check:checked');
+  const ids = [...checks].map(c=>Number(c.dataset.id));
+  memos = memos.filter(m=>!ids.includes(m.id));
+  localStorage.setItem("jas_memos", JSON.stringify(memos));
   renderList();
 }
 
 /* ===== 사진 ===== */
-function addPhoto(){photoInput.click();}
-photoInput.onchange=e=>{
-  const f=e.target.files[0];
+function addPhoto(){ photoInput.click(); }
+photoInput.onchange = e=>{
+  const f = e.target.files[0];
   if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{
-    photo=r.result;
-    localStorage.setItem("jas_photo",photo);
+  const r = new FileReader();
+  r.onload = ()=>{
+    photo = r.result;
+    localStorage.setItem("jas_photo", photo);
   };
   r.readAsDataURL(f);
 };
-function openPhoto(){if(!photo)return;photoImg.src=photo;photoLayer.style.display="flex";}
-function closePhoto(){photoLayer.style.display="none";}
+function openPhoto(){ if(!photo) return; photoImg.src = photo; photoLayer.style.display="flex"; }
+function closePhoto(){ photoLayer.style.display="none"; }
 
-/* ===== EQUIPMENT (바탕화면에서만) ===== */
+/* ===== EQUIPMENT ===== */
 function openEquip(){
-  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
-  tug1.value=pad(eq.tug1,2);
-  tug2.value=pad(eq.tug2,2);
-  belt.value=pad(eq.belt,2);
+  const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
+  tug1.value = pad(eq.tug1,2);
+  tug2.value = pad(eq.tug2,2);
+  belt.value = pad(eq.belt,2);
   equipModal.style.display="flex";
 }
-function closeEquip(){equipModal.style.display="none";}
+function closeEquip(){ equipModal.style.display="none"; }
 function saveEquip(){
-  const eq={
+  const eq = {
     tug1: pad(tug1.value,2),
     tug2: pad(tug2.value,2),
     belt: pad(belt.value,2)
   };
-  localStorage.setItem("jas_equipment",JSON.stringify(eq));
+  localStorage.setItem("jas_equipment", JSON.stringify(eq));
   updateEquipBadge();
   closeEquip();
 }
 function updateEquipBadge(){
-  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
+  const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
   if(!eq.tug1 && !eq.tug2 && !eq.belt){
     equipBadge.style.display="none";
     return;
