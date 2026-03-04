@@ -785,10 +785,9 @@ function escapeHtml(s){
    ✅ 3.7 핵심 수정: 기존값 유지하며 재렌더
 ================================ */
 inChk.onchange = outChk.onchange = () => {
-  const m = getEditMemo();     // 편집중이면 기존값 유지
+  const m = getEditMemo();
   renderSectionsForEdit(m);
 };
-
 function renderSectionsForEdit(memo){
   sections.innerHTML = "";
   if(inChk.checked) sections.appendChild(makeSection("INBOUND", memo));
@@ -805,15 +804,30 @@ function renderSectionsForEdit(memo){
 ================================ */
 function newMemo(){
   editId = null;
-  inChk.checked = false;
-  outChk.checked = false;
-  sections.innerHTML = "";
+
+  inChk.checked = true;
+  outChk.checked = true;
+
+  renderSectionsForEdit(null);
   openModal();
 }
-
 function openModal(){
   modal.style.display = "flex";
   setHomeUiVisible(false);
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      if(sections.childElementCount===0){
+        if(!inChk.checked && !outChk.checked){
+          inChk.checked=true;
+          outChk.checked=true;
+        }
+        renderSectionsForEdit(getEditMemo());
+      }
+    });
+  });
+}
+
 
   // ✅ 섹션 비어있으면 자동 복구 (가끔 모바일에서 렌더 타이밍 이슈)
   setTimeout(() => {
@@ -1195,3 +1209,4 @@ if(!Array.isArray(memos)) {
 
 </body>
 </html>
+
