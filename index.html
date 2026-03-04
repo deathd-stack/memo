@@ -31,8 +31,8 @@
     overflow-x:hidden;
   }
 
-  /* ✅ 전체 20% 축소 (iOS 포함 안정) */
-  body{
+  /* ✅ 전체 20% 축소: body가 아니라 app만 (fixed 안깨짐) */
+  #app{
     transform:scale(.8);
     transform-origin:top center;
     width:125%;
@@ -86,7 +86,7 @@
 
   /* ====== LIST ====== */
   #memoList{
-    padding:10px 14px 110px;
+    padding:10px 14px 160px; /* ✅ 하단 고정 버튼 공간 더 확보 */
     max-width:780px;
     margin:0 auto;
   }
@@ -161,11 +161,11 @@
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
 
-  /* ====== EQUIP HOME ====== */
+  /* ====== EQUIP HOME (고정) ====== */
   #equipBtn{
     position:fixed;
     left:14px;
-    bottom:18px;
+    bottom:calc(12px + env(safe-area-inset-bottom));
     z-index:20;
     border:none;
     border-radius:18px;
@@ -179,18 +179,22 @@
   #equipBadge{
     position:fixed;
     right:14px;
-    bottom:18px;
+    bottom:calc(12px + env(safe-area-inset-bottom));
     z-index:20;
     background:rgba(0,0,0,.86);
     color:#fff;
-    border-radius:20px;
-    padding:12px 14px;
+    border-radius:18px;
+    padding:12px 16px;
     font-weight:1000;
     line-height:1.15;
     text-align:right;
-    min-width:190px;
-    box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
+
+    /* ✅ 동그라미 친 빈 공간 제거 */
+    width:fit-content;
+    max-width:72vw;
+    min-width:unset;
+    box-shadow:0 14px 26px rgba(0,0,0,.22);
   }
   #equipBadge .b1{font-size:18px;}
   #equipBadge .b2{font-size:18px; opacity:.95;}
@@ -314,14 +318,6 @@
     text-align:right;
   }
 
-  .row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:10px 0;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
   .lab{
     font-size:20px;
     font-weight:1000;
@@ -330,7 +326,6 @@
     white-space:nowrap;
   }
 
-  /* ✅ 숫자 안 잘리게: line-height + padding + tabular nums */
   input, textarea, select{
     font-size:18px;
     font-weight:1000;
@@ -342,11 +337,7 @@
     outline:none;
     background:#fff;
   }
-  input{
-    height:50px;
-    padding-top:8px;
-    padding-bottom:8px;
-  }
+  input{height:50px; padding-top:8px; padding-bottom:8px;}
   textarea{
     width:100%;
     height:76px;
@@ -360,6 +351,14 @@
   .w2{font-size:22px;}
   .wT{font-size:22px;}
 
+  .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:10px 0;
+    flex-wrap:nowrap;
+    min-width:0;
+  }
   .long{
     flex:1;
     min-width:0;
@@ -440,7 +439,7 @@
     border-radius:14px;
   }
 
-  /* ====== PHOTO LAYER ====== */
+  /* PHOTO LAYER */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -452,7 +451,7 @@
   }
   #photoLayer img{max-width:100%;max-height:100%;}
 
-  /* ✅ 칸 정렬: 7C HL # / T D BB (안 잘리게) */
+  /* ✅ 7C HL # / T D BB / T/T T/B */
   .rowGrid3{
     display:grid;
     grid-template-columns: 34px 1fr 34px 1fr 16px .9fr;
@@ -469,13 +468,6 @@
     margin:10px 0;
     min-width:0;
   }
-  .rowGrid3 input,
-  .rowGridTDBB input{
-    width:100%;
-    min-width:0;
-  }
-
-  /* ✅ OUTBOUND T/T T/B 한줄 고정 */
   .rowGridTTTB{
     display:grid;
     grid-template-columns: 48px 1fr 48px 1fr;
@@ -484,28 +476,30 @@
     margin:10px 0;
     min-width:0;
   }
-  .rowGridTTTB input{width:100%;min-width:0;}
-
+  .rowGrid3 input,.rowGridTDBB input,.rowGridTTTB input{width:100%;min-width:0;}
 </style>
 </head>
 
 <body>
 
-<header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
-  <div class="titleWrap">
-    <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.3</div>
-  </div>
-</header>
+<div id="app">
+  <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
+    <div class="titleWrap">
+      <div class="titleMain">JAS MEMO</div>
+      <div class="titleVer">VER 4.3</div>
+    </div>
+  </header>
 
-<div class="controls">
-  <button type="button" onclick="newMemo()">ADD</button>
-  <button type="button" onclick="deleteSelected()">DELETE</button>
-  <button type="button" onclick="addPhoto()">PHOTO</button>
+  <div class="controls">
+    <button type="button" onclick="newMemo()">ADD</button>
+    <button type="button" onclick="deleteSelected()">DELETE</button>
+    <button type="button" onclick="addPhoto()">PHOTO</button>
+  </div>
+
+  <div id="memoList"></div>
 </div>
 
-<div id="memoList"></div>
-
+<!-- ✅ 고정 버튼/배지는 app 밖에 둠 (고정 깨짐 방지) -->
 <button id="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
 <div id="equipBadge"></div>
 
@@ -606,19 +600,17 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  /* ✅ HL/#는 INBOUND/OUTBOUND 무조건 같은 값(둘 중 하나 바꾸면 같이 바뀜) */
+  /* ✅ HL/#는 IN/OUT 무조건 같은 값 */
   function syncShared(kind, fromEl){
     if(!inChk.checked || !outChk.checked) return;
     const inEl  = document.querySelector(`[data-k="INBOUND-${kind}"]`);
     const outEl = document.querySelector(`[data-k="OUTBOUND-${kind}"]`);
     if(!inEl || !outEl) return;
-
     const v = fromEl.value;
     if(fromEl === inEl && outEl.value !== v) outEl.value = v;
     if(fromEl === outEl && inEl.value !== v) inEl.value = v;
   }
 
-  /* ✅ 숫자 입력 제한 + HL/# 강제 공유 */
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
@@ -694,9 +686,9 @@
 
       ${type==="OUTBOUND" ? `
         <div class="rowGridTTTB">
-          <div class="lab" style="min-width:48px;">T/T</div>
+          <div class="lab">T/T</div>
           <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt">
-          <div class="lab" style="min-width:48px;">T/B</div>
+          <div class="lab">T/B</div>
           <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb">
         </div>
       ` : ""}
@@ -751,8 +743,6 @@
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
     if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
-
-    /* ✅ 둘 다 체크되면 HL/# 즉시 같은 값으로 맞춤 */
     if(inChk.checked && outChk.checked){
       const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
       const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
@@ -835,7 +825,6 @@
       data[type+"-EXTRAS"] = extras;
     });
 
-    /* ✅ HL/#는 무조건 같은 값으로 저장 */
     if(data.hasIn && data.hasOut){
       data["OUTBOUND-HL"] = data["INBOUND-HL"] || data["OUTBOUND-HL"] || "";
       data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || data["OUTBOUND-HASH"] || "";
@@ -859,8 +848,12 @@
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
-      const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
-      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
+      /* ✅ 원래대로:
+         IN  : 7C + HL
+         OUT : 7C + #
+      */
+      const inText  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
+      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
 
       let lines = "";
       if(m.hasIn){
@@ -882,7 +875,6 @@
       memoList.appendChild(card);
     });
 
-    /* ✅ 클릭이 확실히 먹게 이벤트로 연결 */
     memoList.querySelectorAll(".lines[data-open]").forEach(el=>{
       el.addEventListener("click", ()=>{
         const id = Number(el.getAttribute("data-open"));
@@ -944,13 +936,11 @@
         if(shown) shown.textContent = m[type+"-TIME"] || "";
       });
 
-      /* ✅ 편집 열 때도 HL/# 무조건 동일하게 맞춤 */
       if(m.hasIn && m.hasOut){
         const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
         const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
         const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
         const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
-
         if(inHL && outHL) outHL.value = inHL.value;
         if(inHash && outHash) outHash.value = inHash.value;
       }
