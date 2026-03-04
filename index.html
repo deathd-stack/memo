@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 3.5</title>
+<title>JAS MEMO VER 3.7</title>
 
 <style>
   :root{
@@ -34,7 +34,6 @@
     overflow-x:hidden;
   }
 
-  /* ===== Header ===== */
   header{
     padding:18px 12px 10px;
     text-align:center;
@@ -55,7 +54,6 @@
     transform:translateY(-2px);
   }
 
-  /* ===== Top buttons ===== */
   .controls{
     display:flex;
     justify-content:center;
@@ -75,7 +73,6 @@
   }
   .btnTop:active{transform:scale(.98);}
 
-  /* ===== Memo list ===== */
   #memoList{padding:4px 10px 120px;}
   .memoCard{
     background:rgba(246,234,220,.92);
@@ -119,7 +116,6 @@
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.06);} }
 
-  /* ===== Equipment (HOME only) ===== */
   #equipBtn{
     position:fixed;left:14px;bottom:14px;z-index:50;
     border:0;border-radius:18px;background:#fff;
@@ -144,7 +140,6 @@
   #equipBadge .b1{font-size:22px;}
   #equipBadge .b2{font-size:20px;}
 
-  /* ===== Modal / Sheet ===== */
   .modal{
     position:fixed; inset:0;
     background:rgba(0,0,0,.45);
@@ -172,10 +167,7 @@
   }
   .handle{width:64px;height:7px;border-radius:999px;background:#d9d9d9;}
 
-  /* top blank tap area (open photo) */
-  .sheetTopTap{
-    padding:2px 0 8px;
-  }
+  .sheetTopTap{padding:2px 0 8px;}
   .sheetTopTapHint{
     text-align:center;
     font-weight:900;
@@ -189,28 +181,19 @@
     padding:6px 0 8px;font-weight:950;font-size:16px;
     white-space:nowrap;
   }
-  .checkLine label{
-    display:flex;gap:8px;align-items:center;white-space:nowrap;
-  }
+  .checkLine label{display:flex;gap:8px;align-items:center;white-space:nowrap;}
   .checkLine input{width:20px;height:20px;accent-color:var(--blue);}
 
   .section{
     background:#f2f2f2;border-radius:16px;padding:12px;
     margin:10px 0;border:1px solid #e5e5e5;
   }
-  .secHead{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:8px;
-  }
+  .secHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
   .secTitle{font-size:18px;font-weight:950;letter-spacing:.2px;}
   .timeArea{display:flex;align-items:baseline;gap:10px;font-weight:950;}
   .timeBtn{
-    border:0;background:transparent;
-    color:var(--red);
-    font-weight:950;
-    font-size:16px;
-    padding:4px 8px;
-    border-radius:10px;
+    border:0;background:transparent;color:var(--red);
+    font-weight:950;font-size:16px;padding:4px 8px;border-radius:10px;
   }
   .timeBtn:active{background:rgba(226,27,27,.08);}
   .timeValue{
@@ -246,26 +229,20 @@
   }
 
   input, textarea, select, button{font-family:inherit;}
-
   input[type="text"], textarea{
     width:100%;
     border-radius:14px;
     border:2px solid var(--line);
     padding:10px 10px;
     font-weight:950;
-    font-size:16px;  /* iOS zoom 방지 */
+    font-size:16px; /* iOS zoom 방지 */
     outline:none;
     background:#fff;
     min-width:0;
   }
   input::placeholder{color:#bdbdbd;font-weight:900;}
-  textarea{
-    height:64px;
-    resize:none;
-    font-weight:900;
-  }
+  textarea{height:64px;resize:none;font-weight:900;}
 
-  /* CMPT */
   .cmptRow{
     display:grid;
     grid-template-columns: 86px 1fr;
@@ -273,13 +250,8 @@
     align-items:center;
     margin:8px 0;
   }
-  .cmptLbl{
-    font-size:14px;
-    font-weight:950;
-    white-space:nowrap; /* 줄바꿈 방지 */
-  }
+  .cmptLbl{font-size:14px;font-weight:950;white-space:nowrap;}
 
-  /* EXTRA vertical */
   .extraBox{
     background:#fff;border:2px solid #e7e7e7;
     border-radius:16px;padding:12px;margin-top:10px;
@@ -288,8 +260,7 @@
   .extraTitle{font-weight:950;font-size:16px;}
   .extraPlus{
     border:0;background:transparent;color:var(--blue);
-    font-weight:950;font-size:26px;line-height:1;
-    padding:2px 8px;
+    font-weight:950;font-size:26px;line-height:1;padding:2px 8px;
   }
   .extraList{display:flex;flex-direction:column;gap:8px;}
   .extraRow{
@@ -321,7 +292,6 @@
     padding:8px 4px;
   }
 
-  /* ===== Photo layer ===== */
   #photoLayer{
     position:fixed; inset:0;
     background:black;
@@ -332,7 +302,6 @@
   }
   #photoLayer img{max-width:100%;max-height:100%;}
 
-  /* ===== Equipment modal ===== */
   #equipModal{
     position:fixed; inset:0;
     background:rgba(0,0,0,.45);
@@ -350,10 +319,7 @@
     max-height:70vh;
     overflow:auto;
   }
-  .equipTitle{
-    font-weight:950;font-size:18px;
-    padding:8px 4px 10px;
-  }
+  .equipTitle{font-weight:950;font-size:18px;padding:8px 4px 10px;}
   .equipRow{
     display:grid;
     grid-template-columns: 70px 1fr 1fr;
@@ -362,9 +328,7 @@
     margin:10px 0;
     white-space:nowrap;
   }
-  .equipRow.single{
-    grid-template-columns: 70px 1fr;
-  }
+  .equipRow.single{grid-template-columns: 70px 1fr;}
   .equipLbl{font-weight:950;font-size:16px;}
 </style>
 </head>
@@ -374,7 +338,7 @@
 <header ondblclick="openPhoto()">
   <span class="titleLine">
     <span class="titleMain">JAS MEMO</span>
-    <span class="titleVer">VER 3.5</span>
+    <span class="titleVer">VER 3.7</span>
   </span>
 </header>
 
@@ -387,18 +351,15 @@
 <div id="memoList"></div>
 <input type="file" id="photoInput" accept="image/*" hidden>
 
-<!-- HOME ONLY -->
 <button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
 <div id="equipBadge"></div>
 
-<!-- MEMO MODAL -->
 <div class="modal" id="modal">
   <div class="sheet" id="sheet">
-
-    <!-- drag handle + tap to open photo -->
     <div class="handleWrap" id="handleWrap">
       <div class="handle"></div>
     </div>
+
     <div class="sheetTopTap" onclick="openPhoto()">
       <div class="sheetTopTapHint">TAP HERE TO OPEN PHOTO</div>
     </div>
@@ -414,16 +375,13 @@
       <button class="sheetBtn" onclick="saveMemo()">SAVE</button>
       <button class="sheetBtn" onclick="closeModal()">CLOSE</button>
     </div>
-
   </div>
 </div>
 
-<!-- PHOTO -->
 <div id="photoLayer" ondblclick="closePhoto()" onclick="closePhoto()">
   <img id="photoImg" />
 </div>
 
-<!-- EQUIPMENT MODAL -->
 <div id="equipModal" ondblclick="closeEquip()" onclick="closeEquip()">
   <div id="equipSheet" onclick="event.stopPropagation()">
     <div class="handleWrap"><div class="handle"></div></div>
@@ -452,6 +410,7 @@
    STORAGE KEYS
 ================================ */
 const KEY_MEMOS = "jas_memos";
+const KEY_MEMOS_BACKUP = "jas_memos_backup";   // ✅ 안전 백업
 const KEY_PHOTO = "jas_photo";
 const KEY_EQUIP = "jas_equipment";
 
@@ -503,10 +462,34 @@ function nowTime(){
 function deepClone(obj){
   return JSON.parse(JSON.stringify(obj));
 }
+function getEditMemo(){
+  if(!editId) return null;
+  return memos.find(x => x.id === editId) || null;
+}
+function safeWriteMemos(nextMemos){
+  // ✅ 저장 직전 현재값 백업
+  try{
+    localStorage.setItem(KEY_MEMOS_BACKUP, localStorage.getItem(KEY_MEMOS) || "[]");
+  }catch(e){}
+  localStorage.setItem(KEY_MEMOS, JSON.stringify(nextMemos));
+}
+function tryRestoreFromBackup(){
+  const bk = localStorage.getItem(KEY_MEMOS_BACKUP);
+  if(!bk) return false;
+  try{
+    const arr = JSON.parse(bk);
+    if(!Array.isArray(arr)) return false;
+    localStorage.setItem(KEY_MEMOS, bk);
+    memos = loadMemosWithMigration();
+    renderList();
+    return true;
+  }catch(e){
+    return false;
+  }
+}
 
 /* ===============================
-   MIGRATION (old -> new)
-   - 기존에 저장된 다양한 키(INBOUND-c7 등) 최대한 복구
+   MIGRATION
 ================================ */
 function loadMemosWithMigration(){
   let raw = [];
@@ -517,21 +500,16 @@ function loadMemosWithMigration(){
     raw = [];
   }
 
-  // already new format?
   const looksNew = raw.every(m => !m || typeof m !== "object" || ("dataVersion" in m) || ("in" in m) || ("out" in m));
   if(looksNew) return raw.map(normalizeNewMemo);
 
-  // old format -> new
   const converted = raw.map(old => migrateOldMemo(old)).map(normalizeNewMemo);
-
-  // write back once to stabilize
   localStorage.setItem(KEY_MEMOS, JSON.stringify(converted));
   return converted;
 }
 
 function normalizeNewMemo(m){
   if(!m || typeof m !== "object") m = {};
-  // ensure shape
   const base = {
     id: m.id ?? Date.now(),
     dataVersion: 2,
@@ -543,11 +521,9 @@ function normalizeNewMemo(m){
     out: m.out || {}
   };
 
-  // keep shared as padded
   base.sharedHL = pad(base.sharedHL, 4);
   base.sharedHASH = pad(base.sharedHASH, 3);
 
-  // normalize in/out
   base.in = {
     c7: pad(base.in.c7 ?? "", 4),
     t: pad(base.in.t ?? "", 3),
@@ -578,7 +554,6 @@ function normalizeNewMemo(m){
     extras: Array.isArray(base.out.extras) ? base.out.extras : []
   };
 
-  // sanitize extras
   base.in.extras = base.in.extras
     .filter(x => x && typeof x === "object")
     .map(x => ({ key:String(x.key||"").toUpperCase(), val: pad(x.val||"", 3) }))
@@ -593,16 +568,14 @@ function normalizeNewMemo(m){
 }
 
 function migrateOldMemo(old){
-  // old can be flat keys: INBOUND-c7, INBOUND-HL, INBOUND-HASH, etc.
   const m = { id: old.id ?? Date.now(), dataVersion: 2 };
 
-  const hasIn = !!old.hasIn || !!old["INBOUND-c7"] || !!old["INBOUND-c7".toLowerCase()];
-  const hasOut = !!old.hasOut || !!old["OUTBOUND-c7"] || !!old["OUTBOUND-c7".toLowerCase()];
+  const hasIn = !!old.hasIn || !!old["INBOUND-c7"] || !!old["inbound-c7"];
+  const hasOut = !!old.hasOut || !!old["OUTBOUND-c7"] || !!old["outbound-c7"];
 
   m.hasIn = hasIn;
   m.hasOut = hasOut;
 
-  // shared hl/hash could be old.HL old.HASH or IN/OUT specific
   const hl = old.sharedHL ?? old.HL ?? old["INBOUND-HL"] ?? old["OUTBOUND-HL"] ?? "";
   const hash = old.sharedHASH ?? old.HASH ?? old["INBOUND-HASH"] ?? old["OUTBOUND-HASH"] ?? "";
 
@@ -610,33 +583,33 @@ function migrateOldMemo(old){
   m.sharedHASH = hash;
 
   m.in = {
-    c7: old["INBOUND-c7"] ?? "",
-    t: old["INBOUND-t"] ?? "",
-    d: old["INBOUND-d"] ?? "",
-    bb: old["INBOUND-bb"] ?? "",
-    cmpt1: old["INBOUND-cmpt1"] ?? "F",
-    cmpt2: old["INBOUND-cmpt2"] ?? "F",
-    cmpt3: old["INBOUND-cmpt3"] ?? "",
-    cmpt4: old["INBOUND-cmpt4"] ?? "",
-    note: old["INBOUND-note"] ?? "",
-    time: old["INBOUND-TIME"] ?? old["INBOUND-time"] ?? "",
-    extras: old["INBOUND-EXTRAS"] ?? old["INBOUND-extras"] ?? []
+    c7: old["INBOUND-c7"] ?? old["inbound-c7"] ?? "",
+    t: old["INBOUND-t"] ?? old["inbound-t"] ?? "",
+    d: old["INBOUND-d"] ?? old["inbound-d"] ?? "",
+    bb: old["INBOUND-bb"] ?? old["inbound-bb"] ?? "",
+    cmpt1: old["INBOUND-cmpt1"] ?? old["inbound-cmpt1"] ?? "F",
+    cmpt2: old["INBOUND-cmpt2"] ?? old["inbound-cmpt2"] ?? "F",
+    cmpt3: old["INBOUND-cmpt3"] ?? old["inbound-cmpt3"] ?? "",
+    cmpt4: old["INBOUND-cmpt4"] ?? old["inbound-cmpt4"] ?? "",
+    note: old["INBOUND-note"] ?? old["inbound-note"] ?? "",
+    time: old["INBOUND-TIME"] ?? old["INBOUND-time"] ?? old["inbound-time"] ?? "",
+    extras: old["INBOUND-EXTRAS"] ?? old["INBOUND-extras"] ?? old["inbound-extras"] ?? []
   };
 
   m.out = {
-    c7: old["OUTBOUND-c7"] ?? "",
-    t: old["OUTBOUND-t"] ?? "",
-    d: old["OUTBOUND-d"] ?? "",
-    bb: old["OUTBOUND-bb"] ?? "",
-    tt: old["OUTBOUND-tt"] ?? "",
-    tb: old["OUTBOUND-tb"] ?? "",
-    cmpt1: old["OUTBOUND-cmpt1"] ?? "F",
-    cmpt2: old["OUTBOUND-cmpt2"] ?? "F",
-    cmpt3: old["OUTBOUND-cmpt3"] ?? "",
-    cmpt4: old["OUTBOUND-cmpt4"] ?? "",
-    note: old["OUTBOUND-note"] ?? "",
-    time: old["OUTBOUND-TIME"] ?? old["OUTBOUND-time"] ?? "",
-    extras: old["OUTBOUND-EXTRAS"] ?? old["OUTBOUND-extras"] ?? []
+    c7: old["OUTBOUND-c7"] ?? old["outbound-c7"] ?? "",
+    t: old["OUTBOUND-t"] ?? old["outbound-t"] ?? "",
+    d: old["OUTBOUND-d"] ?? old["outbound-d"] ?? "",
+    bb: old["OUTBOUND-bb"] ?? old["outbound-bb"] ?? "",
+    tt: old["OUTBOUND-tt"] ?? old["outbound-tt"] ?? "",
+    tb: old["OUTBOUND-tb"] ?? old["outbound-tb"] ?? "",
+    cmpt1: old["OUTBOUND-cmpt1"] ?? old["outbound-cmpt1"] ?? "F",
+    cmpt2: old["OUTBOUND-cmpt2"] ?? old["outbound-cmpt2"] ?? "F",
+    cmpt3: old["OUTBOUND-cmpt3"] ?? old["outbound-cmpt3"] ?? "",
+    cmpt4: old["OUTBOUND-cmpt4"] ?? old["outbound-cmpt4"] ?? "",
+    note: old["OUTBOUND-note"] ?? old["outbound-note"] ?? "",
+    time: old["OUTBOUND-TIME"] ?? old["OUTBOUND-time"] ?? old["outbound-time"] ?? "",
+    extras: old["OUTBOUND-EXTRAS"] ?? old["OUTBOUND-extras"] ?? old["outbound-extras"] ?? []
   };
 
   return m;
@@ -651,11 +624,9 @@ document.addEventListener("input", (e) => {
 
   const k = el.dataset.k || "";
 
-  // shared
   if(k === "HL") el.value = onlyNum(el.value, 4);
   if(k === "HASH") el.value = onlyNum(el.value, 3);
 
-  // section fields
   if(k.endsWith(".c7")) el.value = onlyNum(el.value, 4);
   if(k.endsWith(".t")) el.value = onlyNum(el.value, 3);
   if(k.endsWith(".d")) el.value = onlyNum(el.value, 2);
@@ -663,16 +634,10 @@ document.addEventListener("input", (e) => {
   if(k.endsWith(".tt")) el.value = onlyNum(el.value, 4);
   if(k.endsWith(".tb")) el.value = onlyNum(el.value, 4);
 
-  // extra value
   if(k.startsWith("extra.val.")) el.value = onlyNum(el.value, 3);
 
-  // sync shared HL/HASH across inputs in modal instantly
-  if(k === "HL"){
-    syncSharedInputs("HL", el.value);
-  }
-  if(k === "HASH"){
-    syncSharedInputs("HASH", el.value);
-  }
+  if(k === "HL") syncSharedInputs("HL", el.value);
+  if(k === "HASH") syncSharedInputs("HASH", el.value);
 });
 
 function syncSharedInputs(key, val){
@@ -691,7 +656,6 @@ function makeSection(type, memo){
   const sec = document.createElement("div");
   sec.className = "section";
 
-  const title = type;
   const timeVal = memo ? ((isOut ? memo.out.time : memo.in.time) || "") : "";
   const sharedHL = memo ? memo.sharedHL : "";
   const sharedHASH = memo ? memo.sharedHASH : "";
@@ -714,7 +678,7 @@ function makeSection(type, memo){
 
   sec.innerHTML = `
     <div class="secHead">
-      <div class="secTitle">${title}</div>
+      <div class="secTitle">${type}</div>
       <div class="timeArea">
         <button class="timeBtn" type="button" data-timebtn="${type}">TIME</button>
         <div class="timeValue" id="${type}-timeValue">${timeVal}</div>
@@ -776,27 +740,20 @@ function makeSection(type, memo){
     <textarea placeholder="NOTE (${type})" data-k="${type.toLowerCase()}.note">${escapeHtml(음표)}</textarea>
   `;
 
-  // TIME button behavior
   const btn = sec.querySelector(`[data-timebtn="${type}"]`);
   const timeValue = sec.querySelector(`#${type}-timeValue`);
-  btn.addEventListener("click", () => {
-    timeValue.textContent = nowTime();
-  });
+  btn.addEventListener("click", () => { timeValue.textContent = nowTime(); });
   btn.addEventListener("dblclick", () => {
     const cur = timeValue.textContent || nowTime();
-    const t = prompt("TIME (HH:MM 24H)", cur);
-    if(t) timeValue.textContent = t;
+    const t2 = prompt("TIME (HH:MM 24H)", cur);
+    if(t2) timeValue.textContent = t2;
   });
 
-  // extras render
   const list = sec.querySelector(`#${type}-extraList`);
   extras.forEach(x => list.appendChild(makeExtraRow(type, x.key, x.val)));
 
-  // add extra
   const plus = sec.querySelector(`[data-extra-plus="${type}"]`);
-  plus.addEventListener("click", () => {
-    list.appendChild(makeExtraRow(type, "W", ""));
-  });
+  plus.addEventListener("click", () => { list.appendChild(makeExtraRow(type, "W", "")); });
 
   return sec;
 }
@@ -825,9 +782,11 @@ function escapeHtml(s){
 
 /* ===============================
    CHECKBOX CHANGE -> render sections
+   ✅ 3.7 핵심 수정: 기존값 유지하며 재렌더
 ================================ */
 inChk.onchange = outChk.onchange = () => {
-  renderSectionsForEdit(null);
+  const m = getEditMemo();     // 편집중이면 기존값 유지
+  renderSectionsForEdit(m);
 };
 
 function renderSectionsForEdit(memo){
@@ -835,7 +794,6 @@ function renderSectionsForEdit(memo){
   if(inChk.checked) sections.appendChild(makeSection("INBOUND", memo));
   if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", memo));
 
-  // After adding sections: keep shared sync
   const hl = memo ? memo.sharedHL : "";
   const hash = memo ? memo.sharedHASH : "";
   if(hl) syncSharedInputs("HL", hl);
@@ -855,20 +813,30 @@ function newMemo(){
 
 function openModal(){
   modal.style.display = "flex";
-  // HOME ONLY 숨김
   setHomeUiVisible(false);
+
+  // ✅ 섹션 비어있으면 자동 복구 (가끔 모바일에서 렌더 타이밍 이슈)
+  setTimeout(() => {
+    const needSection = (inChk.checked || outChk.checked);
+    if(needSection && sections.childElementCount === 0){
+      const m = getEditMemo();
+      renderSectionsForEdit(m);
+      if(m){
+        syncSharedInputs("HL", m.sharedHL || "");
+        syncSharedInputs("HASH", m.sharedHASH || "");
+      }
+    }
+  }, 0);
 }
 
 function closeModal(){
   modal.style.display = "none";
   editId = null;
-  // HOME ONLY 표시
   setHomeUiVisible(true);
 }
 
 function setHomeUiVisible(on){
   equipBtn.style.display = on ? "block" : "none";
-  // badge는 데이터 있으면만 표시
   if(on) updateEquipBadge();
   else equipBadge.style.display = "none";
 }
@@ -877,6 +845,12 @@ function setHomeUiVisible(on){
    SAVE / EDIT
 ================================ */
 function saveMemo(){
+  // ✅ 섹션이 안 그려진 상태에서 저장하면 빈값 덮어쓰기됨 → 차단
+  if((inChk.checked || outChk.checked) && sections.childElementCount === 0){
+    alert("입력칸이 표시되지 않았어요.\nCLOSE 후 새로고침 → 다시 열고 저장해주세요.");
+    return;
+  }
+
   const data = editId ? deepClone(memos.find(x => x.id === editId)) : null;
 
   const memo = normalizeNewMemo({
@@ -890,7 +864,6 @@ function saveMemo(){
     out: {}
   });
 
-  // INBOUND
   if(memo.hasIn){
     memo.in.c7 = pad(getInput("inbound.c7"), 4);
     memo.in.t  = pad(getInput("inbound.t"), 3);
@@ -904,11 +877,9 @@ function saveMemo(){
 
     memo.in.note = getTextarea("inbound.note", "");
     memo.in.time = (document.getElementById("INBOUND-timeValue")?.textContent || "").trim();
-
     memo.in.extras = collectExtras("INBOUND");
   }
 
-  // OUTBOUND
   if(memo.hasOut){
     memo.out.c7 = pad(getInput("outbound.c7"), 4);
     memo.out.t  = pad(getInput("outbound.t"), 3);
@@ -925,30 +896,26 @@ function saveMemo(){
 
     memo.out.note = getTextarea("outbound.note", "");
     memo.out.time = (document.getElementById("OUTBOUND-timeValue")?.textContent || "").trim();
-
     memo.out.extras = collectExtras("OUTBOUND");
   }
 
-  // preserve missing parts from previous object if edit and section unchecked now?
-  // (요청상 체크에 따라 저장되게, 기존값은 유지)
+  // ✅ 체크를 꺼도 기존값은 유지(요청사항)
   if(data){
-    // if user unchecked, keep old but mark hasIn/hasOut accordingly (값은 남겨둠)
     if(!memo.hasIn && data.in) memo.in = data.in;
     if(!memo.hasOut && data.out) memo.out = data.out;
 
-    // keep shared if empty
     if(!memo.sharedHL && data.sharedHL) memo.sharedHL = data.sharedHL;
     if(!memo.sharedHASH && data.sharedHASH) memo.sharedHASH = data.sharedHASH;
   }
 
-  // write
   if(editId){
     const idx = memos.findIndex(x => x.id === editId);
     if(idx >= 0) memos[idx] = memo;
   }else{
     memos.push(memo);
   }
-  localStorage.setItem(KEY_MEMOS, JSON.stringify(memos));
+
+  safeWriteMemos(memos);
 
   closeModal();
   renderList(memo.id);
@@ -994,11 +961,9 @@ function editMemo(id){
   openModal();
   renderSectionsForEdit(memo);
 
-  // fill shared
   syncSharedInputs("HL", memo.sharedHL || "");
   syncSharedInputs("HASH", memo.sharedHASH || "");
 
-  // fill IN
   if(memo.hasIn){
     setInput("inbound.c7", memo.in.c7);
     setInput("inbound.t", memo.in.t);
@@ -1016,7 +981,6 @@ function editMemo(id){
     if(tv) tv.textContent = memo.in.time || "";
   }
 
-  // fill OUT
   if(memo.hasOut){
     setInput("outbound.c7", memo.out.c7);
     setInput("outbound.t", memo.out.t);
@@ -1036,8 +1000,6 @@ function editMemo(id){
     const tv = document.getElementById("OUTBOUND-timeValue");
     if(tv) tv.textContent = memo.out.time || "";
   }
-
-  // extras are rendered inside makeSection() already from memo
 }
 
 function setInput(k, v){
@@ -1051,10 +1013,6 @@ function setTextarea(k, v){
 
 /* ===============================
    LIST RENDER
-   규칙:
-   - 둘 다: IN 7C[] HL[]  / 줄바꿈 / OUT 7C[] #[]
-   - IN만: IN 7C[] HL[] #[]
-   - OUT만: OUT 7C[] HL[] #[]
 ================================ */
 function renderList(flashId){
   memoList.innerHTML = "";
@@ -1076,9 +1034,9 @@ function renderList(flashId){
       outChip = `OUT ${outLineBoth}`;
     }else if(m.hasIn){
       inChip = `IN 7C[${m.in.c7 || ""}] HL[${m.sharedHL || ""}] #[${m.sharedHASH || ""}]`;
-      outChip = ""; // blank
+      outChip = "";
     }else if(m.hasOut){
-      inChip = ""; // blank
+      inChip = "";
       outChip = `OUT 7C[${m.out.c7 || ""}] HL[${m.sharedHL || ""}] #[${m.sharedHASH || ""}]`;
     }else{
       inChip = "IN";
@@ -1103,7 +1061,6 @@ function renderList(flashId){
     memoList.appendChild(card);
   });
 
-  // click binding
   memoList.querySelectorAll("[data-open]").forEach(el => {
     el.addEventListener("click", () => {
       const id = Number(el.getAttribute("data-open"));
@@ -1123,7 +1080,7 @@ function deleteSelected(){
   if(ids.length === 0) return;
 
   memos = memos.filter(m => !ids.includes(m.id));
-  localStorage.setItem(KEY_MEMOS, JSON.stringify(memos));
+  safeWriteMemos(memos);
   renderList();
 }
 
@@ -1163,15 +1120,9 @@ function openEquip(){
   belt.value = pad(eq.belt, 2) || "";
   equipModal.style.display = "flex";
 }
-function closeEquip(){
-  equipModal.style.display = "none";
-}
+function closeEquip(){ equipModal.style.display = "none"; }
 function saveEquip(){
-  const eq = {
-    tug1: pad(tug1.value, 2),
-    tug2: pad(tug2.value, 2),
-    belt: pad(belt.value, 2)
-  };
+  const eq = { tug1: pad(tug1.value, 2), tug2: pad(tug2.value, 2), belt: pad(belt.value, 2) };
   localStorage.setItem(KEY_EQUIP, JSON.stringify(eq));
   updateEquipBadge();
   closeEquip();
@@ -1179,18 +1130,12 @@ function saveEquip(){
 function updateEquipBadge(){
   const eq = JSON.parse(localStorage.getItem(KEY_EQUIP) || "{}");
   const has = (eq.tug1 || eq.tug2 || eq.belt);
-  if(!has){
-    equipBadge.style.display = "none";
-    return;
-  }
+  if(!has){ equipBadge.style.display = "none"; return; }
+
   const t1 = eq.tug1 || "00";
   const t2 = eq.tug2 || "00";
   const b  = eq.belt || "00";
-  // 공백 없이 깔끔하게
-  equipBadge.innerHTML = `
-    <div class="b1">TUG ${t1}/${t2}</div>
-    <div class="b2">BELT ${b}</div>
-  `;
+  equipBadge.innerHTML = `<div class="b1">TUG ${t1}/${t2}</div><div class="b2">BELT ${b}</div>`;
   equipBadge.style.display = "block";
 }
 
@@ -1222,9 +1167,7 @@ function updateEquipBadge(){
     const dy = Math.max(0, currentY - startY);
     sheet.style.transition = "transform .18s ease";
     sheet.style.transform = "translateY(0)";
-    if(dy > 90){
-      closeModal();
-    }
+    if(dy > 90) closeModal();
   }
 
   handleWrap.addEventListener("touchstart", (e) => onStart(e.touches[0].clientY), {passive:true});
@@ -1242,6 +1185,12 @@ function updateEquipBadge(){
 renderList();
 updateEquipBadge();
 setHomeUiVisible(true);
+
+// ✅ 혹시라도 저장값이 깨져서 빈 화면이면 백업 자동 복구 시도
+if(!Array.isArray(memos)) {
+  const ok = tryRestoreFromBackup();
+  if(!ok) memos = [];
+}
 </script>
 
 </body>
