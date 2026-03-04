@@ -3,484 +3,338 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>JAS MEMO VER 3.1</title>
+<title>JAS MEMO VER 3.2</title>
 
 <style>
-  :root{
-    --bg1:#f2a323;
-    --bg2:#f08a1a;
-    --card:#f6e8d6;
-    --pill:#e6ded5;
-    --black:#111;
-    --blue:#2f86ff;
-  }
+/* ====== (1) 전체 UI 크기 다운(약 20%) + (2) 타이틀 한 줄 ====== */
+:root{
+  --ui-font: 0.82;          /* 전체 폰트 축소 */
+  --ui-space: 0.82;         /* 여백/패딩 축소 */
+  --ui-radius: 0.88;        /* 라운드 약간 축소 */
+}
 
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:-apple-system, system-ui, sans-serif;
-    font-weight:600;
-    background: radial-gradient(1200px 600px at 50% -10%, #ffb647 0%, var(--bg1) 35%, var(--bg2) 100%);
-    min-height:100vh;
-    padding-bottom:96px; /* equipment/badge 공간 */
-  }
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:-apple-system, system-ui, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  font-weight:600;
+  background: linear-gradient(180deg, #f7b233 0%, #f08b2a 55%, #ef7a21 100%);
+  color:#111;
+  overflow-x:hidden;
+}
 
-  header{
-    text-align:center;
-    padding:26px 16px 10px;
-    cursor:pointer;
-    user-select:none;
-  }
-  .title{
-    font-weight:900;
-    letter-spacing:-0.5px;
-    color:#111;
-    font-size:52px;
-    line-height:1.0;
-  }
-  .title small{
-    font-weight:900;
-    font-size:26px; /* VER 3.1 반 크기 느낌 */
-    margin-left:10px;
-    letter-spacing:-0.5px;
-  }
+/* 헤더(한 줄) */
+header{
+  text-align:center;
+  padding: calc(22px * var(--ui-space));
+  cursor:pointer;
+  user-select:none;
+  line-height:1;
+}
+.header-line{
+  display:inline-flex;
+  align-items:baseline;
+  gap: calc(14px * var(--ui-space));
+}
+.header-main{
+  font-weight:900;
+  font-size: calc(2.6rem * var(--ui-font));
+  letter-spacing:-0.5px;
+}
+.header-ver{
+  font-weight:900;
+  font-size: calc(1.25rem * var(--ui-font)); /* VER 글씨 작게 */
+  opacity:.95;
+}
 
-  .controls{
-    display:flex;
-    justify-content:center;
-    gap:18px;
-    padding:16px 12px 14px;
-  }
-  button{
-    padding:18px 26px;
-    border:none;
-    border-radius:22px;
-    background:#fff;
-    font-weight:900;
-    font-size:22px;
-    color:var(--blue);
-    box-shadow:0 10px 18px rgba(0,0,0,.18);
-  }
-  button:active{transform:translateY(1px);}
+/* 상단 버튼 */
+.controls{
+  display:flex;
+  justify-content:center;
+  gap: calc(14px * var(--ui-space));
+  margin-bottom: calc(14px * var(--ui-space));
+}
+button{
+  padding: calc(10px * var(--ui-space)) calc(18px * var(--ui-space));
+  border:none;
+  border-radius: calc(18px * var(--ui-radius));
+  background:#fff;
+  font-weight:900;
+  font-size: calc(15px * var(--ui-font));
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+button:active{transform:scale(.98);}
 
-  /* ===== LIST CARD (홈) ===== */
-  #memoList{padding:8px 10px 16px;}
-  .memo{
-    background:var(--card);
-    border-radius:22px;
-    padding:18px 18px;
-    margin:14px 0;
-    box-shadow:0 18px 26px rgba(0,0,0,.22);
-    border:1px solid rgba(0,0,0,.06);
-  }
-  .memo.flash{animation:flash .5s;}
-  @keyframes flash{50%{background:#ffe3b4;transform:scale(1.01);}}
+.memo{
+  background:#f5e9de;
+  margin: calc(10px * var(--ui-space)) calc(12px * var(--ui-space));
+  padding: calc(12px * var(--ui-space)) calc(12px * var(--ui-space));
+  border-radius: calc(18px * var(--ui-radius));
+  box-shadow:0 14px 34px rgba(0,0,0,.18);
+  transition:.2s;
+  font-size: calc(14px * var(--ui-font));
+  line-height:1.35;
+  overflow:hidden;
+}
+.memo.flash{animation:flash .5s;}
+@keyframes flash{50%{background:#ffe8b5;transform:scale(1.01);}}
 
-  .memoRow{
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-  }
-  .memoCheck{
-    width:34px;height:34px;
-    border-radius:12px;
-    border:2px solid rgba(0,0,0,.22);
-    appearance:none;
-    background:#fff;
-    margin-top:4px;
-  }
-  .memoCheck:checked{background:rgba(0,0,0,.15);}
+/* 리스트 내부(예전 스타일 느낌 유지) */
+.list-row{
+  display:flex;
+  gap: calc(10px * var(--ui-space));
+  align-items:flex-start;
+}
+.list-check{
+  width: calc(26px * var(--ui-space));
+  height: calc(26px * var(--ui-space));
+  margin-top: calc(2px * var(--ui-space));
+  accent-color:#111;
+}
+.pills{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap: calc(10px * var(--ui-space));
+  min-width:0;
+}
+.pill-line{
+  display:flex;
+  align-items:center;
+  gap: calc(10px * var(--ui-space));
+  min-width:0;
+}
+.pill-tag{
+  background:#111;
+  color:#fff;
+  border-radius: calc(18px * var(--ui-radius));
+  padding: calc(8px * var(--ui-space)) calc(18px * var(--ui-space));
+  font-weight:900;
+  font-size: calc(13px * var(--ui-font));
+  min-width: calc(64px * var(--ui-space));
+  text-align:center;
+}
+.pill-text{
+  background:rgba(0,0,0,.07);
+  border-radius: calc(18px * var(--ui-radius));
+  padding: calc(10px * var(--ui-space)) calc(14px * var(--ui-space));
+  font-weight:900;
+  font-size: calc(16px * var(--ui-font));
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex:1;
+  min-width:0;
+}
 
-  .memoLines{flex:1; display:flex; flex-direction:column; gap:10px; min-width:0;}
-  .line{
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-  .tag{
-    min-width:82px;
-    height:42px;
-    padding:0 18px;
-    border-radius:18px;
-    background:var(--black);
-    color:#fff;
-    font-weight:900;
-    font-size:18px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex:0 0 auto;
-  }
-  .pill{
-    flex:1;
-    min-width:0;
-    background:rgba(0,0,0,.08);
-    border-radius:18px;
-    padding:10px 16px;
-    font-weight:900;
-    font-size:26px;
-    color:#111;
-    white-space:nowrap;
-    overflow:visible;       /* ✅ ... 방지 */
-    text-overflow:clip;
-  }
+/* 체크(모달 상단) */
+.check-line{
+  display:flex;
+  justify-content:center;
+  gap: calc(18px * var(--ui-space));
+  align-items:center;
+  margin-bottom: calc(12px * var(--ui-space));
+  white-space:nowrap;
+  font-size: calc(14px * var(--ui-font));
+  font-weight:900;
+}
+.check-line label{display:flex;align-items:center;gap: calc(8px * var(--ui-space));}
 
-  /* 오른쪽 공항코드 동그라미(뱃지) */
-  .airportDot{
-    width:58px;height:58px;
-    border-radius:999px;
-    background:#111;
-    color:#fff;
-    font-weight:900;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:16px;
-    flex:0 0 auto;
-    margin-left:10px;
-    box-shadow:0 8px 14px rgba(0,0,0,.18);
-    letter-spacing:0.5px;
-  }
+/* 모달 */
+.modal{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:flex-end;
+  z-index:40;
+}
+.box{
+  background:#fff;
+  width:100%;
+  max-height:92vh;
+  overflow:auto;
+  border-radius: calc(26px * var(--ui-radius)) calc(26px * var(--ui-radius)) 0 0;
+  padding: calc(16px * var(--ui-space));
+}
 
-  /* ===== MODAL ===== */
-  .modal{
-    position:fixed;inset:0;
-    background:rgba(0,0,0,.45);
-    display:none;
-    justify-content:center;
-    align-items:flex-end;
-    z-index:80;
-  }
-  .box{
-    background:#fff;
-    width:100%;
-    max-height:92vh;
-    overflow:auto;
-    border-radius:26px 26px 0 0;
-    padding:14px 14px 20px;
-  }
+/* 섹션 */
+.section{
+  background:#f2f2f2;
+  padding: calc(12px * var(--ui-space));
+  border-radius: calc(14px * var(--ui-radius));
+  margin-top: calc(12px * var(--ui-space));
+  overflow:hidden;
+}
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: calc(10px * var(--ui-space));
+}
+.section-title{
+  font-size: calc(16px * var(--ui-font));
+  font-weight:900;
+}
+.time-btn{
+  font-size: calc(13px * var(--ui-font));
+  font-weight:900;
+  user-select:none;
+  cursor:pointer;
+}
+.time-red{
+  color:#e10600;
+  font-weight:900;
+  font-size: calc(18px * var(--ui-font));
+  white-space:nowrap;
+}
 
-  /* 모달 상단 빈공간(사진열기) */
-  .tapSpace{
-    height:10px;
-    border-radius:10px;
-    background:transparent;
-    margin-bottom:6px;
-  }
+/* rows */
+.row{
+  display:flex;
+  gap: calc(10px * var(--ui-space));
+  align-items:center;
+  margin-bottom: calc(10px * var(--ui-space));
+  flex-wrap:wrap;         /* 화면 벗어남 방지 */
+}
+.lbl{
+  font-weight:900;
+  font-size: calc(16px * var(--ui-font));
+  min-width: calc(46px * var(--ui-space));
+}
+input{
+  padding: calc(10px * var(--ui-space)) calc(12px * var(--ui-space));
+  font-weight:900;
+  border-radius: calc(16px * var(--ui-radius));
+  border:2px solid rgba(0,0,0,.15);
+  font-size:16px;         /* iOS 자동 줌 방지 */
+  max-width:100%;
+}
+.input4{width: calc(120px * var(--ui-space)); text-align:center;}
+.input3{width: calc(108px * var(--ui-space)); text-align:center;}
+.input2{width: calc(98px * var(--ui-space)); text-align:center;}
+.long{flex:1; min-width: 180px;}
 
-  .check-line{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:18px;
-    padding:10px 0 6px;
-    white-space:nowrap;
-  }
-  .check-line label{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-weight:900;
-    font-size:22px;
-  }
-  .check-line input[type="checkbox"]{
-    width:26px;height:26px;
-    accent-color:var(--blue);
-  }
+textarea{
+  width:100%;
+  height: calc(70px * var(--ui-space));
+  border-radius: calc(16px * var(--ui-radius));
+  padding: calc(12px * var(--ui-space));
+  border:2px solid rgba(0,0,0,.12);
+  font-size:16px;
+  font-weight:700;
+}
 
-  .section{
-    background:#f1f1f1;
-    border-radius:22px;
-    padding:16px;
-    margin-top:12px;
-    border:1px solid rgba(0,0,0,.06);
-  }
-  .section-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
-  }
-  .section-title{
-    font-weight:900;
-    font-size:30px;
-    letter-spacing:-0.3px;
-  }
+/* EXTRA */
+.extra-wrap{
+  margin-top: calc(10px * var(--ui-space));
+  background:#fff;
+  border-radius: calc(16px * var(--ui-radius));
+  padding: calc(12px * var(--ui-space));
+  border:2px solid rgba(0,0,0,.08);
+}
+.extra-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom: calc(10px * var(--ui-space));
+}
+.extra-head b{font-size: calc(16px * var(--ui-font));}
+.extra-row{
+  display:flex;
+  gap: calc(10px * var(--ui-space));
+  align-items:center;
+  margin-top: calc(10px * var(--ui-space));
+  flex-wrap:wrap;
+}
+.extra-row select{
+  height: calc(46px * var(--ui-space));
+  font-size: calc(16px * var(--ui-font));
+  font-weight:900;
+  border-radius: calc(16px * var(--ui-radius));
+  border:2px solid rgba(0,0,0,.12);
+  padding:0 calc(12px * var(--ui-space));
+  background:#eee;
+}
+.extra-row .exval{
+  width: calc(120px * var(--ui-space));
+  text-align:center;
+}
+.smallbtn{
+  padding: calc(10px * var(--ui-space)) calc(14px * var(--ui-space));
+  border-radius: calc(16px * var(--ui-radius));
+  font-weight:900;
+  font-size: calc(14px * var(--ui-font));
+  box-shadow:none;
+}
 
-  .timeWrap{
-    display:flex;
-    align-items:baseline;
-    gap:12px;
-  }
-  .timeLabel{
-    font-weight:900;
-    font-size:22px;
-    color:#111;
-  }
-  .timeValue{
-    font-weight:900;
-    font-size:34px;
-    color:red;
-    cursor:pointer;
-    user-select:none;
-    white-space:nowrap;
-  }
-  .timeValue:active{transform:translateY(1px);}
+/* 사진 레이어 */
+#photoLayer{
+  position:fixed;inset:0;background:black;
+  display:none;justify-content:center;align-items:center;
+  z-index:60;
+}
+#photoLayer img{max-width:100%;max-height:100%;}
 
-  /* ✅ 7C/HL/# 한줄 + 숫자 4자리 모두 보이게 */
-  .topGrid{
-    display:grid;
-    grid-template-columns: 48px 128px 48px 128px 36px 120px;
-    gap:12px;
-    align-items:center;
-    margin-bottom:12px;
-  }
-  .lbl{
-    font-weight:900;
-    font-size:30px;
-    color:#111;
-    text-align:left;
-    white-space:nowrap;
-  }
+/* EQUIPMENT (바탕화면에서만 보이도록: 모달 열릴 때도 숨김) */
+#equipBtn{
+  position:fixed;
+  left: calc(16px * var(--ui-space));
+  bottom: calc(16px * var(--ui-space));
+  z-index:50;
+  background:#fff;
+  border:none;
+  border-radius: calc(18px * var(--ui-radius));
+  padding: calc(14px * var(--ui-space)) calc(18px * var(--ui-space));
+  font-weight:900;
+  box-shadow:0 14px 34px rgba(0,0,0,.18);
+}
+#equipBadge{
+  position:fixed;
+  right: calc(16px * var(--ui-space));
+  bottom: calc(18px * var(--ui-space));
+  z-index:55;
+  background:rgba(0,0,0,.85);
+  color:#fff;
+  padding: calc(16px * var(--ui-space)) calc(18px * var(--ui-space));
+  border-radius: calc(22px * var(--ui-radius));
+  font-size: calc(18px * var(--ui-font));
+  font-weight:900;
+  line-height:1.2;
+  min-width: calc(220px * var(--ui-space));
+  text-align:right;
+  display:none;
+}
 
-  input{
-    height:62px;
-    border-radius:18px;
-    border:2px solid rgba(0,0,0,.18);
-    padding:0 14px;
-    font-weight:900;
-    font-size:30px; /* ✅ 숫자 크게 */
-    text-align:center;
-    outline:none;
-    background:#fff;
-    width:100%;
-  }
-  input::placeholder{color:#bbb;}
-  input[data-long]{
-    text-align:left;
-    padding-left:16px;
-    font-size:28px;
-  }
+/* EQUIPMENT 모달 */
+#equipModal{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);
+  display:none;justify-content:center;align-items:flex-end;
+  z-index:80;
+}
+#equipBox{
+  background:#fff;width:100%;max-height:70vh;overflow:auto;
+  border-radius: calc(26px * var(--ui-radius)) calc(26px * var(--ui-radius)) 0 0;
+  padding: calc(16px * var(--ui-space));
+}
+.equipRow{
+  display:flex;gap: calc(10px * var(--ui-space));
+  align-items:center;margin-bottom: calc(12px * var(--ui-space));
+  white-space:nowrap;flex-wrap:wrap;
+}
+.equipRow b{min-width: calc(80px * var(--ui-space)); font-size: calc(16px * var(--ui-font));}
 
-  /* CMPT 라인 */
-  .row{
-    display:grid;
-    grid-template-columns: 160px 1fr;
-    gap:12px;
-    align-items:center;
-    margin:10px 0;
-  }
-  .row .lbl{font-size:30px;}
-
-  /* T D BB / T/T T/B */
-  .miniGrid{
-    display:grid;
-    grid-template-columns: 32px 140px 32px 120px 48px 120px;
-    gap:12px;
-    align-items:center;
-    margin-top:12px;
-  }
-  .miniGrid .lbl{font-size:28px;}
-  .miniGrid input{height:58px;font-size:28px;border-radius:18px;}
-
-  .ttGrid{
-    display:grid;
-    grid-template-columns: 60px 160px 60px 160px;
-    gap:12px;
-    align-items:center;
-    margin-top:12px;
-  }
-  .ttGrid .lbl{font-size:28px;}
-  .ttGrid input{height:58px;font-size:28px;border-radius:18px;}
-
-  /* EXTRA (세로로 추가) */
-  .extraBox{
-    margin-top:14px;
-    background:#fff;
-    border-radius:22px;
-    padding:14px;
-    border:2px solid rgba(0,0,0,.12);
-  }
-  .extraHead{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
-  }
-  .extraHead b{font-size:30px; font-weight:900;}
-  .plusBtn{
-    width:44px;height:44px;
-    border-radius:14px;
-    border:none;
-    background:transparent;
-    color:var(--blue);
-    font-weight:900;
-    font-size:32px;
-    padding:0;
-    box-shadow:none;
-  }
-
-  .extraList{
-    display:flex;
-    flex-direction:column; /* ✅ 세로 */
-    gap:12px;
-  }
-  .extraRow{
-    display:grid;
-    grid-template-columns: 180px 140px 76px;
-    gap:12px;
-    align-items:center;
-  }
-  .extraRow select{
-    height:62px;
-    border-radius:18px;
-    border:2px solid rgba(0,0,0,.18);
-    font-weight:900;
-    font-size:26px;
-    padding:0 14px;
-    background:#f3f3f7;
-  }
-  .minusBtn{
-    height:62px;
-    border-radius:18px;
-    border:none;
-    background:#f1f3f9;
-    color:var(--blue);
-    font-weight:900;
-    font-size:30px;
-    box-shadow:none;
-  }
-
-  textarea{
-    width:100%;
-    margin-top:12px;
-    height:84px;
-    border-radius:22px;
-    border:2px solid rgba(0,0,0,.12);
-    padding:16px;
-    font-weight:900;
-    font-size:24px;
-    outline:none;
-    resize:none;
-  }
-  textarea::placeholder{color:#c8c8c8;font-weight:900;}
-
-  .bottomBtns{
-    display:flex;
-    justify-content:flex-start;
-    gap:18px;
-    padding:14px 8px 0;
-  }
-  .bottomBtns button{
-    padding:14px 18px;
-    border-radius:18px;
-    font-size:20px;
-    box-shadow:none;
-    background:transparent;
-    color:var(--blue);
-  }
-
-  /* ===== PHOTO LAYER ===== */
-  #photoLayer{
-    position:fixed;inset:0;
-    background:#000;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:120;
-  }
-  #photoLayer img{max-width:100%;max-height:100%;}
-
-  /* ===== EQUIPMENT (홈에서만 보이게) ===== */
-  #equipBtn{
-    position:fixed;
-    left:18px;
-    bottom:18px;
-    z-index:70;
-    background:#fff;
-    color:var(--blue);
-    border:none;
-    border-radius:22px;
-    padding:16px 18px;
-    font-weight:900;
-    font-size:18px;
-    box-shadow:0 10px 18px rgba(0,0,0,.18);
-  }
-  #equipBadge{
-    position:fixed;
-    right:18px;
-    bottom:18px; /* ✅ 오른쪽 아래 */
-    z-index:70;
-    background:rgba(0,0,0,.85);
-    color:#fff;
-    border-radius:22px;
-    padding:16px 18px;
-    font-weight:900;
-    font-size:30px;
-    line-height:1.1;
-    text-align:right;
-    min-width:220px;
-    box-shadow:0 12px 20px rgba(0,0,0,.22);
-    display:none;
-  }
-  #equipBadge small{
-    display:block;
-    font-size:26px;
-    margin-top:6px;
-    opacity:.95;
-  }
-
-  /* EQUIPMENT MODAL */
-  #equipModal{
-    position:fixed; inset:0;
-    background:rgba(0,0,0,.45);
-    display:none;
-    justify-content:center;
-    align-items:flex-end;
-    z-index:90;
-  }
-  #equipBox{
-    background:#fff;
-    width:100%;
-    max-height:70vh;
-    overflow:auto;
-    border-radius:26px 26px 0 0;
-    padding:16px;
-  }
-  .equipRow{
-    display:grid;
-    grid-template-columns: 120px 1fr 1fr;
-    gap:12px;
-    align-items:center;
-    margin:12px 0;
-  }
-  .equipRow.single{
-    grid-template-columns: 120px 1fr;
-  }
-  .equipRow b{
-    font-size:26px;
-    font-weight:900;
-  }
-
-  /* 작은 화면 대응 */
-  @media (max-width: 420px){
-    .title{font-size:46px;}
-    .title small{font-size:24px;}
-    .topGrid{grid-template-columns: 44px 118px 44px 118px 34px 110px; gap:10px;}
-    input{font-size:28px;}
-    .lbl{font-size:28px;}
-    .row{grid-template-columns: 150px 1fr;}
-    .miniGrid{grid-template-columns: 30px 132px 30px 112px 46px 112px;}
-    .ttGrid{grid-template-columns: 56px 150px 56px 150px;}
-    .pill{font-size:24px;}
-  }
 </style>
 </head>
 
 <body>
 
 <header ondblclick="openPhoto()">
-  <div class="title">JAS MEMO <small>VER 3.1</small></div>
+  <div class="header-line">
+    <div class="header-main">JAS MEMO</div>
+    <div class="header-ver">VER 3.2</div>
+  </div>
 </header>
 
 <div class="controls">
@@ -492,16 +346,14 @@
 <div id="memoList"></div>
 <input type="file" id="photoInput" accept="image/*" hidden>
 
-<!-- 홈에서만 보이는 장비 -->
-<button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
+<!-- 우측 하단 장비 표시 -->
 <div id="equipBadge"></div>
+<!-- 좌측 하단 버튼 -->
+<button id="equipBtn" onclick="openEquip()">EQUIPMENT</button>
 
 <!-- 메모 모달 -->
 <div class="modal" id="modal">
   <div class="box">
-
-    <!-- ✅ 메모 들어가서도 위쪽 공백 탭하면 사진 열기 -->
-    <div class="tapSpace" onclick="openPhoto()"></div>
 
     <div class="check-line">
       <label><input type="checkbox" id="inChk"> INBOUND</label>
@@ -510,9 +362,9 @@
 
     <div id="sections"></div>
 
-    <div class="bottomBtns">
-      <button onclick="saveMemo()">SAVE</button>
-      <button onclick="closeModal()">CLOSE</button>
+    <div class="row" style="justify-content:flex-start;">
+      <button class="smallbtn" onclick="saveMemo()">SAVE</button>
+      <button class="smallbtn" onclick="closeModal()">CLOSE</button>
     </div>
 
   </div>
@@ -526,473 +378,397 @@
 <!-- 장비 모달 -->
 <div id="equipModal" ondblclick="closeEquip()">
   <div id="equipBox" onclick="event.stopPropagation()">
-    <div style="font-weight:900;font-size:22px;margin-bottom:12px;">EQUIPMENT</div>
+    <div style="font-weight:900;font-size:16px;margin-bottom:12px;">EQUIPMENT</div>
 
     <div class="equipRow">
       <b>TUG</b>
-      <input id="tug1" inputmode="numeric" maxlength="2" placeholder="00">
-      <input id="tug2" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="tug1" class="input2" inputmode="numeric" placeholder="00" maxlength="2">
+      <input id="tug2" class="input2" inputmode="numeric" placeholder="00" maxlength="2">
     </div>
 
-    <div class="equipRow single">
+    <div class="equipRow">
       <b>BELT</b>
-      <input id="belt" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="belt" class="input2" inputmode="numeric" placeholder="00" maxlength="2">
     </div>
 
-    <div class="bottomBtns">
-      <button onclick="saveEquip()">SAVE</button>
-      <button onclick="closeEquip()">CLOSE</button>
+    <div class="row">
+      <button class="smallbtn" onclick="saveEquip()">SAVE</button>
+      <button class="smallbtn" onclick="closeEquip()">CLOSE</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ===== DOM ===== */
-const modal = document.getElementById("modal");
-const sections = document.getElementById("sections");
-const memoList = document.getElementById("memoList");
-const photoInput = document.getElementById("photoInput");
-const photoLayer = document.getElementById("photoLayer");
-const photoImg = document.getElementById("photoImg");
-const inChk = document.getElementById("inChk");
-const outChk = document.getElementById("outChk");
+const modal=document.getElementById("modal");
+const sections=document.getElementById("sections");
+const memoList=document.getElementById("memoList");
+const photoInput=document.getElementById("photoInput");
+const photoLayer=document.getElementById("photoLayer");
+const photoImg=document.getElementById("photoImg");
+const inChk=document.getElementById("inChk");
+const outChk=document.getElementById("outChk");
 
-const equipBtn = document.getElementById("equipBtn");
-const equipBadge = document.getElementById("equipBadge");
-const equipModal = document.getElementById("equipModal");
-const tug1 = document.getElementById("tug1");
-const tug2 = document.getElementById("tug2");
-const belt = document.getElementById("belt");
+const equipBadge=document.getElementById("equipBadge");
+const equipModal=document.getElementById("equipModal");
+const tug1=document.getElementById("tug1");
+const tug2=document.getElementById("tug2");
+const belt=document.getElementById("belt");
 
-/* ===== DATA ===== */
-let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
-let photo = localStorage.getItem("jas_photo");
-let editId = null;
+let memos=JSON.parse(localStorage.getItem("jas_memos")||"[]");
+let photo=localStorage.getItem("jas_photo");
+let editId=null;
 
-const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
-
-/* ===== UTIL ===== */
-function onlyNum(val, len){
-  return (val||"").toString().replace(/[^0-9]/g,"").slice(0,len);
-}
-function pad(val, len){
-  const v = onlyNum(val, len);
+function onlyNum(val,len){ return (val||"").replace(/[^0-9]/g,'').slice(0,len); }
+function pad(val,len){
+  const v=onlyNum(val,len);
   return v ? v.padStart(len,"0") : "";
 }
 function nowTime(){
-  const d = new Date();
-  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  const d=new Date();
+  return d.getHours().toString().padStart(2,"0")+":"+
+         d.getMinutes().toString().padStart(2,"0");
 }
 
-/* ===== 입력 제한 + HL/# 공유(동기화) ===== */
-document.addEventListener("input", (e)=>{
-  const k = e.target.dataset.k;
+/* 입력 제한 */
+document.addEventListener("input",e=>{
+  const k=e.target.dataset.k;
   if(!k) return;
 
-  // 숫자 제한
-  if(k.endsWith("-c7")) e.target.value = onlyNum(e.target.value,4);
-  if(k.endsWith("-HL")) e.target.value = onlyNum(e.target.value,4);
-  if(k.endsWith("-HASH")) e.target.value = onlyNum(e.target.value,3);
+  if(k.endsWith("-c7")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-HL")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-HASH")) e.target.value=onlyNum(e.target.value,3);
 
-  if(k.endsWith("-t")) e.target.value = onlyNum(e.target.value,3);
-  if(k.endsWith("-d")) e.target.value = onlyNum(e.target.value,2);
-  if(k.endsWith("-bb")) e.target.value = onlyNum(e.target.value,2);
+  if(k.endsWith("-t")) e.target.value=onlyNum(e.target.value,3);
+  if(k.endsWith("-d")) e.target.value=onlyNum(e.target.value,2);
+  if(k.endsWith("-bb")) e.target.value=onlyNum(e.target.value,2);
 
-  if(k.endsWith("-tt")) e.target.value = onlyNum(e.target.value,4);
-  if(k.endsWith("-tb")) e.target.value = onlyNum(e.target.value,4);
+  if(k.endsWith("-tt")) e.target.value=onlyNum(e.target.value,4);
+  if(k.endsWith("-tb")) e.target.value=onlyNum(e.target.value,4);
 
-  if(k.startsWith("extraVal-")) e.target.value = onlyNum(e.target.value,3);
-
-  // ✅ HL, # 값 공유(인바/아웃바 둘 다 같은 값)
-  if(k.endsWith("-HL")){
-    const v = e.target.value;
-    document.querySelectorAll('[data-k$="-HL"]').forEach(el=>{
-      if(el !== e.target) el.value = v;
-    });
-  }
-  if(k.endsWith("-HASH")){
-    const v = e.target.value;
-    document.querySelectorAll('[data-k$="-HASH"]').forEach(el=>{
-      if(el !== e.target) el.value = v;
-    });
-  }
+  if(k.startsWith("extraVal-")) e.target.value=onlyNum(e.target.value,3);
 });
 
-/* ===== SECTION ===== */
-function makeExtraRow(type, key="W", val=""){
-  const row = document.createElement("div");
-  row.className = "extraRow";
-  row.innerHTML = `
+/* EXTRA */
+const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
+function makeExtraRow(type, key="", val=""){
+  const row=document.createElement("div");
+  row.className="extra-row";
+  row.innerHTML=`
     <select>
       ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
     </select>
-    <input data-k="extraVal-${type}" inputmode="numeric" maxlength="3" placeholder="000" value="${onlyNum(val,3)}">
-    <button type="button" class="minusBtn" onclick="this.closest('.extraRow').remove()">-</button>
+    <input class="exval" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+    <button type="button" class="smallbtn" onclick="this.parentElement.remove()">-</button>
   `;
   return row;
 }
-
 function addExtraRow(type){
-  const box = document.getElementById(type+"-EXTRAS");
+  const box=document.getElementById(type+"-EXTRAS");
   if(!box) return;
-  box.appendChild(makeExtraRow(type, "W", ""));
+  box.appendChild(makeExtraRow(type,"W",""));
 }
 
+/* 섹션 생성 */
 function makeSection(type, memoData){
-  const d = document.createElement("div");
-  d.className = "section";
+  const d=document.createElement("div");
+  d.className="section";
 
-  const timeVal = memoData ? (memoData[type+"-TIME"] || "") : "";
-  const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
+  const savedTime = memoData ? (memoData[type+"-TIME"]||"") : "";
 
-  d.innerHTML = `
+  d.innerHTML=`
     <div class="section-head">
       <div class="section-title">${type}</div>
-      <div class="timeWrap">
-        <div class="timeLabel">TIME</div>
-        <div class="timeValue" id="${type}-TIMEVAL">${timeVal}</div>
+      <div style="display:flex;align-items:baseline;gap:12px;">
+        <div class="time-btn" id="${type}-TIMEBTN">TIME</div>
+        <div class="time-red" id="${type}-TIMESHOWN">${savedTime||""}</div>
       </div>
     </div>
 
-    <div class="topGrid">
+    <div class="row">
       <div class="lbl">7C</div>
-      <input data-k="${type}-c7" inputmode="numeric" maxlength="4" placeholder="0000">
-
+      <input class="input4" inputmode="numeric" data-k="${type}-c7" maxlength="4" placeholder="0000">
       <div class="lbl">HL</div>
-      <input data-k="${type}-HL" inputmode="numeric" maxlength="4" placeholder="0000">
-
+      <input class="input4" inputmode="numeric" data-k="${type}-HL" maxlength="4" placeholder="0000">
       <div class="lbl">#</div>
-      <input data-k="${type}-HASH" inputmode="numeric" maxlength="3" placeholder="000">
+      <input class="input3" inputmode="numeric" data-k="${type}-HASH" maxlength="3" placeholder="000">
     </div>
 
     ${[1,2,3,4].map(i=>`
       <div class="row">
         <div class="lbl">CMPT ${i}</div>
-        <input data-long data-k="${type}-cmpt${i}" placeholder="TEXT">
-      </div>
-    `).join("")}
+        <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT">
+      </div>`).join("")}
 
-    <!-- ✅ T D BB 위치: CMPT4 아래 -->
-    <div class="miniGrid">
+    <div class="row">
       <div class="lbl">T</div>
-      <input data-k="${type}-t" inputmode="numeric" maxlength="3" placeholder="000">
+      <input class="input3" inputmode="numeric" data-k="${type}-t" maxlength="3" placeholder="000">
       <div class="lbl">D</div>
-      <input data-k="${type}-d" inputmode="numeric" maxlength="2" placeholder="00">
+      <input class="input2" inputmode="numeric" data-k="${type}-d" maxlength="2" placeholder="00">
       <div class="lbl">BB</div>
-      <input data-k="${type}-bb" inputmode="numeric" maxlength="2" placeholder="00">
+      <input class="input2" inputmode="numeric" data-k="${type}-bb" maxlength="2" placeholder="00">
     </div>
 
     ${type==="OUTBOUND" ? `
-      <div class="ttGrid">
+      <div class="row">
         <div class="lbl">T/T</div>
-        <input data-k="${type}-tt" inputmode="numeric" maxlength="4" placeholder="0000">
+        <input class="input4" inputmode="numeric" data-k="${type}-tt" maxlength="4" placeholder="0000">
         <div class="lbl">T/B</div>
-        <input data-k="${type}-tb" inputmode="numeric" maxlength="4" placeholder="0000">
+        <input class="input4" inputmode="numeric" data-k="${type}-tb" maxlength="4" placeholder="0000">
       </div>
     ` : ""}
 
-    <div class="extraBox">
-      <div class="extraHead">
+    <div class="extra-wrap">
+      <div class="extra-head">
         <b>EXTRA</b>
-        <button type="button" class="plusBtn" onclick="addExtraRow('${type}')">+</button>
+        <button type="button" class="smallbtn" onclick="addExtraRow('${type}')">+</button>
       </div>
-      <div class="extraList" id="${type}-EXTRAS"></div>
+      <div id="${type}-EXTRAS"></div>
     </div>
 
     <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
   `;
 
-  // TIME: 클릭=현재시간 저장 / 더블클릭=수정
-  const tv = d.querySelector(`#${type}-TIMEVAL`);
-  tv.onclick = ()=>{
-    tv.textContent = nowTime();
-  };
-  tv.ondblclick = ()=>{
-    const cur = tv.textContent || nowTime();
-    const t = prompt("TIME (HH:MM 24H)", cur);
-    if(t) tv.textContent = t;
+  // TIME 버튼
+  const btn = d.querySelector(`#${type}-TIMEBTN`);
+  const shown = d.querySelector(`#${type}-TIMESHOWN`);
+  btn.onclick = ()=>{
+    shown.textContent = nowTime();
   };
 
-  // EXTRA 복원
+  // 기존 EXTRAS 로드
   const extrasBox = d.querySelector(`#${type}-EXTRAS`);
+  const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
   extras.forEach(ex=>{
     extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val));
   });
 
-  // ✅ 기본값 F 복원: CMPT1,2 (IN/OUT 둘 다)
-  if(!memoData){
-    const c1 = d.querySelector(`[data-k="${type}-cmpt1"]`);
-    const c2 = d.querySelector(`[data-k="${type}-cmpt2"]`);
-    if(c1) c1.value = "F";
-    if(c2) c2.value = "F";
-  }
-
   return d;
 }
 
-/* 체크 변경 -> 섹션 생성 */
-inChk.onchange = outChk.onchange = ()=>{
-  sections.innerHTML = "";
-  if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
-  if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
-
-  // ✅ 새로 만든 경우에도 HL/# 동기화가 “빈값”이면 같이 맞춰지게(선택사항)
+/* 체크 변경 -> 섹션 렌더 */
+inChk.onchange=outChk.onchange=()=>{
+  sections.innerHTML="";
+  if(inChk.checked) sections.append(makeSection("INBOUND", null));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND", null));
 };
 
-/* ===== HOME / MODAL ===== */
 function newMemo(){
-  editId = null;
-  inChk.checked = false;
-  outChk.checked = false;
-  sections.innerHTML = "";
-  modal.style.display = "flex";
+  editId=null;
+  inChk.checked=false;
+  outChk.checked=false;
+  sections.innerHTML="";
+  modal.style.display="flex";
 
-  // ✅ 모달 들어가면 홈 장비는 숨김(요청: 바탕화면에서만 보이게)
-  equipBtn.style.display = "none";
-  equipBadge.style.display = "none";
+  // 메모 화면 들어가면 바탕화면 장비 UI 숨김
+  document.getElementById("equipBtn").style.display="none";
+  equipBadge.style.display="none";
 }
-function closeModal(){
-  modal.style.display = "none";
-  editId = null;
 
-  // ✅ 홈으로 돌아오면 장비 다시 표시
-  equipBtn.style.display = "";
+function closeModal(){
+  modal.style.display="none";
+  editId=null;
+
+  // 바탕화면 돌아오면 장비 UI 복구
+  document.getElementById("equipBtn").style.display="block";
   updateEquipBadge();
 }
 
-/* ===== SAVE ===== */
+/* 저장 */
 function saveMemo(){
-  const data = { id: editId ?? Date.now() };
-  data.hasIn = inChk.checked;
-  data.hasOut = outChk.checked;
+  const data={id:editId??Date.now()};
+  data.hasIn=inChk.checked;
+  data.hasOut=outChk.checked;
 
   ["INBOUND","OUTBOUND"].forEach(type=>{
-    const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
-    if(!enabled) return;
+    if(!(type==="INBOUND"?data.hasIn:data.hasOut)) return;
 
-    data[type+"-c7"]   = pad(document.querySelector(`[data-k="${type}-c7"]`)?.value, 4);
-    data[type+"-HL"]   = pad(document.querySelector(`[data-k="${type}-HL"]`)?.value, 4);
-    data[type+"-HASH"] = pad(document.querySelector(`[data-k="${type}-HASH"]`)?.value, 3);
+    data[type+"-c7"]=pad(document.querySelector(`[data-k="${type}-c7"]`)?.value,4);
+    data[type+"-HL"]=pad(document.querySelector(`[data-k="${type}-HL"]`)?.value,4);
+    data[type+"-HASH"]=pad(document.querySelector(`[data-k="${type}-HASH"]`)?.value,3);
 
-    data[type+"-cmpt1"] = document.querySelector(`[data-k="${type}-cmpt1"]`)?.value || "";
-    data[type+"-cmpt2"] = document.querySelector(`[data-k="${type}-cmpt2"]`)?.value || "";
-    data[type+"-cmpt3"] = document.querySelector(`[data-k="${type}-cmpt3"]`)?.value || "";
-    data[type+"-cmpt4"] = document.querySelector(`[data-k="${type}-cmpt4"]`)?.value || "";
+    data[type+"-t"]=pad(document.querySelector(`[data-k="${type}-t"]`)?.value,3);
+    data[type+"-d"]=pad(document.querySelector(`[data-k="${type}-d"]`)?.value,2);
+    data[type+"-bb"]=pad(document.querySelector(`[data-k="${type}-bb"]`)?.value,2);
 
-    data[type+"-t"]  = pad(document.querySelector(`[data-k="${type}-t"]`)?.value, 3);
-    data[type+"-d"]  = pad(document.querySelector(`[data-k="${type}-d"]`)?.value, 2);
-    data[type+"-bb"] = pad(document.querySelector(`[data-k="${type}-bb"]`)?.value, 2);
+    [1,2,3,4].forEach(i=>{
+      data[type+`-cmpt${i}`]=document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+    });
 
     if(type==="OUTBOUND"){
-      data[type+"-tt"] = pad(document.querySelector(`[data-k="${type}-tt"]`)?.value, 4);
-      data[type+"-tb"] = pad(document.querySelector(`[data-k="${type}-tb"]`)?.value, 4);
+      data[type+"-tt"]=pad(document.querySelector(`[data-k="${type}-tt"]`)?.value,4);
+      data[type+"-tb"]=pad(document.querySelector(`[data-k="${type}-tb"]`)?.value,4);
     }
 
-    data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+    data[type+"-note"]=document.querySelector(`[data-k="${type}-note"]`)?.value || "";
 
-    const tv = document.getElementById(type+"-TIMEVAL");
-    data[type+"-TIME"] = tv ? (tv.textContent || "") : "";
+    const tShown = document.getElementById(type+"-TIMESHOWN");
+    data[type+"-TIME"]=tShown ? (tShown.textContent||"") : "";
 
     // EXTRAS
-    const extrasBox = document.getElementById(type+"-EXTRAS");
-    const extras = [];
-    if(extrasBox){
-      [...extrasBox.querySelectorAll(".extraRow")].forEach(r=>{
+    const extras=[];
+    const box=document.getElementById(type+"-EXTRAS");
+    if(box){
+      [...box.querySelectorAll(".extra-row")].forEach(r=>{
         const key = r.querySelector("select")?.value || "";
-        const val = pad(r.querySelector("input")?.value, 3);
-        if(key && val) extras.push({key, val});
+        const val = onlyNum(r.querySelector("input")?.value,3);
+        if(key && val) extras.push({key, val:val.padStart(3,"0")});
       });
     }
-    data[type+"-EXTRAS"] = extras;
+    data[type+"-EXTRAS"]=extras;
   });
 
-  // ✅ HL/# 공유 저장값도 맞춰주기(둘 다 켜져있으면 OUT값을 IN으로 복사 같은거 X, 이미 동기화 입력으로 동일해짐)
   if(editId){
-    const idx = memos.findIndex(m=>m.id===editId);
-    if(idx>-1) memos[idx] = data;
+    memos[memos.findIndex(m=>m.id===editId)] = data;
   }else{
     memos.push(data);
   }
 
-  localStorage.setItem("jas_memos", JSON.stringify(memos));
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
   closeModal();
   renderList(data.id);
 }
 
-/* ===== LIST RENDER ===== */
-function deriveAirportCodeFrom7C(fourDigits){
-  // TODO: “규칙 로직”은 다음 단계에서 여기 구현하면 됨.
-  // 지금은 빈 문자열(표시 안함)로 둠.
-  return "";
-}
-
+/* 리스트 출력 */
 function renderList(flashId){
-  memoList.innerHTML = "";
+  memoList.innerHTML="";
   memos.forEach(m=>{
-    const card = document.createElement("div");
-    card.className = "memo";
-    if(m.id===flashId) card.classList.add("flash");
+    const div=document.createElement("div");
+    div.className="memo";
+    if(m.id===flashId) div.classList.add("flash");
 
-    const inLine = m.hasIn
-      ? `7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]${m["INBOUND-HASH"]?` #[${m["INBOUND-HASH"]}]`:""}`
-      : "";
-    const outLine = m.hasOut
-      ? `7C[${m["OUTBOUND-c7"]||""}]${m["OUTBOUND-HL"]?` HL[${m["OUTBOUND-HL"]}]`:""}${m["OUTBOUND-HASH"]?` #[${m["OUTBOUND-HASH"]}]`:""}`
-      : "";
-
-    const airport = deriveAirportCodeFrom7C(m.hasIn ? m["INBOUND-c7"] : (m["OUTBOUND-c7"]||""));
-    const dotHtml = airport ? `<div class="airportDot">${airport}</div>` : "";
-
-    let linesHtml = "";
+    // 예전처럼 IN/OUT 두 줄(둘 다 체크일 때), 하나만이면 한 줄
+    let lines=[];
     if(m.hasIn && m.hasOut){
-      linesHtml = `
-        <div class="line">
-          <div class="tag">IN</div>
-          <div class="pill">${inLine}</div>
-        </div>
-        <div class="line">
-          <div class="tag">OUT</div>
-          <div class="pill">${outLine}</div>
-        </div>
-      `;
+      lines.push({tag:"IN", text:`7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`});
+      lines.push({tag:"OUT", text:`7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`});
     }else if(m.hasIn){
-      linesHtml = `
-        <div class="line">
-          <div class="tag">IN</div>
-          <div class="pill">${inLine}</div>
-        </div>
-      `;
+      lines.push({tag:"IN", text:`7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`});
     }else if(m.hasOut){
-      linesHtml = `
-        <div class="line">
-          <div class="tag">OUT</div>
-          <div class="pill">${outLine}</div>
-        </div>
-      `;
+      lines.push({tag:"OUT", text:`7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`});
     }else{
-      linesHtml = `<div class="pill">(EMPTY)</div>`;
+      lines.push({tag:"", text:"(EMPTY)"});
     }
 
-    card.innerHTML = `
-      <div class="memoRow">
-        <input class="memoCheck" type="checkbox" data-id="${m.id}">
-        <div class="memoLines" onclick="editMemo(${m.id})">
-          ${linesHtml}
+    div.innerHTML=`
+      <div class="list-row">
+        <input class="list-check" type="checkbox" data-id="${m.id}">
+        <div class="pills" onclick="editMemo(${m.id})" style="cursor:pointer;">
+          ${lines.map(l=>`
+            <div class="pill-line">
+              ${l.tag?`<div class="pill-tag">${l.tag}</div>`:""}
+              <div class="pill-text">${l.text}</div>
+            </div>
+          `).join("")}
         </div>
-        ${dotHtml}
       </div>
     `;
-
-    memoList.appendChild(card);
+    memoList.appendChild(div);
   });
 }
 
-/* ===== EDIT ===== */
+/* 수정(불러오기) */
 function editMemo(id){
-  const m = memos.find(x=>x.id===id);
+  const m=memos.find(x=>x.id===id);
   if(!m) return;
-  editId = id;
+  editId=id;
 
-  modal.style.display = "flex";
-  equipBtn.style.display = "none";
-  equipBadge.style.display = "none";
+  modal.style.display="flex";
+  inChk.checked=!!m.hasIn;
+  outChk.checked=!!m.hasOut;
 
-  inChk.checked = !!m.hasIn;
-  outChk.checked = !!m.hasOut;
+  sections.innerHTML="";
+  if(inChk.checked) sections.append(makeSection("INBOUND", m));
+  if(outChk.checked) sections.append(makeSection("OUTBOUND", m));
 
-  sections.innerHTML = "";
-  if(inChk.checked) sections.appendChild(makeSection("INBOUND", m));
-  if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", m));
+  // 메모 화면 들어가면 바탕화면 장비 UI 숨김
+  document.getElementById("equipBtn").style.display="none";
+  equipBadge.style.display="none";
 
   setTimeout(()=>{
     ["INBOUND","OUTBOUND"].forEach(type=>{
-      const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
-      if(!enabled) return;
+      if(!(type==="INBOUND"?m.hasIn:m.hasOut)) return;
 
-      const setV = (k, v)=>{
-        const el = document.querySelector(`[data-k="${type}-${k}"]`);
-        if(el) el.value = v || "";
+      const setV=(k,val)=>{
+        const el=document.querySelector(`[data-k="${type}-${k}"]`);
+        if(el) el.value=val||"";
       };
 
-      setV("c7",   m[type+"-c7"]);
-      setV("HL",   m[type+"-HL"]);
+      setV("c7", m[type+"-c7"]);
+      setV("HL", m[type+"-HL"]);
       setV("HASH", m[type+"-HASH"]);
 
-      setV("cmpt1", m[type+"-cmpt1"]);
-      setV("cmpt2", m[type+"-cmpt2"]);
-      setV("cmpt3", m[type+"-cmpt3"]);
-      setV("cmpt4", m[type+"-cmpt4"]);
-
-      setV("t",  m[type+"-t"]);
-      setV("d",  m[type+"-d"]);
+      setV("t", m[type+"-t"]);
+      setV("d", m[type+"-d"]);
       setV("bb", m[type+"-bb"]);
 
+      [1,2,3,4].forEach(i=>{
+        const el=document.querySelector(`[data-k="${type}-cmpt${i}"]`);
+        if(el) el.value=m[type+`-cmpt${i}`]||"";
+      });
+
       if(type==="OUTBOUND"){
-        setV("tt", m[type+"-tt"]);
-        setV("tb", m[type+"-tb"]);
+        const tt=document.querySelector(`[data-k="${type}-tt"]`);
+        const tb=document.querySelector(`[data-k="${type}-tb"]`);
+        if(tt) tt.value=m[type+"-tt"]||"";
+        if(tb) tb.value=m[type+"-tb"]||"";
       }
 
-      const note = document.querySelector(`[data-k="${type}-note"]`);
-      if(음표) note.value = m[type+"-note"] || "";
+      const note=document.querySelector(`[data-k="${type}-note"]`);
+      if(음표) note.value=m[type+"-note"]||"";
 
-      const tv = document.getElementById(type+"-TIMEVAL");
-      if(tv) tv.textContent = m[type+"-TIME"] || "";
+      const shown=document.getElementById(type+"-TIMESHOWN");
+      if(shown) shown.textContent=m[type+"-TIME"]||"";
     });
   },30);
 }
 
-/* ===== DELETE ===== */
+/* 삭제 */
 function deleteSelected(){
-  const checks = document.querySelectorAll('.memoCheck:checked');
-  const ids = [...checks].map(c=>Number(c.dataset.id));
-  memos = memos.filter(m=>!ids.includes(m.id));
-  localStorage.setItem("jas_memos", JSON.stringify(memos));
+  const checks=document.querySelectorAll('.memo input[type="checkbox"]:checked');
+  const ids=[...checks].map(c=>Number(c.dataset.id));
+  memos=memos.filter(m=>!ids.includes(m.id));
+  localStorage.setItem("jas_memos",JSON.stringify(memos));
   renderList();
 }
 
-/* ===== PHOTO ===== */
-function addPhoto(){ photoInput.click(); }
-photoInput.onchange = (e)=>{
-  const f = e.target.files[0];
+/* 사진 */
+function addPhoto(){photoInput.click();}
+photoInput.onchange=e=>{
+  const f=e.target.files[0];
   if(!f) return;
-  const r = new FileReader();
-  r.onload = ()=>{
-    photo = r.result;
-    localStorage.setItem("jas_photo", photo);
+  const r=new FileReader();
+  r.onload=()=>{
+    photo=r.result;
+    localStorage.setItem("jas_photo",photo);
   };
   r.readAsDataURL(f);
 };
-function openPhoto(){
-  if(!photo) return;
-  photoImg.src = photo;
-  photoLayer.style.display = "flex";
-}
-function closePhoto(){ photoLayer.style.display = "none"; }
+function openPhoto(){ if(!photo) return; photoImg.src=photo; photoLayer.style.display="flex"; }
+function closePhoto(){ photoLayer.style.display="none"; }
 
-/* ===== EQUIPMENT ===== */
+/* EQUIPMENT */
 function openEquip(){
-  const eq = JSON.parse(localStorage.getItem("jas_equipment")||"{}");
-  tug1.value = pad(eq.tug1,2);
-  tug2.value = pad(eq.tug2,2);
-  belt.value = pad(eq.belt,2);
-  equipModal.style.display = "flex";
+  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
+  tug1.value=pad(eq.tug1,2);
+  tug2.value=pad(eq.tug2,2);
+  belt.value=pad(eq.belt,2);
+  equipModal.style.display="flex";
 }
-function closeEquip(){ equipModal.style.display = "none"; }
-
+function closeEquip(){ equipModal.style.display="none"; }
 function saveEquip(){
-  const eq = { tug1: pad(tug1.value,2), tug2: pad(tug2.value,2), belt: pad(belt.value,2) };
-  localStorage.setItem("jas_equipment", JSON.stringify(eq));
+  const eq={ tug1: pad(tug1.value,2), tug2: pad(tug2.value,2), belt: pad(belt.value,2) };
+  localStorage.setItem("jas_equipment",JSON.stringify(eq));
   updateEquipBadge();
   closeEquip();
 }
 function updateEquipBadge(){
-  const eq = JSON.parse(localStorage.getItem("jas_equipment")||"{}");
+  const eq=JSON.parse(localStorage.getItem("jas_equipment")||"{}");
   if(!eq.tug1 && !eq.tug2 && !eq.belt){
-    equipBadge.style.display = "none";
+    equipBadge.style.display="none";
     return;
   }
-  equipBadge.innerHTML = `TUG ${eq.tug1||"00"}/${eq.tug2||"00"}<small>BELT ${eq.belt||"00"}</small>`;
-  equipBadge.style.display = "block";
+  equipBadge.innerHTML = `TUG ${eq.tug1||"00"}/${eq.tug2||"00"}<br>BELT ${eq.belt||"00"}`;
+  equipBadge.style.display="block";
 }
 
 /* init */
