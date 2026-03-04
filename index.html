@@ -19,33 +19,23 @@
     --red:#e20000;
     --line:#cfcfcf;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
+  *{box-sizing:border-box;}
+  html, body{height:100%; width:100%; overflow-x:hidden;}
   body{
     margin:0;
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-weight:700;
     background:radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
               linear-gradient(180deg,var(--bg1),var(--bg2));
-    min-height:100vh;
-    overflow-x:hidden;
+    overflow:hidden; /* ✅ 홈 화면 고정(페이지 스크롤 막기) */
   }
 
-  /* ✅ 전체 20% 축소(홈은 유지) */
-  #app{
-    transform:scale(.8);
-    transform-origin:top center;
-    width:125%;
-  }
-
-  /* ✅ 홈 상단 고정(헤더+버튼) */
-  .homeTop{
-    position:sticky;
-    top:0;
-    z-index:10;
-    padding-top:env(safe-area-inset-top);
-    background:linear-gradient(180deg, rgba(255,152,0,.95) 0%, rgba(255,122,26,.90) 65%, rgba(255,122,26,0) 100%);
-    backdrop-filter:saturate(120%) blur(0px);
+  /* ✅ 앱 레이아웃: 헤더/버튼 고정 + 리스트만 스크롤 */
+  .app{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
   }
 
   /* ====== HOME HEADER ====== */
@@ -54,6 +44,7 @@
     padding:22px 14px 10px;
     user-select:none;
     cursor:pointer;
+    flex:0 0 auto;
   }
   .titleWrap{
     display:flex;
@@ -80,7 +71,8 @@
     display:flex;
     justify-content:center;
     gap:14px;
-    padding:8px 14px 12px;
+    padding:8px 14px 8px;
+    flex:0 0 auto;
   }
   button{
     border:none;
@@ -96,9 +88,14 @@
 
   /* ====== LIST ====== */
   #memoList{
-    padding:10px 14px 160px;
+    flex:1 1 auto;
+    overflow:auto;             /* ✅ 리스트만 스크롤 */
+    -webkit-overflow-scrolling:touch;
+    padding:10px 14px 110px;   /* 아래 고정 버튼 공간 */
     max-width:780px;
+    width:100%;
     margin:0 auto;
+    overflow-x:hidden;         /* ✅ 옆으로 안 밀리게 */
   }
   .memoCard{
     background:rgba(246,231,215,.92);
@@ -113,6 +110,7 @@
     display:flex;
     gap:10px;
     align-items:flex-start;
+    overflow:hidden;
   }
   .selBox{
     width:30px;
@@ -136,12 +134,14 @@
     gap:10px;
     cursor:pointer;
     min-width:0;
+    overflow:hidden;
   }
   .line{
     display:flex;
     align-items:center;
     gap:10px;
     min-width:0;
+    overflow:hidden;
   }
   .tagPill{
     background:#111;
@@ -171,11 +171,11 @@
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
 
-  /* ====== EQUIP HOME (고정) ====== */
+  /* ====== EQUIP HOME (맨 밑) ====== */
   #equipBtn{
     position:fixed;
     left:14px;
-    bottom:calc(12px + env(safe-area-inset-bottom));
+    bottom:18px;
     z-index:20;
     border:none;
     border-radius:18px;
@@ -189,23 +189,22 @@
   #equipBadge{
     position:fixed;
     right:14px;
-    bottom:calc(12px + env(safe-area-inset-bottom));
+    bottom:18px;
     z-index:20;
     background:rgba(0,0,0,.86);
     color:#fff;
     border-radius:18px;
-    padding:12px 16px;
+    padding:10px 12px;     /* ✅ 불필요한 ‘검은 여백’ 줄이기 */
     font-weight:1000;
-    line-height:1.15;
+    line-height:1.12;
     text-align:right;
-    display:none;
-    width:fit-content;
-    max-width:72vw;
-    min-width:unset;
+    max-width:46vw;        /* ✅ 너무 넓게 안 잡히게 */
     box-shadow:0 14px 26px rgba(0,0,0,.22);
+    display:none;
+    overflow:hidden;
   }
-  #equipBadge .b1{font-size:18px;}
-  #equipBadge .b2{font-size:18px; opacity:.95;}
+  #equipBadge .b1{font-size:18px; white-space:nowrap;}
+  #equipBadge .b2{font-size:18px; opacity:.95; white-space:nowrap;}
 
   /* ====== MODAL ====== */
   .modal{
@@ -218,6 +217,7 @@
     z-index:50;
     overscroll-behavior:contain;
     pointer-events:none;
+    overflow:hidden;     /* ✅ 모달 자체도 옆 스크롤 방지 */
   }
   .box{
     width:100%;
@@ -227,6 +227,7 @@
     padding:10px 14px 16px;
     max-height:92vh;
     overflow:auto;
+    overflow-x:hidden;   /* ✅ 바텀시트 옆으로 안 밀리게 */
     transform:translateY(0);
     will-change:transform;
     -webkit-overflow-scrolling:touch;
@@ -238,7 +239,7 @@
     position:sticky;
     top:0;
     background:#fff;
-    z-index:3;
+    z-index:2;
   }
   .drag-handle{
     width:60px;
@@ -248,14 +249,7 @@
     margin:0 auto;
   }
 
-  /* ✅ 메모 안 UI 20% 축소 (모달 내부만) */
-  #sheetInner{
-    transform:scale(.8);
-    transform-origin:top center;
-    width:125%;
-    padding-bottom:18px;
-  }
-
+  /* ✅ 메모 안에서 사진 열기 */
   .modalTitleTap{
     text-align:center;
     font-weight:1000;
@@ -285,6 +279,14 @@
   .check-line input[type="checkbox"]{
     width:22px;height:22px;
     accent-color:var(--blue);
+  }
+
+  /* ✅ 메모 내부 UI 20% 축소(전체 섹션 컨텐츠) */
+  .memoScale{
+    transform:scale(.8);
+    transform-origin:top center;
+    width:125%;                 /* 1 / 0.8 */
+    margin-left:-12.5%;
   }
 
   .section{
@@ -330,7 +332,7 @@
     font-weight:1000;
     font-size:22px;
     color:var(--red);
-    min-width:64px;
+    min-width:72px;
     text-align:right;
   }
 
@@ -342,23 +344,21 @@
     white-space:nowrap;
   }
 
-  /* ✅ 7C/HL/# 입력 숫자 잘 보이게(클리핑 방지) */
+  /* ✅ 숫자 안짤리게: height + line-height + tabular-nums */
   input, textarea, select{
-    font-size:18px;
+    font-size:16px;
     font-weight:1000;
-    line-height:1.05;
-    font-variant-numeric: tabular-nums;
     border:2px solid var(--line);
     border-radius:16px;
-    padding:10px 12px;
+    padding:10px 10px;
     outline:none;
     background:#fff;
-    color:#111;
+    line-height:1.2;
+    font-variant-numeric: tabular-nums;
   }
   input{
     height:52px;
-    padding-top:10px;
-    padding-bottom:10px;
+    text-align:center;
   }
   textarea{
     width:100%;
@@ -367,26 +367,13 @@
     font-weight:800;
   }
 
-  .w4,.w3,.w2,.wT{ text-align:center; }
-  .w4{font-size:22px;}
-  .w3{font-size:22px;}
-  .w2{font-size:22px;}
-  .wT{font-size:22px;}
-
-  .row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:10px 0;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
   .long{
     flex:1;
     min-width:0;
-    font-size:18px;
+    font-size:16px;
     font-weight:1000;
     padding-left:14px;
+    text-align:left;
   }
 
   .extraBox{
@@ -427,14 +414,13 @@
   .extraRow select{
     width:130px;
     height:52px;
-    font-size:18px;
+    font-size:16px;
     font-weight:1000;
   }
   .extraRow input{
     width:130px;
     height:52px;
-    font-size:22px;
-    text-align:center;
+    font-size:20px;
   }
   .minusBtn{
     width:60px;
@@ -461,7 +447,7 @@
     border-radius:14px;
   }
 
-  /* PHOTO LAYER */
+  /* ====== PHOTO LAYER ====== */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -473,58 +459,62 @@
   }
   #photoLayer img{max-width:100%;max-height:100%;}
 
-  /* 7C HL # / T D BB / T/T T/B */
+  /* ✅ 7C HL # / T D BB GRID: 옆으로 절대 안넘치게 */
   .rowGrid3{
     display:grid;
-    grid-template-columns: 34px 1fr 34px 1fr 16px .9fr;
+    grid-template-columns: 34px minmax(0,1fr) 34px minmax(0,1fr) 14px minmax(0,.95fr);
     gap:10px;
     align-items:center;
     margin:10px 0;
+    width:100%;
     min-width:0;
   }
   .rowGridTDBB{
     display:grid;
-    grid-template-columns: 18px 1fr 18px 1fr 26px 1fr;
+    grid-template-columns: 18px minmax(0,1fr) 18px minmax(0,.9fr) 26px minmax(0,.9fr);
     gap:10px;
     align-items:center;
     margin:10px 0;
+    width:100%;
     min-width:0;
   }
-  .rowGridTTTB{
+  .rowGrid3 input,
+  .rowGridTDBB input{
+    width:100%;
+    min-width:0;
+  }
+
+  .rowTTTB{
     display:grid;
-    grid-template-columns: 48px 1fr 48px 1fr;
+    grid-template-columns: 44px minmax(0,1fr) 44px minmax(0,1fr);
     gap:10px;
     align-items:center;
     margin:10px 0;
+    width:100%;
     min-width:0;
   }
-  .rowGrid3 input,.rowGridTDBB input,.rowGridTTTB input{width:100%;min-width:0;}
 </style>
 </head>
 
 <body>
-
-<div id="app">
-  <!-- ✅ 홈 고정 영역 -->
-  <div class="homeTop">
-    <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
-      <div class="titleWrap">
-        <div class="titleMain">JAS MEMO</div>
-        <div class="titleVer">VER 4.3</div>
-      </div>
-    </header>
-
-    <div class="controls">
-      <button type="button" onclick="newMemo()">ADD</button>
-      <button type="button" onclick="deleteSelected()">DELETE</button>
-      <button type="button" onclick="addPhoto()">PHOTO</button>
+<div class="app">
+  <!-- ✅ HOME: 헤더 누르면 사진 열기 -->
+  <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
+    <div class="titleWrap">
+      <div class="titleMain">JAS MEMO</div>
+      <div class="titleVer">VER 4.3</div>
     </div>
+  </header>
+
+  <div class="controls">
+    <button type="button" onclick="newMemo()">ADD</button>
+    <button type="button" onclick="deleteSelected()">DELETE</button>
+    <button type="button" onclick="addPhoto()">PHOTO</button>
   </div>
 
   <div id="memoList"></div>
 </div>
 
-<!-- ✅ fixed는 app 밖 (고정 유지) -->
 <button id="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
 <div id="equipBadge"></div>
 
@@ -537,24 +527,24 @@
       <div class="drag-handle"></div>
     </div>
 
-    <!-- ✅ 모달 내부만 20% 축소 -->
-    <div id="sheetInner">
-      <div class="modalTitleTap" onclick="openPhoto()">
-        <div class="m1">JAS MEMO</div>
-        <div class="m2">TAP TO OPEN PHOTO</div>
-      </div>
+    <div class="modalTitleTap" onclick="openPhoto()">
+      <div class="m1">JAS MEMO</div>
+      <div class="m2">TAP TO OPEN PHOTO</div>
+    </div>
 
-      <div class="check-line">
-        <label><input type="checkbox" id="inChk"> INBOUND</label>
-        <label><input type="checkbox" id="outChk"> OUTBOUND</label>
-      </div>
+    <div class="check-line">
+      <label><input type="checkbox" id="inChk"> INBOUND</label>
+      <label><input type="checkbox" id="outChk"> OUTBOUND</label>
+    </div>
 
+    <!-- ✅ 메모 내부 20% 축소 -->
+    <div class="memoScale">
       <div id="sections"></div>
+    </div>
 
-      <div class="bottomBtns">
-        <button type="button" onclick="saveMemo()">SAVE</button>
-        <button type="button" onclick="closeModal()">CLOSE</button>
-      </div>
+    <div class="bottomBtns">
+      <button type="button" onclick="saveMemo()">SAVE</button>
+      <button type="button" onclick="closeModal()">CLOSE</button>
     </div>
   </div>
 </div>
@@ -573,15 +563,15 @@
 
     <div style="font-weight:1000;font-size:20px;margin:6px 0 12px;">EQUIPMENT</div>
 
-    <div class="row">
+    <div style="display:grid;grid-template-columns:72px 1fr 1fr;gap:10px;align-items:center;margin:10px 0;">
       <div class="lab" style="min-width:72px;">TUG</div>
-      <input id="tug1" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
-      <input id="tug2" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="tug1" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="tug2" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
-    <div class="row">
+    <div style="display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center;margin:10px 0;">
       <div class="lab" style="min-width:72px;">BELT</div>
-      <input id="belt" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="belt" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
     <div class="bottomBtns">
@@ -628,15 +618,12 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  /* ✅ HL/#는 IN/OUT 무조건 같은 값 */
-  function syncShared(kind, fromEl){
-    if(!inChk.checked || !outChk.checked) return;
-    const inEl  = document.querySelector(`[data-k="INBOUND-${kind}"]`);
-    const outEl = document.querySelector(`[data-k="OUTBOUND-${kind}"]`);
-    if(!inEl || !outEl) return;
-    const v = fromEl.value;
-    if(fromEl === inEl && outEl.value !== v) outEl.value = v;
-    if(fromEl === outEl && inEl.value !== v) inEl.value = v;
+  /* ✅ HL/# 공유(양방향): 둘 다 있을 때 어느쪽을 바꿔도 같이 바뀜 */
+  function syncShared(fieldKey, val, fromType){
+    if(!(inChk.checked && outChk.checked)) return;
+    const otherType = (fromType === "INBOUND") ? "OUTBOUND" : "INBOUND";
+    const other = document.querySelector(`input[data-k="${otherType}-${fieldKey}"]`);
+    if(other && other !== document.activeElement) other.value = val;
   }
 
   document.addEventListener("input", (e)=>{
@@ -658,8 +645,11 @@
 
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
 
-    if(k === "INBOUND-HL" || k === "OUTBOUND-HL") syncShared("HL", t);
-    if(k === "INBOUND-HASH" || k === "OUTBOUND-HASH") syncShared("HASH", t);
+    // ✅ HL/# 공유 동기화
+    if(k === "INBOUND-HL")  syncShared("HL", t.value, "INBOUND");
+    if(k === "OUTBOUND-HL") syncShared("HL", t.value, "OUTBOUND");
+    if(k === "INBOUND-HASH")  syncShared("HASH", t.value, "INBOUND");
+    if(k === "OUTBOUND-HASH") syncShared("HASH", t.value, "OUTBOUND");
   });
 
   function makeSection(type, memoData){
@@ -667,6 +657,7 @@
     d.className = "section";
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
+
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
     const cmpt2Default = memoData ? (memoData[type+"-cmpt2"] || "F") : "F";
 
@@ -681,23 +672,23 @@
 
       <div class="rowGrid3">
         <div class="lab">7C</div>
-        <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-c7">
+        <input inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-c7">
         <div class="lab">HL</div>
-        <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-HL">
+        <input inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-HL">
         <div class="lab">#</div>
-        <input class="w3" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-HASH">
+        <input inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-HASH">
       </div>
 
-      <div class="row">
+      <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;margin:10px 0;">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
         <input class="long" data-k="${type}-cmpt1" placeholder="TEXT" value="${cmpt1Default}">
       </div>
-      <div class="row">
+      <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;margin:10px 0;">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
         <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${cmpt2Default}">
       </div>
       ${[3,4].map(i=>`
-        <div class="row">
+        <div style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;margin:10px 0;">
           <div class="lab" style="min-width:96px;">CMPT ${i}</div>
           <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT">
         </div>
@@ -705,19 +696,19 @@
 
       <div class="rowGridTDBB">
         <div class="lab">T</div>
-        <input class="wT" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t">
+        <input inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t">
         <div class="lab">D</div>
-        <input class="w2" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d">
+        <input inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d">
         <div class="lab">BB</div>
-        <input class="w2" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb">
+        <input inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb">
       </div>
 
       ${type==="OUTBOUND" ? `
-        <div class="rowGridTTTB">
-          <div class="lab">T/T</div>
-          <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt">
-          <div class="lab">T/B</div>
-          <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb">
+        <div class="rowTTTB">
+          <div class="lab" style="min-width:44px;">T/T</div>
+          <input inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt">
+          <div class="lab" style="min-width:44px;">T/B</div>
+          <input inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb">
         </div>
       ` : ""}
 
@@ -771,6 +762,8 @@
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
     if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
+
+    // ✅ 둘다 체크된 상태로 켜졌으면 HL/# 즉시 동일하게 맞춤(빈값 포함)
     if(inChk.checked && outChk.checked){
       const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
       const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
@@ -812,19 +805,20 @@
     data.hasOut = outChk.checked;
 
     const normalizeF = (v)=> (v && v.trim() ? v : "F");
-    const g = (type, k)=>document.querySelector(`[data-k="${type}-${k}"]`);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
       if(!enabled) return;
 
-      data[type+"-c7"]   = pad(g(type,"c7")?.value, 4);
-      data[type+"-HL"]   = pad(g(type,"HL")?.value, 4);
-      data[type+"-HASH"] = pad(g(type,"HASH")?.value, 3);
+      const g = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
 
-      data[type+"-t"]  = pad(g(type,"t")?.value, 3);
-      data[type+"-d"]  = pad(g(type,"d")?.value, 2);
-      data[type+"-bb"] = pad(g(type,"bb")?.value, 2);
+      data[type+"-c7"]   = pad(g("c7")?.value, 4);
+      data[type+"-HL"]   = pad(g("HL")?.value, 4);
+      data[type+"-HASH"] = pad(g("HASH")?.value, 3);
+
+      data[type+"-t"]  = pad(g("t")?.value, 3);
+      data[type+"-d"]  = pad(g("d")?.value, 2);
+      data[type+"-bb"] = pad(g("bb")?.value, 2);
 
       data[type+"-cmpt1"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt1"]`)?.value || "");
       data[type+"-cmpt2"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt2"]`)?.value || "");
@@ -833,11 +827,12 @@
       });
 
       if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(g(type,"tt")?.value, 4);
-        data[type+"-tb"] = pad(g(type,"tb")?.value, 4);
+        data[type+"-tt"] = pad(g("tt")?.value, 4);
+        data[type+"-tb"] = pad(g("tb")?.value, 4);
       }
 
       data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
 
@@ -853,9 +848,12 @@
       data[type+"-EXTRAS"] = extras;
     });
 
+    // ✅ HL/#는 둘다 체크면 항상 동일하게 맞춰 저장(양방향 공유)
     if(data.hasIn && data.hasOut){
-      data["OUTBOUND-HL"] = data["INBOUND-HL"] || data["OUTBOUND-HL"] || "";
-      data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || data["OUTBOUND-HASH"] || "";
+      const hl = data["INBOUND-HL"] || data["OUTBOUND-HL"] || "";
+      const hs = data["INBOUND-HASH"] || data["OUTBOUND-HASH"] || "";
+      data["INBOUND-HL"] = hl;    data["OUTBOUND-HL"] = hl;
+      data["INBOUND-HASH"] = hs;  data["OUTBOUND-HASH"] = hs;
     }
 
     if(editId){
@@ -876,34 +874,35 @@
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
-      const inText  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
-      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
-
       let lines = "";
-      if(m.hasIn){
+
+      // ✅ 둘 다 있으면: IN은 7C/HL, OUT은 7C/# (예전처럼)
+      if(m.hasIn && m.hasOut){
+        const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
+        const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
         lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${inText}</div></div>`;
-      }
-      if(m.hasOut){
         lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${outText}</div></div>`;
-      }
-      if(!m.hasIn && !m.hasOut){
-        lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
+      }else{
+        if(m.hasIn){
+          const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
+          lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${inText}</div></div>`;
+        }
+        if(m.hasOut){
+          const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
+          lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${outText}</div></div>`;
+        }
+        if(!m.hasIn && !m.hasOut){
+          lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
+        }
       }
 
       card.innerHTML = `
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" data-open="${m.id}">${lines}</div>
+          <div class="lines" onclick="editMemo(${m.id})">${lines}</div>
         </div>
       `;
       memoList.appendChild(card);
-    });
-
-    memoList.querySelectorAll(".lines[data-open]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        const id = Number(el.getAttribute("data-open"));
-        editMemo(id);
-      });
     });
   }
 
@@ -934,9 +933,9 @@
         setV("c7",   m[type+"-c7"]);
         setV("HL",   m[type+"-HL"]);
         setV("HASH", m[type+"-HASH"]);
-        setV("t",    m[type+"-t"]);
-        setV("d",    m[type+"-d"]);
-        setV("bb",   m[type+"-bb"]);
+        setV("t",  m[type+"-t"]);
+        setV("d",  m[type+"-d"]);
+        setV("bb", m[type+"-bb"]);
 
         const c1 = document.querySelector(`[data-k="${type}-cmpt1"]`);
         const c2 = document.querySelector(`[data-k="${type}-cmpt2"]`);
@@ -954,26 +953,34 @@
         }
 
         const note = document.querySelector(`[data-k="${type}-note"]`);
-        if(음표) note.value = m[type+"-note"] || "";
+        if(음표) note.value = m[type+"-note"] || "";  // ✅ (음표) 오타 수정
 
         const shown = document.getElementById(type+"-TIMESHOWN");
         if(shown) shown.textContent = m[type+"-TIME"] || "";
+
+        // extras 복원
+        const box = document.getElementById(type+"-EXTRAS");
+        if(box){
+          box.innerHTML = "";
+          (m[type+"-EXTRAS"] || []).forEach(ex=> box.appendChild(makeExtraRow(type, ex.key, ex.val)));
+        }
       });
 
+      // ✅ HL/# 둘다 있으면 최종 동기화(보기/수정 모두 동일)
       if(m.hasIn && m.hasOut){
         const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
-        const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
+        const inHs = document.querySelector(`[data-k="INBOUND-HASH"]`);
         const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
-        const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
-        if(inHL && outHL) outHL.value = inHL.value;
-        if(inHash && outHash) outHash.value = inHash.value;
+        const outHs = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
+        if(inHL && outHL) outHL.value = inHL.value || outHL.value || "";
+        if(inHs && outHs) outHs.value = inHs.value || outHs.value || "";
       }
-    }, 0);
+    }, 30);
   }
 
   function deleteSelected(){
     const checks = document.querySelectorAll('.selBox:checked');
-    const ids = [...checks].map(c=>Number(c.dataset.id)).filter(Boolean);
+    const ids = [...checks].map(c=>Number(c.dataset.id));
     memos = memos.filter(m=>!ids.includes(m.id));
     localStorage.setItem("jas_memos", JSON.stringify(memos));
     renderList();
@@ -1030,6 +1037,7 @@
     equipBadge.style.display = "block";
   }
 
+  /* ✅ 모달 바깥 클릭 닫기(장비) */
   equipModal.addEventListener("click",(e)=>{
     if(e.target === equipModal) closeEquip();
   });
@@ -1040,7 +1048,6 @@
   let dragging = false;
 
   function onStart(y){
-    if(modal.style.display !== "flex") return;
     dragging = true;
     startY = y;
     sheet.style.transition = "none";
@@ -1067,7 +1074,7 @@
   dragArea.addEventListener("touchmove",  (e)=> onMove(e.touches[0].clientY),  {passive:true});
   dragArea.addEventListener("touchend",   ()=> onEnd());
 
-  dragArea.addEventListener("mousedown", (e)=> { e.preventDefault(); onStart(e.clientY); });
+  dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
