@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.7</title>
+<title>JAS MEMO VER 4.2</title>
 
 <style>
   :root{
@@ -19,33 +19,23 @@
     --red:#e20000;
     --line:#cfcfcf;
 
-    /* ✅ UI 전체 20% 더 작게(타이틀 제외) */
-    --s: .528;     /* 기존 .66 * 0.8 */
-    --ts: .66;     /* 타이틀은 기존 크기 유지 */
+    /* ✅ 타이틀 제외 전체 UI 20% 축소 */
+    --ui: .8;
   }
-
   *{box-sizing:border-box}
-  html, body{
-    width:100%;
-    max-width:100%;
-    overflow-x:hidden;
-    overscroll-behavior-x:none;
-  }
-
   body{
     margin:0;
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-weight:700;
-    background:
-      radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
-      linear-gradient(180deg,var(--bg1),var(--bg2));
+    background:radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
+              linear-gradient(180deg,var(--bg1),var(--bg2));
     min-height:100vh;
+    overflow-x:hidden;
   }
 
-  /* ====== HOME HEADER ====== (타이틀은 --ts 사용) */
   header{
     text-align:center;
-    padding:calc(22px * var(--ts)) calc(14px * var(--ts)) calc(10px * var(--ts));
+    padding:22px 14px 10px; /* ✅ 타이틀은 그대로 */
     user-select:none;
     cursor:pointer;
   }
@@ -53,194 +43,158 @@
     display:flex;
     justify-content:center;
     align-items:baseline;
-    gap:calc(10px * var(--ts));
+    gap:10px;
     flex-wrap:wrap;
   }
   .titleMain{
-    font-size:calc(42px * var(--ts));
+    font-size:42px; /* ✅ 그대로 */
     font-weight:1000;
     letter-spacing:-1px;
     color:#111;
+    text-transform:uppercase;
   }
   .titleVer{
-    font-size:calc(18px * var(--ts));
+    font-size:18px; /* ✅ 그대로 */
     font-weight:1000;
     color:#111;
     opacity:.9;
+    text-transform:uppercase;
   }
 
-  /* ====== TOP BUTTONS ====== */
   .controls{
     display:flex;
     justify-content:center;
-    gap:calc(14px * var(--s));
-    padding:calc(8px * var(--s)) calc(14px * var(--s));
+    gap:calc(14px * var(--ui));
+    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(8px * var(--ui));
   }
   button{
     border:none;
-    border-radius:calc(22px * var(--s));
+    border-radius:calc(22px * var(--ui));
     background:#fff;
-    padding:calc(14px * var(--s)) calc(22px * var(--s));
+    padding:calc(14px * var(--ui)) calc(22px * var(--ui));
     font-weight:1000;
     color:var(--blue);
-    font-size:calc(18px * var(--s));
+    font-size:calc(18px * var(--ui));
     box-shadow:0 10px 20px rgba(0,0,0,.18);
-    cursor:pointer;
+    text-transform:uppercase;
   }
   button:active{transform:scale(.99)}
 
-  /* ====== LIST ====== */
   #memoList{
-    padding:calc(10px * var(--s)) calc(14px * var(--s)) calc(110px * var(--s));
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(110px * var(--ui));
     max-width:780px;
     margin:0 auto;
   }
   .memoCard{
     background:rgba(246,231,215,.92);
-    border-radius:calc(24px * var(--s));
-    padding:calc(14px * var(--s)) calc(12px * var(--s));
-    margin:calc(12px * var(--s)) 0;
+    border-radius:calc(24px * var(--ui));
+    padding:calc(14px * var(--ui)) calc(12px * var(--ui));
+    margin:calc(12px * var(--ui)) 0;
     box-shadow:0 16px 26px rgba(0,0,0,.18);
     border:2px solid rgba(255,255,255,.45);
     overflow:hidden;
-    max-width:100%;
   }
   .memoRow{
     display:flex;
-    gap:calc(10px * var(--s));
+    gap:calc(10px * var(--ui));
     align-items:flex-start;
-    max-width:100%;
   }
-
   .selBox{
-    width:calc(30px * var(--s));
-    height:calc(30px * var(--s));
-    border-radius:calc(10px * var(--s));
+    width:calc(30px * var(--ui));
+    height:calc(30px * var(--ui));
+    border-radius:calc(10px * var(--ui));
     border:2px solid rgba(0,0,0,.25);
     background:#fff;
     appearance:none;
-    margin-top:calc(8px * var(--s));
+    margin-top:calc(8px * var(--ui));
     flex:0 0 auto;
-
-    position: relative;
-    cursor: pointer;
-    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .selBox:active{ transform: scale(0.96); }
   .selBox:checked{
-    border-color: rgba(0,0,0,.35);
-    box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
-    animation: checkPop .18s ease-out;
-    background:
-      linear-gradient(#fff,#fff),
+    background:linear-gradient(#fff,#fff),
       radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
-  }
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    inset:calc(-10px * var(--s));
-    border-radius:calc(16px * var(--s));
-    border:calc(3px * var(--s)) solid rgba(47,125,246,.35);
-    opacity:0;
-    transform:scale(.7);
-    animation: ringPulse .35s ease-out;
-    pointer-events:none;
-  }
-  @keyframes checkPop{
-    0%{ transform:scale(.92); }
-    60%{ transform:scale(1.08); }
-    100%{ transform:scale(1.00); }
-  }
-  @keyframes ringPulse{
-    0%{ opacity:.9; transform:scale(.75); }
-    100%{ opacity:0; transform:scale(1.15); }
   }
 
   .lines{
     flex:1;
     display:flex;
     flex-direction:column;
-    gap:calc(10px * var(--s));
+    gap:calc(10px * var(--ui));
     cursor:pointer;
     min-width:0;
-    max-width:100%;
   }
   .line{
     display:flex;
     align-items:flex-start;
-    gap:calc(10px * var(--s));
+    gap:calc(10px * var(--ui));
     min-width:0;
-    max-width:100%;
   }
   .tagPill{
     background:#111;
     color:#fff;
     border-radius:999px;
-    padding:calc(9px * var(--s)) calc(12px * var(--s));
+    padding:calc(9px * var(--ui)) calc(12px * var(--ui));
     font-weight:1000;
-    font-size:calc(16px * var(--s));
-    min-width:calc(70px * var(--s));
+    font-size:calc(16px * var(--ui));
+    min-width:calc(70px * var(--ui));
     text-align:center;
     flex:0 0 auto;
-    letter-spacing:.5px;
+    text-transform:uppercase;
   }
-  /* ✅ 메모 제목(리스트) 줄바꿈으로 “다 보이게” */
+  /* ✅ 메모 제목 안 짤리게: 줄바꿈 허용 */
   .textPill{
     background:rgba(210,199,188,.45);
-    border-radius:calc(18px * var(--s));
-    padding:calc(10px * var(--s)) calc(14px * var(--s));
+    border-radius:999px;
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
     font-weight:1000;
-    font-size:calc(18px * var(--s));
+    font-size:calc(18px * var(--ui));
     color:#111;
     flex:1;
     min-width:0;
-    max-width:100%;
     white-space:normal;
     overflow:visible;
     text-overflow:clip;
     word-break:break-word;
-    line-height:1.25;
+    text-transform:uppercase;
   }
 
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
 
-  /* ====== EQUIP HOME ====== */
   #equipBtn{
     position:fixed;
-    left:calc(14px * var(--s));
-    bottom:calc(14px + env(safe-area-inset-bottom));
+    left:calc(14px * var(--ui));
+    bottom:calc(18px * var(--ui));
     z-index:20;
     border:none;
-    border-radius:calc(18px * var(--s));
+    border-radius:calc(18px * var(--ui));
     background:#fff;
-    padding:calc(12px * var(--s)) calc(18px * var(--s));
+    padding:calc(12px * var(--ui)) calc(18px * var(--ui));
     font-weight:1000;
     color:var(--blue);
-    font-size:calc(16px * var(--s));
+    font-size:calc(16px * var(--ui));
     box-shadow:0 12px 22px rgba(0,0,0,.18);
+    text-transform:uppercase;
   }
-
   #equipBadge{
     position:fixed;
-    right:calc(14px * var(--s));
-    bottom:calc(14px + env(safe-area-inset-bottom));
+    right:calc(14px * var(--ui));
+    bottom:calc(18px * var(--ui));
     z-index:20;
     background:rgba(0,0,0,.86);
     color:#fff;
-    border-radius:calc(20px * var(--s));
-    padding:calc(12px * var(--s)) calc(14px * var(--s));
+    border-radius:calc(20px * var(--ui));
+    padding:calc(12px * var(--ui)) calc(14px * var(--ui));
     font-weight:1000;
-    line-height:1.12;
+    line-height:1.15;
     text-align:right;
+    min-width:calc(190px * var(--ui));
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
-    max-width:calc(240px * var(--s));
+    text-transform:uppercase;
   }
-  #equipBadge .b1{font-size:calc(18px * var(--s));}
-  #equipBadge .b2{font-size:calc(18px * var(--s)); opacity:.95;}
+  #equipBadge .b1{font-size:calc(18px * var(--ui));}
+  #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
 
-  /* ====== MODAL ====== */
   .modal{
     position:fixed;
     inset:0;
@@ -256,27 +210,26 @@
     width:100%;
     max-width:820px;
     background:#fff;
-    border-radius:calc(26px * var(--s)) calc(26px * var(--s)) 0 0;
-    padding:calc(10px * var(--s)) calc(14px * var(--s)) calc(16px * var(--s));
+    border-radius:calc(26px * var(--ui)) calc(26px * var(--ui)) 0 0;
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(16px * var(--ui));
     max-height:92vh;
     overflow:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-    pointer-events:auto;
     transform:translateY(0);
     will-change:transform;
+    -webkit-overflow-scrolling:touch;
+    pointer-events:auto;
   }
 
   .dragArea{
-    padding:calc(6px * var(--s)) 0 calc(8px * var(--s));
+    padding:calc(6px * var(--ui)) 0 calc(8px * var(--ui));
     position:sticky;
     top:0;
     background:#fff;
     z-index:2;
   }
   .drag-handle{
-    width:calc(60px * var(--s));
-    height:calc(7px * var(--s));
+    width:calc(60px * var(--ui));
+    height:calc(7px * var(--ui));
     background:#cfcfcf;
     border-radius:999px;
     margin:0 auto;
@@ -286,208 +239,223 @@
     text-align:center;
     font-weight:1000;
     color:#111;
-    padding:calc(6px * var(--s)) 0 calc(10px * var(--s));
+    padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
     cursor:pointer;
     user-select:none;
+    text-transform:uppercase;
   }
-  .modalTitleTap .m1{font-size:calc(18px * var(--s));}
-  .modalTitleTap .m2{font-size:calc(12px * var(--s)); opacity:.55; margin-top:2px;}
+  .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
+  .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
 
   .check-line{
     display:flex;
     justify-content:center;
-    gap:calc(18px * var(--s));
+    gap:calc(18px * var(--ui));
     align-items:center;
-    padding:calc(6px * var(--s)) 0 calc(10px * var(--s));
+    padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
     white-space:nowrap;
+    text-transform:uppercase;
   }
   .check-line label{
     display:flex;
     align-items:center;
-    gap:calc(8px * var(--s));
-    font-size:calc(16px * var(--s));
+    gap:calc(8px * var(--ui));
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
   }
   .check-line input[type="checkbox"]{
-    width:calc(22px * var(--s));
-    height:calc(22px * var(--s));
+    width:calc(22px * var(--ui));
+    height:calc(22px * var(--ui));
     accent-color:var(--blue);
   }
 
   .section{
     background:#f2f2f2;
-    border-radius:calc(16px * var(--s));
-    padding:calc(12px * var(--s));
-    margin:calc(10px * var(--s)) 0;
+    border-radius:calc(16px * var(--ui));
+    padding:calc(12px * var(--ui)) calc(12px * var(--ui));
+    margin:calc(10px * var(--ui)) 0;
     overflow:hidden;
     border:1px solid #e6e6e6;
-    max-width:100%;
   }
   .sectionHead{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin-bottom:calc(10px * var(--s));
-    gap:calc(10px * var(--s));
+    margin-bottom:calc(10px * var(--ui));
+    gap:calc(10px * var(--ui));
   }
   .sectionTitle{
-    font-size:calc(24px * var(--s));
+    font-size:calc(24px * var(--ui));
     font-weight:1000;
     letter-spacing:.3px;
+    text-transform:uppercase;
   }
 
   .timeWrap{
     display:flex;
     align-items:baseline;
-    gap:calc(10px * var(--s));
+    gap:calc(10px * var(--ui));
     white-space:nowrap;
+    text-transform:uppercase;
   }
   .timeBtn{
     border:none;
     background:transparent;
     box-shadow:none;
-    padding:calc(4px * var(--s)) calc(8px * var(--s));
+    padding:calc(4px * var(--ui)) calc(8px * var(--ui));
     margin:0;
     font-weight:1000;
-    font-size:calc(16px * var(--s));
+    font-size:calc(16px * var(--ui));
     color:#111;
-    border-radius:calc(10px * var(--s));
+    border-radius:calc(10px * var(--ui));
+    text-transform:uppercase;
   }
   .timeBtn:active{background:rgba(226,27,27,.08);}
   .timeVal{
     font-weight:1000;
-    font-size:calc(22px * var(--s));
+    font-size:calc(22px * var(--ui));
     color:var(--red);
-    min-width:calc(64px * var(--s));
+    min-width:calc(64px * var(--ui));
     text-align:right;
+    font-variant-numeric: tabular-nums;
   }
 
   .row{
     display:flex;
     align-items:center;
-    gap:calc(10px * var(--s));
-    margin:calc(10px * var(--s)) 0;
+    gap:calc(10px * var(--ui));
+    margin:calc(10px * var(--ui)) 0;
     flex-wrap:nowrap;
     min-width:0;
-    max-width:100%;
   }
   .lab{
-    font-size:calc(20px * var(--s));
+    font-size:calc(20px * var(--ui));
     font-weight:1000;
-    min-width:calc(40px * var(--s));
+    min-width:calc(40px * var(--ui));
     color:#111;
     white-space:nowrap;
+    text-transform:uppercase;
   }
 
   input, textarea, select{
-    font-size:calc(16px * var(--s));
+    font-family:inherit;
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
     border:2px solid var(--line);
-    border-radius:calc(16px * var(--s));
-    padding:calc(10px * var(--s));
+    border-radius:calc(16px * var(--ui));
     outline:none;
     background:#fff;
-    max-width:100%;
+    -webkit-text-size-adjust:100%;
+    font-variant-numeric: tabular-nums;
+    text-transform:uppercase;
   }
-  input{ height:calc(48px * var(--s)); }
+  input{
+    width:100%;
+    height:calc(54px * var(--ui));
+    line-height:calc(54px * var(--ui));
+    padding:0 calc(10px * var(--ui));
+    text-align:center;
+  }
   textarea{
     width:100%;
-    height:calc(76px * var(--s));
+    height:calc(76px * var(--ui));
     resize:none;
     font-weight:800;
+    padding:calc(10px * var(--ui)) calc(10px * var(--ui));
+    text-transform:none;
+  }
+  select{
+    height:calc(54px * var(--ui));
+    padding:0 calc(10px * var(--ui));
   }
 
-  .w4,.w3,.w2,.wT{ text-align:center; width:100%; }
-  .w4{font-size:calc(20px * var(--s));}
-  .w3{font-size:calc(20px * var(--s));}
-  .w2{font-size:calc(20px * var(--s));}
-  .wT{font-size:calc(20px * var(--s));}
+  .numBox{
+    font-size:calc(18px * var(--ui));
+    letter-spacing:.6px;
+  }
 
   .long{
     flex:1;
     min-width:0;
-    font-size:calc(16px * var(--s));
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
-    padding-left:calc(14px * var(--s));
+    padding-left:calc(14px * var(--ui));
+    text-align:left;
   }
 
   .extraBox{
     background:#fff;
     border:2px solid #e2e2e2;
-    border-radius:calc(16px * var(--s));
-    padding:calc(12px * var(--s));
-    margin-top:calc(10px * var(--s));
+    border-radius:calc(16px * var(--ui));
+    padding:calc(12px * var(--ui));
+    margin-top:calc(10px * var(--ui));
   }
   .extraHead{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:calc(10px * var(--s));
+    margin-bottom:calc(10px * var(--ui));
+    text-transform:uppercase;
   }
   .extraTitle{
-    font-size:calc(20px * var(--s));
+    font-size:calc(20px * var(--ui));
     font-weight:1000;
     letter-spacing:.4px;
   }
   .iconBtn{
-    width:calc(48px * var(--s));
-    height:calc(48px * var(--s));
-    border-radius:calc(16px * var(--s));
+    width:calc(48px * var(--ui));
+    height:calc(48px * var(--ui));
+    border-radius:calc(16px * var(--ui));
     border:none;
     background:#fff;
     box-shadow:0 8px 18px rgba(0,0,0,.10);
     color:var(--blue);
-    font-size:calc(28px * var(--s));
-    font-weight:1000;
-  }
-  .extraRow{
-    display:flex;
-    gap:calc(10px * var(--s));
-    align-items:center;
-    margin-top:calc(10px * var(--s));
-    max-width:100%;
-  }
-  .extraRow select{
-    width:calc(130px * var(--s));
-    height:calc(48px * var(--s));
-    font-size:calc(16px * var(--s));
+    font-size:calc(28px * var(--ui));
     font-weight:1000;
     text-transform:uppercase;
   }
+  .extraRow{
+    display:flex;
+    gap:calc(10px * var(--ui));
+    align-items:center;
+    margin-top:calc(10px * var(--ui));
+  }
+  .extraRow select{
+    width:calc(130px * var(--ui));
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
+  }
   .extraRow input{
-    width:calc(130px * var(--s));
-    height:calc(48px * var(--s));
-    font-size:calc(20px * var(--s));
-    text-align:center;
+    width:calc(130px * var(--ui));
+    font-size:calc(18px * var(--ui));
   }
   .minusBtn{
-    width:calc(60px * var(--s));
-    height:calc(48px * var(--s));
-    border-radius:calc(16px * var(--s));
+    width:calc(60px * var(--ui));
+    height:calc(54px * var(--ui));
+    border-radius:calc(16px * var(--ui));
     border:none;
     background:#eef1f7;
     color:var(--blue);
     font-weight:1000;
-    font-size:calc(22px * var(--s));
+    font-size:calc(22px * var(--ui));
     box-shadow:none;
+    text-transform:uppercase;
   }
 
   .bottomBtns{
     display:flex;
-    gap:calc(18px * var(--s));
-    padding:calc(12px * var(--s)) calc(6px * var(--s)) 0;
+    gap:calc(18px * var(--ui));
+    padding:calc(12px * var(--ui)) calc(6px * var(--ui)) 0;
     justify-content:flex-start;
-    align-items:center;
-    flex-wrap:wrap;
+    text-transform:uppercase;
   }
   .bottomBtns button{
-    padding:calc(10px * var(--s)) calc(14px * var(--s));
-    font-size:calc(16px * var(--s));
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
+    font-size:calc(16px * var(--ui));
     box-shadow:none;
-    border-radius:calc(14px * var(--s));
+    border-radius:calc(14px * var(--ui));
   }
 
-  /* PHOTO LAYER */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -499,57 +467,21 @@
   }
   #photoLayer img{max-width:100%;max-height:100%;}
 
-  /* ✅ 7C HL # 한줄 grid */
   .rowGrid3{
     display:grid;
-    grid-template-columns:
-      calc(34px * var(--s)) 1fr
-      calc(34px * var(--s)) 1fr
-      calc(14px * var(--s)) .95fr;
-    gap:calc(10px * var(--s));
+    grid-template-columns: calc(34px * var(--ui)) 1fr calc(34px * var(--ui)) 1fr calc(14px * var(--ui)) .95fr;
+    gap:calc(10px * var(--ui));
     align-items:center;
-    margin:calc(10px * var(--s)) 0;
+    margin:calc(10px * var(--ui)) 0;
     min-width:0;
-    max-width:100%;
   }
-
-  /* ✅ T D BB 한줄 grid */
   .rowGridTDBB{
     display:grid;
-    grid-template-columns:
-      calc(18px * var(--s)) 1fr
-      calc(18px * var(--s)) .9fr
-      calc(26px * var(--s)) .9fr;
-    gap:calc(10px * var(--s));
+    grid-template-columns: calc(18px * var(--ui)) 1fr calc(18px * var(--ui)) .9fr calc(26px * var(--ui)) .9fr;
+    gap:calc(10px * var(--ui));
     align-items:center;
-    margin:calc(10px * var(--s)) 0;
+    margin:calc(10px * var(--ui)) 0;
     min-width:0;
-    max-width:100%;
-  }
-
-  .rowGrid3 input,
-  .rowGridTDBB input{
-    width:100%;
-    min-width:0;
-  }
-
-  /* ✅ OUTBOUND T/T T/B 한줄 */
-  .rowGridTTTB{
-    display:grid;
-    grid-template-columns:
-      calc(46px * var(--s)) 1fr
-      calc(46px * var(--s)) 1fr;
-    gap:calc(10px * var(--s));
-    align-items:center;
-    margin:calc(10px * var(--s)) 0;
-    min-width:0;
-    max-width:100%;
-  }
-
-  /* ✅ iOS 확대 방지 + 영문 대문자 */
-  input, textarea, select, button{
-    -webkit-text-size-adjust:100%;
-    text-transform:uppercase;
   }
 </style>
 </head>
@@ -559,7 +491,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.7</div>
+    <div class="titleVer">VER 4.2</div>
   </div>
 </header>
 
@@ -597,13 +529,12 @@
     <div class="bottomBtns">
       <button type="button" onclick="saveMemo()">SAVE</button>
       <button type="button" onclick="closeModal()">CLOSE</button>
-      <button type="button" onclick="clearPhoto()" style="color:#111">CLEAR PHOTO</button>
     </div>
   </div>
 </div>
 
 <div id="photoLayer" ondblclick="closePhoto()" onclick="closePhoto()">
-  <img id="photoImg" alt="PHOTO" />
+  <img id="photoImg" alt="photo" />
 </div>
 
 <div class="modal" id="equipModal" aria-hidden="true">
@@ -612,17 +543,17 @@
       <div class="drag-handle"></div>
     </div>
 
-    <div style="font-weight:1000;font-size:calc(20px * var(--s));margin:calc(6px * var(--s)) 0 calc(12px * var(--s));">EQUIPMENT</div>
+    <div style="font-weight:1000;font-size:20px;margin:6px 0 12px; text-transform:uppercase;">EQUIPMENT</div>
 
     <div class="row">
-      <div class="lab" style="min-width:calc(72px * var(--s));">TUG</div>
-      <input id="tug1" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
-      <input id="tug2" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
+      <div class="lab" style="min-width:72px;">TUG</div>
+      <input id="tug1" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
+      <input id="tug2" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
     <div class="row">
-      <div class="lab" style="min-width:calc(72px * var(--s));">BELT</div>
-      <input id="belt" class="w2" inputmode="numeric" maxlength="2" placeholder="00">
+      <div class="lab" style="min-width:72px;">BELT</div>
+      <input id="belt" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
     </div>
 
     <div class="bottomBtns">
@@ -652,13 +583,10 @@
   const belt = document.getElementById("belt");
 
   let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
+  let photo = localStorage.getItem("jas_photo");
   let editId = null;
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
-
-  // ✅ INBOUND -> OUTBOUND HL/# 연동
-  let outSyncHL = true;
-  let outSyncHASH = true;
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -672,199 +600,56 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  /* =========================
-     ✅ PHOTO: IndexedDB 저장
-  ========================== */
-  const DB_NAME = "JAS_MEMO_DB";
-  const DB_STORE = "KV";
-  const PHOTO_KEY = "PHOTO_BLOB";
-
-  function idbOpen(){
-    return new Promise((resolve, reject)=>{
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = ()=>{
-        const db = req.result;
-        if(!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
-      };
-      req.onsuccess = ()=> resolve(req.result);
-      req.onerror = ()=> reject(req.error);
-    });
-  }
-  async function idbSet(key, value){
-    const db = await idbOpen();
-    return new Promise((resolve, reject)=>{
-      const tx = db.transaction(DB_STORE, "readwrite");
-      tx.objectStore(DB_STORE).put(value, key);
-      tx.oncomplete = ()=> { db.close(); resolve(true); };
-      tx.onerror = ()=> { db.close(); reject(tx.error); };
-    });
-  }
-  async function idbGet(key){
-    const db = await idbOpen();
-    return new Promise((resolve, reject)=>{
-      const tx = db.transaction(DB_STORE, "readonly");
-      const req = tx.objectStore(DB_STORE).get(key);
-      req.onsuccess = ()=> { db.close(); resolve(req.result); };
-      req.onerror = ()=> { db.close(); reject(req.error); };
-    });
-  }
-  async function idbDel(key){
-    const db = await idbOpen();
-    return new Promise((resolve, reject)=>{
-      const tx = db.transaction(DB_STORE, "readwrite");
-      tx.objectStore(DB_STORE).delete(key);
-      tx.oncomplete = ()=> { db.close(); resolve(true); };
-      tx.onerror = ()=> { db.close(); reject(tx.error); };
+  function syncByDataK(dataK, value){
+    document.querySelectorAll(`input[data-k="${dataK}"]`).forEach(el=>{
+      if(el !== document.activeElement) el.value = value;
     });
   }
 
-  let photoURL = null;
-
-  async function loadPhotoFromDB(){
-    try{
-      const blob = await idbGet(PHOTO_KEY);
-      if(blob instanceof Blob){
-        if(photoURL) URL.revokeObjectURL(photoURL);
-        photoURL = URL.createObjectURL(blob);
-      }else{
-        photoURL = null;
-      }
-    }catch(e){
-      photoURL = null;
-    }
-  }
-
-  function blobFromCanvas(canvas, quality=0.78){
-    return new Promise((resolve)=> canvas.toBlob((b)=> resolve(b), "image/jpeg", quality));
-  }
-
-  async function fileToCompressedBlob(file){
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    await new Promise((res, rej)=>{
-      img.onload = ()=> res();
-      img.onerror = (e)=> rej(e);
-      img.src = url;
-    });
-    URL.revokeObjectURL(url);
-
-    const maxW = 1600;
-    const w = img.naturalWidth || img.width;
-    const h = img.naturalHeight || img.height;
-    const scale = Math.min(1, maxW / Math.max(w,h));
-    const nw = Math.max(1, Math.round(w*scale));
-    const nh = Math.max(1, Math.round(h*scale));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = nw;
-    canvas.height = nh;
-    canvas.getContext("2d").drawImage(img, 0, 0, nw, nh);
-
-    return await blobFromCanvas(canvas, 0.78);
-  }
-
-  async function addPhoto(){
-    photoInput.value="";
-    photoInput.click();
-  }
-
-  photoInput.onchange = async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    try{
-      const blob = await fileToCompressedBlob(f);
-      await idbSet(PHOTO_KEY, blob);
-      await loadPhotoFromDB();
-      alert("PHOTO SAVED");
-    }catch(err){
-      alert("PHOTO SAVE FAILED\n" + err);
-    }
-  };
-
-  async function clearPhoto(){
-    try{
-      await idbDel(PHOTO_KEY);
-      if(photoURL) URL.revokeObjectURL(photoURL);
-      photoURL = null;
-      alert("PHOTO CLEARED");
-    }catch(err){
-      alert("CLEAR FAILED\n" + err);
-    }
-  }
-
-  async function openPhoto(){
-    if(!photoURL) await loadPhotoFromDB();
-    if(!photoURL) return;
-    photoImg.src = photoURL;
-    photoLayer.style.display = "flex";
-  }
-  function closePhoto(){ photoLayer.style.display = "none"; }
-
-  /* =========================
-     ✅ INPUT 제한 + HL/# 공유
-  ========================== */
+  /* ✅ 숫자 입력 제한 + HL/# 완전공유(양방향) */
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
     const k = t.dataset.k || "";
     if(!k) return;
 
-    if(k.endsWith("-c7")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-HL")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-HASH")) t.value = onlyNum(t.value, 3);
+    // shared
+    if(k === "SHARED-HL"){
+      t.value = onlyNum(t.value, 4);
+      syncByDataK("SHARED-HL", t.value);
+      return;
+    }
+    if(k === "SHARED-HASH"){
+      t.value = onlyNum(t.value, 3);
+      syncByDataK("SHARED-HASH", t.value);
+      return;
+    }
 
+    if(k.endsWith("-c7")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
     if(k.endsWith("-bb")) t.value = onlyNum(t.value, 2);
-
     if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
-
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
-
-    if(outChk.checked){
-      if(k === "INBOUND-HL" && outSyncHL){
-        const outHL = sections.querySelector('.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]');
-        if(outHL) outHL.value = t.value;
-      }
-      if(k === "INBOUND-HASH" && outSyncHASH){
-        const outHash = sections.querySelector('.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]');
-        if(outHash) outHash.value = t.value;
-      }
-    }
-
-    if(k === "OUTBOUND-HL") outSyncHL = false;
-    if(k === "OUTBOUND-HASH") outSyncHASH = false;
   });
 
-  function makeExtraRow(type, key="W", val=""){
-    const row = document.createElement("div");
-    row.className = "extraRow";
-    row.innerHTML = `
-      <select>
-        ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
-      </select>
-      <input inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
-    `;
-    return row;
-  }
-
-  function addExtraRow(type){
-    const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
-    const box = root ? root.querySelector(\`#\${type}-EXTRAS\`) : null;
-    if(!box) return;
-    box.appendChild(makeExtraRow(type, "W", ""));
-  }
-
+  /* ✅✅ 섹션 루트에 data-type 심고, value도 초기 주입(저장/불러오기 안정) */
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
     d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
+
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
     const cmpt2Default = memoData ? (memoData[type+"-cmpt2"] || "F") : "F";
+
+    const sharedHL = memoData ? (memoData.sharedHL || "") : "";
+    const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
+
+    const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
+    const noteV = memoData ? (memoData[type+"-note"] || "") : "";
 
     d.innerHTML = `
       <div class="sectionHead">
@@ -877,43 +662,43 @@
 
       <div class="rowGrid3">
         <div class="lab">7C</div>
-        <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-c7">
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-c7" value="${v("c7")}">
         <div class="lab">HL</div>
-        <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-HL">
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HL" value="${sharedHL}">
         <div class="lab">#</div>
-        <input class="w3" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-HASH">
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
       </div>
 
       <div class="row">
-        <div class="lab" style="min-width:calc(96px * var(--s));">CMPT 1</div>
+        <div class="lab" style="min-width:96px;">CMPT 1</div>
         <input class="long" data-k="${type}-cmpt1" placeholder="TEXT" value="${cmpt1Default}">
       </div>
       <div class="row">
-        <div class="lab" style="min-width:calc(96px * var(--s));">CMPT 2</div>
+        <div class="lab" style="min-width:96px;">CMPT 2</div>
         <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${cmpt2Default}">
       </div>
       ${[3,4].map(i=>`
         <div class="row">
-          <div class="lab" style="min-width:calc(96px * var(--s));">CMPT ${i}</div>
-          <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT">
+          <div class="lab" style="min-width:96px;">CMPT ${i}</div>
+          <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt"+i]||"") : ""}">
         </div>
       `).join("")}
 
       <div class="rowGridTDBB">
         <div class="lab">T</div>
-        <input class="wT" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t">
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t" value="${v("t")}">
         <div class="lab">D</div>
-        <input class="w2" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d">
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d" value="${v("d")}">
         <div class="lab">BB</div>
-        <input class="w2" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb">
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
       </div>
 
       ${type==="OUTBOUND" ? `
-        <div class="rowGridTTTB">
-          <div class="lab">T/T</div>
-          <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt">
-          <div class="lab">T/B</div>
-          <input class="w4" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb">
+        <div class="row">
+          <div class="lab" style="min-width:60px;">T/T</div>
+          <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
+          <div class="lab" style="min-width:60px;">T/B</div>
+          <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
         </div>
       ` : ""}
 
@@ -925,7 +710,7 @@
         <div id="${type}-EXTRAS"></div>
       </div>
 
-      <textarea data-k="${type}-note" placeholder="NOTE (${type})"></textarea>
+      <textarea data-k="${type}-note" placeholder="NOTE (${type})">${noteV}</textarea>
     `;
 
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
@@ -944,22 +729,37 @@
     return d;
   }
 
+  function makeExtraRow(type, key="W", val=""){
+    const row = document.createElement("div");
+    row.className = "extraRow";
+    row.innerHTML = `
+      <select>
+        ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
+      </select>
+      <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
+    `;
+    return row;
+  }
+
+  /* ✅ + 버튼이 항상 해당 섹션의 EXTRA에 붙게(중복 id 문제 예방) */
+  function addExtraRow(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    box.appendChild(makeExtraRow(type, "W", ""));
+  }
+
   inChk.onchange = outChk.onchange = ()=>{
+    const keepHL = document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "";
+    const keepHASH = document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "";
+
     sections.innerHTML = "";
-    if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
-    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
+    if(inChk.checked) sections.appendChild(makeSection("INBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
+    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
 
-    outSyncHL = true;
-    outSyncHASH = true;
-
-    if(inChk.checked && outChk.checked){
-      const inHL = sections.querySelector('input[data-k="INBOUND-HL"]');
-      const inHash = sections.querySelector('input[data-k="INBOUND-HASH"]');
-      const outHL = sections.querySelector('input[data-k="OUTBOUND-HL"]');
-      const outHash = sections.querySelector('input[data-k="OUTBOUND-HASH"]');
-      if(inHL && outHL) outHL.value = inHL.value;
-      if(inHash && outHash) outHash.value = inHash.value;
-    }
+    syncByDataK("SHARED-HL", keepHL);
+    syncByDataK("SHARED-HASH", keepHASH);
   };
 
   function newMemo(){
@@ -987,13 +787,14 @@
     updateEquipBadge();
   }
 
-  /* ✅ 저장/불러오기 핵심: data-type 섹션 기준으로 100% 고정 */
+  /* ✅✅ 동그라미 부분 저장: 섹션(root) 기준으로 읽어서 저장 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
+    data.hasIn = inChk.checked;
+    data.hasOut = outChk.checked;
 
-    // ✅ 체크박스 값이 아니라 “섹션 존재”로 저장 여부 판단(모바일 꼬임 방지)
-    data.hasIn  = !!sections.querySelector('.section[data-type="INBOUND"]');
-    data.hasOut = !!sections.querySelector('.section[data-type="OUTBOUND"]');
+    data.sharedHL = pad(document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "", 4);
+    data.sharedHASH = pad(document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "", 3);
 
     const normalizeF = (v)=> (v && v.trim() ? v : "F");
 
@@ -1004,78 +805,54 @@
       const root = sections.querySelector(`.section[data-type="${type}"]`);
       if(!root) return;
 
-      const q = (k)=> root.querySelector(`[data-k="${type}-${k}"]`);
-      const qExtraVal = ()=> root.querySelectorAll(".extraRow");
+      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const c  = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
+      const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
-      data[type+"-c7"]   = pad(q("c7")?.value, 4);
-      data[type+"-HL"]   = pad(q("HL")?.value, 4);
-      data[type+"-HASH"] = pad(q("HASH")?.value, 3);
+      data[type+"-c7"] = pad(gi("c7")?.value, 4);
 
-      data[type+"-t"]  = pad(q("t")?.value, 3);
-      data[type+"-d"]  = pad(q("d")?.value, 2);
-      data[type+"-bb"] = pad(q("bb")?.value, 2);
+      data[type+"-t"]  = pad(gi("t")?.value, 3);
+      data[type+"-d"]  = pad(gi("d")?.value, 2);
+      data[type+"-bb"] = pad(gi("bb")?.value, 2);
 
-      data[type+"-cmpt1"] = normalizeF(q("cmpt1")?.value || "");
-      data[type+"-cmpt2"] = normalizeF(q("cmpt2")?.value || "");
-      [3,4].forEach(i=>{
-        data[type+`-cmpt${i}`] = (q(`cmpt${i}`)?.value || "");
-      });
+      data[type+"-cmpt1"] = normalizeF(cm(1)?.value || "");
+      data[type+"-cmpt2"] = normalizeF(cm(2)?.value || "");
+      data[type+"-cmpt3"] = cm(3)?.value || "";
+      data[type+"-cmpt4"] = cm(4)?.value || "";
 
       if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(q("tt")?.value, 4);
-        data[type+"-tb"] = pad(q("tb")?.value, 4);
+        data[type+"-tt"] = pad(gi("tt")?.value, 4);
+        data[type+"-tb"] = pad(gi("tb")?.value, 4);
       }
 
-      data[type+"-note"] = (root.querySelector(`textarea[data-k="${type}-note"]`)?.value || "");
+      data[type+"-note"] = note ? (note.value || "") : "";
 
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
 
       const extras = [];
-      root.querySelectorAll(".extraRow").forEach(r=>{
-        const key = (r.querySelector("select")?.value || "").toUpperCase();
-        const val = pad(r.querySelector("input")?.value, 3);
-        if(key && val) extras.push({key, val});
-      });
+      const box = root.querySelector(`#${type}-EXTRAS`);
+      if(box){
+        [...box.querySelectorAll(".extraRow")].forEach(r=>{
+          const key = (r.querySelector("select")?.value || "").toUpperCase();
+          const val = pad(r.querySelector("input")?.value || "", 3);
+          if(key && val) extras.push({key, val});
+        });
+      }
       data[type+"-EXTRAS"] = extras;
     });
-
-    // ✅ HL/# 공유 기본값 보장
-    if(data.hasIn && data.hasOut){
-      if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
-      if(!data["OUTBOUND-HASH"]) data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || "";
-    }
 
     if(editId){
       const idx = memos.findIndex(m=>m.id===editId);
       if(idx>=0) memos[idx] = data;
-      else memos.push(data);
     }else{
       memos.push(data);
     }
 
-    try{
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-    }catch(err){
-      alert("SAVE FAILED (STORAGE)\n" + err);
-      return;
-    }
-
+    localStorage.setItem("jas_memos", JSON.stringify(memos));
     closeModal();
     renderList(data.id);
-  }
-
-  function buildLineText(m){
-    const inLineTwo  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
-    const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
-
-    const oneIn  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
-    const oneOut = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
-
-    if(m.hasIn && m.hasOut) return [{tag:"IN", text:inLineTwo}, {tag:"OUT", text:outLineTwo}];
-    if(m.hasIn) return [{tag:"IN", text:oneIn}];
-    if(m.hasOut) return [{tag:"OUT", text:oneOut}];
-    return [{tag:"IN", text:"EMPTY"}];
   }
 
   function renderList(flashId){
@@ -1084,23 +861,35 @@
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
-      const linesData = buildLineText(m);
-      const linesHTML = linesData.map(x =>
-        `<div class="line"><div class="tagPill">${x.tag}</div><div class="textPill">${x.text}</div></div>`
-      ).join("");
+      const hl = m.sharedHL || "";
+      const hash = m.sharedHASH || "";
+
+      const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
+      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
+
+      let lines = "";
+      if(m.hasIn){
+        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${inText}</div></div>`;
+      }
+      if(m.hasOut){
+        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${outText}</div></div>`;
+      }
+      if(!m.hasIn && !m.hasOut){
+        lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
+      }
 
       card.innerHTML = `
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" data-open="${m.id}">${linesHTML}</div>
+          <div class="lines" data-open="${m.id}">${lines}</div>
         </div>
       `;
       memoList.appendChild(card);
     });
 
-    memoList.querySelectorAll(".lines").forEach(el=>{
+    memoList.querySelectorAll("[data-open]").forEach(el=>{
       el.addEventListener("click", ()=>{
-        const id = Number(el.dataset.open);
+        const id = Number(el.getAttribute("data-open"));
         editMemo(id);
       });
     });
@@ -1120,87 +909,37 @@
 
     openModal();
 
-    outSyncHL = true;
-    outSyncHASH = true;
-
-    setTimeout(()=>{
-      ["INBOUND","OUTBOUND"].forEach(type=>{
-        const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
-        if(!enabled) return;
-
-        const root = sections.querySelector(`.section[data-type="${type}"]`);
-        if(!root) return;
-
-        const setV=(k,val)=>{
-          const el = root.querySelector(`[data-k="${type}-${k}"]`);
-          if(el) el.value = val || "";
-        };
-
-        setV("c7",   m[type+"-c7"]);
-        setV("HL",   m[type+"-HL"]);
-        setV("HASH", m[type+"-HASH"]);
-        setV("t",    m[type+"-t"]);
-        setV("d",    m[type+"-d"]);
-        setV("bb",   m[type+"-bb"]);
-
-        const c1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
-        const c2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
-        if(c1) c1.value = (m[type+"-cmpt1"] && m[type+"-cmpt1"].trim()) ? m[type+"-cmpt1"] : "F";
-        if(c2) c2.value = (m[type+"-cmpt2"] && m[type+"-cmpt2"].trim()) ? m[type+"-cmpt2"] : "F";
-
-        [3,4].forEach(i=>{
-          const el = root.querySelector(`input[data-k="${type}-cmpt${i}"]`);
-          if(el) el.value = m[type+`-cmpt${i}`] || "";
-        });
-
-        if(type==="OUTBOUND"){
-          setV("tt", m[type+"-tt"]);
-          setV("tb", m[type+"-tb"]);
-        }
-
-        const note = root.querySelector(`textarea[data-k="${type}-note"]`);
-        if(음표) note.value = m[type+"-note"] || "";
-
-        const shown = document.getElementById(type+"-TIMESHOWN");
-        if(shown) shown.textContent = m[type+"-TIME"] || "";
-
-        // extras 재구성
-        const box = root.querySelector(`#${type}-EXTRAS`);
-        if(box){
-          box.innerHTML = "";
-          (m[type+"-EXTRAS"] || []).forEach(ex=>{
-            box.appendChild(makeExtraRow(type, ex.key, ex.val));
-          });
-        }
-      });
-
-      if(m.hasIn && m.hasOut){
-        const inHL = sections.querySelector('input[data-k="INBOUND-HL"]')?.value || "";
-        const inHash = sections.querySelector('input[data-k="INBOUND-HASH"]')?.value || "";
-        const outHL = sections.querySelector('input[data-k="OUTBOUND-HL"]');
-        const outHash = sections.querySelector('input[data-k="OUTBOUND-HASH"]');
-
-        if(outHL && !outHL.value) outHL.value = inHL;
-        if(outHash && !outHash.value) outHash.value = inHash;
-
-        outSyncHL = (outHL?.value || "") === inHL;
-        outSyncHASH = (outHash?.value || "") === inHash;
-      }
-    }, 30);
+    /* ✅ 공유 HL/# 즉시 반영 (양쪽 동일) */
+    syncByDataK("SHARED-HL", m.sharedHL || "");
+    syncByDataK("SHARED-HASH", m.sharedHASH || "");
   }
 
   function deleteSelected(){
     const checks = document.querySelectorAll('.selBox:checked');
     const ids = [...checks].map(c=>Number(c.dataset.id));
     memos = memos.filter(m=>!ids.includes(m.id));
-    try{
-      localStorage.setItem("jas_memos", JSON.stringify(memos));
-    }catch(err){
-      alert("DELETE FAILED\n" + err);
-      return;
-    }
+    localStorage.setItem("jas_memos", JSON.stringify(memos));
     renderList();
   }
+
+  /* PHOTO */
+  function addPhoto(){ photoInput.value=""; photoInput.click(); }
+  photoInput.onchange = (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{
+      photo = r.result;
+      localStorage.setItem("jas_photo", photo);
+    };
+    r.readAsDataURL(f);
+  };
+  function openPhoto(){
+    if(!photo) return;
+    photoImg.src = photo;
+    photoLayer.style.display = "flex";
+  }
+  function closePhoto(){ photoLayer.style.display = "none"; }
 
   /* EQUIP */
   function openEquip(){
@@ -1278,11 +1017,8 @@
   window.addEventListener("mouseup", ()=> onEnd());
 
   /* INIT */
-  (async ()=>{
-    await loadPhotoFromDB();
-    renderList();
-    updateEquipBadge();
-  })();
+  renderList();
+  updateEquipBadge();
 </script>
 
 </body>
