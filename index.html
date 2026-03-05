@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.4</title>
+<title>JAS MEMO VER 4.5</title>
 
 <style>
   :root{
@@ -512,10 +512,10 @@
     max-width:100%;
   }
 
-  /* ✅ iOS 폰트 자동 확대 방지 */
+  /* ✅ iOS 폰트 자동 확대 방지 + 모든 영문 대문자 */
   input, textarea, select, button{
     -webkit-text-size-adjust:100%;
-    text-transform:uppercase; /* ✅ 모든 영문 대문자 */
+    text-transform:uppercase;
   }
 
   /* ===============================
@@ -562,7 +562,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.4</div>
+    <div class="titleVer">VER 4.5</div>
   </div>
 </header>
 
@@ -713,6 +713,7 @@
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
+    d.dataset.type = type; // ✅ 저장/읽기 고정용
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
@@ -859,7 +860,7 @@
     updateEquipBadge();
   }
 
-  /* ✅ OUTBOUND 저장이 확실히 되게: 섹션 DOM에서 직접 읽어서 저장 */
+  /* ✅ OUTBOUND 저장 고정: 섹션을 type으로 정확히 찍어서 읽기 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
     data.hasIn = inChk.checked;
@@ -871,19 +872,19 @@
       const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
       if(!enabled) return;
 
-      const root = sections.querySelector(`.section input[data-k="${type}-c7"]`)?.closest(".section") || sections;
+      const root = sections.querySelector(`.section[data-type="${type}"]`);
+      if(!root) return;
 
-      const g = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
 
-      data[type+"-c7"]   = pad(g("c7")?.value, 4);
-      data[type+"-HL"]   = pad(g("HL")?.value, 4);
-      data[type+"-HASH"] = pad(g("HASH")?.value, 3);
+      data[type+"-c7"]   = pad(gi("c7")?.value, 4);
+      data[type+"-HL"]   = pad(gi("HL")?.value, 4);
+      data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
 
-      data[type+"-t"]  = pad(g("t")?.value, 3);
-      data[type+"-d"]  = pad(g("d")?.value, 2);
-      data[type+"-bb"] = pad(g("bb")?.value, 2);
+      data[type+"-t"]  = pad(gi("t")?.value, 3);
+      data[type+"-d"]  = pad(gi("d")?.value, 2);
+      data[type+"-bb"] = pad(gi("bb")?.value, 2);
 
       data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
       data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
@@ -892,8 +893,8 @@
       });
 
       if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(g("tt")?.value, 4);
-        data[type+"-tb"] = pad(g("tb")?.value, 4);
+        data[type+"-tt"] = pad(gi("tt")?.value, 4);
+        data[type+"-tb"] = pad(gi("tb")?.value, 4);
       }
 
       data[type+"-note"] = (gt("note")?.value || "");
@@ -902,7 +903,7 @@
       data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
 
       const extras = [];
-      const box = document.getElementById(type+"-EXTRAS");
+      const box = root.querySelector(`#${type}-EXTRAS`);
       if(box){
         [...box.querySelectorAll(".extraRow")].forEach(r=>{
           const key = (r.querySelector("select")?.value || "").toUpperCase();
@@ -1000,8 +1001,11 @@
         const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
         if(!enabled) return;
 
+        const root = sections.querySelector(`.section[data-type="${type}"]`);
+        if(!root) return;
+
         const setV=(k,val)=>{
-          const el = document.querySelector(`input[data-k="${type}-${k}"]`);
+          const el = root.querySelector(`input[data-k="${type}-${k}"]`);
           if(el) el.value = val || "";
         };
 
@@ -1012,13 +1016,13 @@
         setV("d",  m[type+"-d"]);
         setV("bb", m[type+"-bb"]);
 
-        const c1 = document.querySelector(`input[data-k="${type}-cmpt1"]`);
-        const c2 = document.querySelector(`input[data-k="${type}-cmpt2"]`);
+        const c1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
+        const c2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
         if(c1) c1.value = (m[type+"-cmpt1"] && m[type+"-cmpt1"].trim()) ? m[type+"-cmpt1"] : "F";
         if(c2) c2.value = (m[type+"-cmpt2"] && m[type+"-cmpt2"].trim()) ? m[type+"-cmpt2"] : "F";
 
         [3,4].forEach(i=>{
-          const el = document.querySelector(`input[data-k="${type}-cmpt${i}"]`);
+          const el = root.querySelector(`input[data-k="${type}-cmpt${i}"]`);
           if(el) el.value = m[type+`-cmpt${i}`] || "";
         });
 
@@ -1027,7 +1031,7 @@
           setV("tb", m[type+"-tb"]);
         }
 
-        const note = document.querySelector(`textarea[data-k="${type}-note"]`);
+        const note = root.querySelector(`textarea[data-k="${type}-note"]`);
         if(음표) note.value = m[type+"-note"] || "";
 
         const shown = document.getElementById(type+"-TIMESHOWN");
@@ -1035,10 +1039,10 @@
       });
 
       if(m.hasIn && m.hasOut){
-        const inHL = document.querySelector(`input[data-k="INBOUND-HL"]`)?.value || "";
-        const inHash = document.querySelector(`input[data-k="INBOUND-HASH"]`)?.value || "";
-        const outHL = document.querySelector(`input[data-k="OUTBOUND-HL"]`);
-        const outHash = document.querySelector(`input[data-k="OUTBOUND-HASH"]`);
+        const inHL = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HL"]`)?.value || "";
+        const inHash = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HASH"]`)?.value || "";
+        const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
+        const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
 
         if(outHL && !outHL.value) outHL.value = inHL;
         if(outHash && !outHash.value) outHash.value = inHash;
