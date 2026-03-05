@@ -27,8 +27,8 @@
   html, body{
     width:100%;
     max-width:100%;
-    overflow-x:hidden;            /* ✅ 가로 밀림 방지 */
-    overscroll-behavior-x:none;   /* ✅ iOS 좌우 튕김 방지 */
+    overflow-x:hidden;
+    overscroll-behavior-x:none;
   }
 
   body{
@@ -39,12 +39,6 @@
       radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
       linear-gradient(180deg,var(--bg1),var(--bg2));
     min-height:100vh;
-  }
-
-  /* ✅ 영문은 대문자 */
-  button, .tagPill, .modalTitleTap, .sectionTitle, .check-line, .extraTitle, .timeBtn{
-    text-transform:uppercase;
-    letter-spacing:.5px;
   }
 
   /* ====== HOME HEADER ====== */
@@ -91,7 +85,6 @@
     font-size:calc(18px * var(--s));
     box-shadow:0 10px 20px rgba(0,0,0,.18);
     cursor:pointer;
-    -webkit-tap-highlight-color: transparent;
   }
   button:active{transform:scale(.99)}
 
@@ -117,8 +110,6 @@
     align-items:flex-start;
     max-width:100%;
   }
-
-  /* ✅ 체크박스 선택 모션 (통합) */
   .selBox{
     width:calc(30px * var(--s));
     height:calc(30px * var(--s));
@@ -128,41 +119,11 @@
     appearance:none;
     margin-top:calc(8px * var(--s));
     flex:0 0 auto;
-
-    position: relative;
-    cursor: pointer;
-    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
-    -webkit-tap-highlight-color: transparent;
   }
-  .selBox:active{ transform: scale(0.96); }
-
   .selBox:checked{
     background:
       linear-gradient(#fff,#fff),
       radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
-    border-color: rgba(0,0,0,.35);
-    box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
-    animation: checkPop .18s ease-out;
-  }
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    inset:calc(-10px * var(--s));
-    border-radius:calc(16px * var(--s));
-    border:calc(3px * var(--s)) solid rgba(47,125,246,.35);
-    opacity:0;
-    transform:scale(.7);
-    animation: ringPulse .35s ease-out;
-    pointer-events:none;
-  }
-  @keyframes checkPop{
-    0%{ transform:scale(.92); }
-    60%{ transform:scale(1.08); }
-    100%{ transform:scale(1.00); }
-  }
-  @keyframes ringPulse{
-    0%{ opacity:.9; transform:scale(.75); }
-    100%{ opacity:0; transform:scale(1.15); }
   }
 
   .lines{
@@ -215,7 +176,7 @@
   #equipBtn{
     position:fixed;
     left:calc(14px * var(--s));
-    bottom:calc((14px + env(safe-area-inset-bottom)) * 1);
+    bottom:calc(14px + env(safe-area-inset-bottom));
     z-index:20;
     border:none;
     border-radius:calc(18px * var(--s));
@@ -231,7 +192,7 @@
   #equipBadge{
     position:fixed;
     right:calc(14px * var(--s));
-    bottom:calc((14px + env(safe-area-inset-bottom)) * 1);
+    bottom:calc(14px + env(safe-area-inset-bottom));
     z-index:20;
     background:rgba(0,0,0,.86);
     color:#fff;
@@ -459,6 +420,7 @@
     height:calc(48px * var(--s));
     font-size:calc(16px * var(--s));
     font-weight:1000;
+    text-transform:uppercase;
   }
   .extraRow input{
     width:calc(130px * var(--s));
@@ -553,6 +515,44 @@
   /* ✅ iOS 폰트 자동 확대 방지 */
   input, textarea, select, button{
     -webkit-text-size-adjust:100%;
+    text-transform:uppercase; /* ✅ 모든 영문 대문자 */
+  }
+
+  /* ===============================
+     ✅ 체크박스 선택 모션 (CSS만)
+  ================================ */
+  .selBox{
+    position: relative;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .selBox:active{
+    transform: scale(0.96);
+  }
+  .selBox:checked{
+    border-color: rgba(0,0,0,.35);
+    box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
+    animation: checkPop .18s ease-out;
+  }
+  .selBox:checked::after{
+    content:"";
+    position:absolute;
+    inset:calc(-10px * var(--s));
+    border-radius:calc(16px * var(--s));
+    border:calc(3px * var(--s)) solid rgba(47,125,246,.35);
+    opacity:0;
+    transform:scale(.7);
+    animation: ringPulse .35s ease-out;
+    pointer-events:none;
+  }
+  @keyframes checkPop{
+    0%{ transform:scale(.92); }
+    60%{ transform:scale(1.08); }
+    100%{ transform:scale(1.00); }
+  }
+  @keyframes ringPulse{
+    0%{ opacity:.9; transform:scale(.75); }
+    100%{ opacity:0; transform:scale(1.15); }
   }
 </style>
 </head>
@@ -605,7 +605,7 @@
 </div>
 
 <div id="photoLayer" ondblclick="closePhoto()" onclick="closePhoto()">
-  <img id="photoImg" alt="photo" />
+  <img id="photoImg" alt="PHOTO" />
 </div>
 
 <div class="modal" id="equipModal" aria-hidden="true">
@@ -659,7 +659,7 @@
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
 
-  // ✅ INBOUND -> OUTBOUND HL/# 연동 (각 항목별로 끊을 수 있게)
+  // ✅ INBOUND -> OUTBOUND HL/# 연동
   let outSyncHL = true;
   let outSyncHASH = true;
 
@@ -695,7 +695,6 @@
 
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
 
-    // ✅ INBOUND HL/# 입력 시 OUTBOUND가 연동 상태면 따라감
     if(outChk.checked){
       if(k === "INBOUND-HL" && outSyncHL){
         const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
@@ -707,7 +706,6 @@
       }
     }
 
-    // ✅ OUTBOUND를 직접 만지면 해당 항목만 연동 해제 (수정 가능)
     if(k === "OUTBOUND-HL") outSyncHL = false;
     if(k === "OUTBOUND-HASH") outSyncHASH = false;
   });
@@ -717,7 +715,6 @@
     d.className = "section";
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
     const cmpt2Default = memoData ? (memoData[type+"-cmpt2"] || "F") : "F";
 
@@ -862,24 +859,11 @@
     updateEquipBadge();
   }
 
-  /* ✅✅ OUTBOUND 저장 안되는 문제 해결: 체크 + 섹션 존재/값 존재로 hasOut 확정 */
+  /* ✅ OUTBOUND 저장이 확실히 되게: 섹션 DOM에서 직접 읽어서 저장 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
-
-    const hasSection = (type)=> !!document.querySelector(`[data-k="${type}-c7"]`);
-    const anyValue = (type)=>{
-      const els = document.querySelectorAll(`[data-k^="${type}-"], #${type}-EXTRAS .extraRow input`);
-      for(const el of els){
-        if(el && typeof el.value === "string" && el.value.trim() !== "") return true;
-      }
-      const shown = document.getElementById(`${type}-TIMESHOWN`);
-      if(shown && (shown.textContent||"").trim() !== "") return true;
-      return false;
-    };
-
-    // ✅ 체크가 잠깐 풀려도(모바일 이슈) 섹션/값 있으면 TRUE로 저장
-    data.hasIn  = !!inChk.checked  || hasSection("INBOUND")  || anyValue("INBOUND");
-    data.hasOut = !!outChk.checked || hasSection("OUTBOUND") || anyValue("OUTBOUND");
+    data.hasIn = inChk.checked;
+    data.hasOut = outChk.checked;
 
     const normalizeF = (v)=> (v && v.trim() ? v : "F");
 
@@ -887,7 +871,11 @@
       const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
       if(!enabled) return;
 
-      const g = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
+      const root = sections.querySelector(`.section input[data-k="${type}-c7"]`)?.closest(".section") || sections;
+
+      const g = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
+      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
 
       data[type+"-c7"]   = pad(g("c7")?.value, 4);
       data[type+"-HL"]   = pad(g("HL")?.value, 4);
@@ -897,10 +885,10 @@
       data[type+"-d"]  = pad(g("d")?.value, 2);
       data[type+"-bb"] = pad(g("bb")?.value, 2);
 
-      data[type+"-cmpt1"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt1"]`)?.value || "");
-      data[type+"-cmpt2"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt2"]`)?.value || "");
+      data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
+      data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
       [3,4].forEach(i=>{
-        data[type+`-cmpt${i}`] = document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+        data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
       });
 
       if(type==="OUTBOUND"){
@@ -908,7 +896,7 @@
         data[type+"-tb"] = pad(g("tb")?.value, 4);
       }
 
-      data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+      data[type+"-note"] = (gt("note")?.value || "");
 
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
@@ -925,7 +913,7 @@
       data[type+"-EXTRAS"] = extras;
     });
 
-    // ✅ 공유 기본값 보장: OUTBOUND HL/# 비어있으면 INBOUND 복사
+    // ✅ 공유 기본값 보장
     if(data.hasIn && data.hasOut){
       if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
       if(!data["OUTBOUND-HASH"]) data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || "";
@@ -957,7 +945,7 @@
         {tag:"OUT", text: outLineTwo}
       ];
     }
-    if(m.hasIn)  return [{tag:"IN",  text: oneIn}];
+    if(m.hasIn) return [{tag:"IN", text: oneIn}];
     if(m.hasOut) return [{tag:"OUT", text: oneOut}];
     return [{tag:"IN", text:"EMPTY"}];
   }
@@ -1013,7 +1001,7 @@
         if(!enabled) return;
 
         const setV=(k,val)=>{
-          const el = document.querySelector(`[data-k="${type}-${k}"]`);
+          const el = document.querySelector(`input[data-k="${type}-${k}"]`);
           if(el) el.value = val || "";
         };
 
@@ -1024,13 +1012,13 @@
         setV("d",  m[type+"-d"]);
         setV("bb", m[type+"-bb"]);
 
-        const c1 = document.querySelector(`[data-k="${type}-cmpt1"]`);
-        const c2 = document.querySelector(`[data-k="${type}-cmpt2"]`);
+        const c1 = document.querySelector(`input[data-k="${type}-cmpt1"]`);
+        const c2 = document.querySelector(`input[data-k="${type}-cmpt2"]`);
         if(c1) c1.value = (m[type+"-cmpt1"] && m[type+"-cmpt1"].trim()) ? m[type+"-cmpt1"] : "F";
         if(c2) c2.value = (m[type+"-cmpt2"] && m[type+"-cmpt2"].trim()) ? m[type+"-cmpt2"] : "F";
 
         [3,4].forEach(i=>{
-          const el = document.querySelector(`[data-k="${type}-cmpt${i}"]`);
+          const el = document.querySelector(`input[data-k="${type}-cmpt${i}"]`);
           if(el) el.value = m[type+`-cmpt${i}`] || "";
         });
 
@@ -1039,7 +1027,7 @@
           setV("tb", m[type+"-tb"]);
         }
 
-        const note = document.querySelector(`[data-k="${type}-note"]`);
+        const note = document.querySelector(`textarea[data-k="${type}-note"]`);
         if(음표) note.value = m[type+"-note"] || "";
 
         const shown = document.getElementById(type+"-TIMESHOWN");
@@ -1047,10 +1035,10 @@
       });
 
       if(m.hasIn && m.hasOut){
-        const inHL = document.querySelector(`[data-k="INBOUND-HL"]`)?.value || "";
-        const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`)?.value || "";
-        const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
-        const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
+        const inHL = document.querySelector(`input[data-k="INBOUND-HL"]`)?.value || "";
+        const inHash = document.querySelector(`input[data-k="INBOUND-HASH"]`)?.value || "";
+        const outHL = document.querySelector(`input[data-k="OUTBOUND-HL"]`);
+        const outHash = document.querySelector(`input[data-k="OUTBOUND-HASH"]`);
 
         if(outHL && !outHL.value) outHL.value = inHL;
         if(outHash && !outHash.value) outHash.value = inHash;
@@ -1113,9 +1101,9 @@
       equipBadge.style.display = "none";
       return;
     }
-    const t1 = (eq.tug1 || "00");
-    const t2 = (eq.tug2 || "00");
-    const b  = (eq.belt || "00");
+    const t1 = eq.tug1 || "00";
+    const t2 = eq.tug2 || "00";
+    const b  = eq.belt || "00";
     equipBadge.innerHTML = `
       <div class="b1">TUG ${t1}/${t2}</div>
       <div class="b2">BELT ${b}</div>
