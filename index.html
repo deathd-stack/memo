@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.5</title>
+<title>JAS MEMO VER 4.6</title>
 
 <style>
   :root{
@@ -110,6 +110,7 @@
     align-items:flex-start;
     max-width:100%;
   }
+
   .selBox{
     width:calc(30px * var(--s));
     height:calc(30px * var(--s));
@@ -188,7 +189,6 @@
     box-shadow:0 12px 22px rgba(0,0,0,.18);
   }
 
-  /* ✅ 빈 공간 제거 */
   #equipBadge{
     position:fixed;
     right:calc(14px * var(--s));
@@ -445,6 +445,7 @@
     gap:calc(18px * var(--s));
     padding:calc(12px * var(--s)) calc(6px * var(--s)) 0;
     justify-content:flex-start;
+    align-items:center;
   }
   .bottomBtns button{
     padding:calc(10px * var(--s)) calc(14px * var(--s));
@@ -518,17 +519,13 @@
     text-transform:uppercase;
   }
 
-  /* ===============================
-     ✅ 체크박스 선택 모션 (CSS만)
-  ================================ */
+  /* ✅ 체크박스 선택 모션(CSS만) */
   .selBox{
     position: relative;
     cursor: pointer;
     transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .selBox:active{
-    transform: scale(0.96);
-  }
+  .selBox:active{ transform: scale(0.96); }
   .selBox:checked{
     border-color: rgba(0,0,0,.35);
     box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
@@ -562,7 +559,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.5</div>
+    <div class="titleVer">VER 4.6</div>
   </div>
 </header>
 
@@ -600,6 +597,7 @@
     <div class="bottomBtns">
       <button type="button" onclick="saveMemo()">SAVE</button>
       <button type="button" onclick="closeModal()">CLOSE</button>
+      <button type="button" onclick="clearPhoto()" style="color:#111">CLEAR PHOTO</button>
     </div>
   </div>
 </div>
@@ -654,7 +652,6 @@
   const belt = document.getElementById("belt");
 
   let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
-  let photo = localStorage.getItem("jas_photo");
   let editId = null;
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
@@ -675,7 +672,142 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  // ✅ 숫자 제한 + HL/# 공유
+  /* =========================
+     ✅ PHOTO: IndexedDB 저장(메모 저장 안정화)
+  ========================== */
+  const DB_NAME = "JAS_MEMO_DB";
+  const DB_STORE = "KV";
+  const PHOTO_KEY = "PHOTO_BLOB";
+
+  function idbOpen(){
+    return new Promise((resolve, reject)=>{
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = ()=>{
+        const db = req.result;
+        if(!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+      };
+      req.onsuccess = ()=> resolve(req.result);
+      req.onerror = ()=> reject(req.error);
+    });
+  }
+  async function idbSet(key, value){
+    const db = await idbOpen();
+    return new Promise((resolve, reject)=>{
+      const tx = db.transaction(DB_STORE, "readwrite");
+      tx.objectStore(DB_STORE).put(value, key);
+      tx.oncomplete = ()=> { db.close(); resolve(true); };
+      tx.onerror = ()=> { db.close(); reject(tx.error); };
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((resolve, reject)=>{
+      const tx = db.transaction(DB_STORE, "readonly");
+      const req = tx.objectStore(DB_STORE).get(key);
+      req.onsuccess = ()=> { db.close(); resolve(req.result); };
+      req.onerror = ()=> { db.close(); reject(req.error); };
+    });
+  }
+  async function idbDel(key){
+    const db = await idbOpen();
+    return new Promise((resolve, reject)=>{
+      const tx = db.transaction(DB_STORE, "readwrite");
+      tx.objectStore(DB_STORE).delete(key);
+      tx.oncomplete = ()=> { db.close(); resolve(true); };
+      tx.onerror = ()=> { db.close(); reject(tx.error); };
+    });
+  }
+
+  let photoURL = null; // objectURL
+
+  async function loadPhotoFromDB(){
+    try{
+      const blob = await idbGet(PHOTO_KEY);
+      if(blob instanceof Blob){
+        if(photoURL) URL.revokeObjectURL(photoURL);
+        photoURL = URL.createObjectURL(blob);
+      }else{
+        photoURL = null;
+      }
+    }catch(e){
+      photoURL = null;
+    }
+  }
+
+  function blobFromCanvas(canvas, quality=0.78){
+    return new Promise((resolve)=>{
+      canvas.toBlob((b)=> resolve(b), "image/jpeg", quality);
+    });
+  }
+
+  async function fileToCompressedBlob(file){
+    // iPhone 사진 그대로 저장하면 커서 용량 문제 유발 → 리사이즈+jpg
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    await new Promise((res, rej)=>{
+      img.onload = ()=> res();
+      img.onerror = (e)=> rej(e);
+      img.src = url;
+    });
+    URL.revokeObjectURL(url);
+
+    const maxW = 1600; // 충분히 선명 + 용량 절감
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    const scale = Math.min(1, maxW / Math.max(w,h));
+    const nw = Math.max(1, Math.round(w*scale));
+    const nh = Math.max(1, Math.round(h*scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = nw;
+    canvas.height = nh;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, nw, nh);
+
+    const blob = await blobFromCanvas(canvas, 0.78);
+    return blob;
+  }
+
+  async function addPhoto(){
+    photoInput.value="";
+    photoInput.click();
+  }
+
+  photoInput.onchange = async (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    try{
+      const blob = await fileToCompressedBlob(f);
+      await idbSet(PHOTO_KEY, blob);
+      await loadPhotoFromDB();
+      alert("PHOTO SAVED");
+    }catch(err){
+      alert("PHOTO SAVE FAILED\n" + err);
+    }
+  };
+
+  async function clearPhoto(){
+    try{
+      await idbDel(PHOTO_KEY);
+      if(photoURL) URL.revokeObjectURL(photoURL);
+      photoURL = null;
+      alert("PHOTO CLEARED");
+    }catch(err){
+      alert("CLEAR FAILED\n" + err);
+    }
+  }
+
+  async function openPhoto(){
+    if(!photoURL) await loadPhotoFromDB();
+    if(!photoURL) return;
+    photoImg.src = photoURL;
+    photoLayer.style.display = "flex";
+  }
+  function closePhoto(){ photoLayer.style.display = "none"; }
+
+  /* =========================
+     ✅ INPUT 제한 + HL/# 공유
+  ========================== */
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
@@ -697,11 +829,11 @@
 
     if(outChk.checked){
       if(k === "INBOUND-HL" && outSyncHL){
-        const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
+        const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
         if(outHL) outHL.value = t.value;
       }
       if(k === "INBOUND-HASH" && outSyncHASH){
-        const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
+        const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
         if(outHash) outHash.value = t.value;
       }
     }
@@ -710,10 +842,30 @@
     if(k === "OUTBOUND-HASH") outSyncHASH = false;
   });
 
+  function makeExtraRow(type, key="W", val=""){
+    const row = document.createElement("div");
+    row.className = "extraRow";
+    row.innerHTML = `
+      <select>
+        ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
+      </select>
+      <input inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
+    `;
+    return row;
+  }
+
+  function addExtraRow(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    box.appendChild(makeExtraRow(type, "W", ""));
+  }
+
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
-    d.dataset.type = type; // ✅ 저장/읽기 고정용
+    d.dataset.type = type; // ✅ OUTBOUND 저장 고정
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
@@ -797,25 +949,6 @@
     return d;
   }
 
-  function makeExtraRow(type, key="W", val=""){
-    const row = document.createElement("div");
-    row.className = "extraRow";
-    row.innerHTML = `
-      <select>
-        ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
-      </select>
-      <input inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
-    `;
-    return row;
-  }
-
-  function addExtraRow(type){
-    const box = document.getElementById(type+"-EXTRAS");
-    if(!box) return;
-    box.appendChild(makeExtraRow(type, "W", ""));
-  }
-
   // ✅ 체크 변경시 섹션 렌더 + 연동 초기화
   inChk.onchange = outChk.onchange = ()=>{
     sections.innerHTML = "";
@@ -826,10 +959,10 @@
     outSyncHASH = true;
 
     if(inChk.checked && outChk.checked){
-      const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
-      const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
-      const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
-      const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
+      const inHL = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HL"]`);
+      const inHash = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HASH"]`);
+      const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
+      const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
       if(inHL && outHL) outHL.value = inHL.value;
       if(inHash && outHash) outHash.value = inHash.value;
     }
@@ -860,7 +993,7 @@
     updateEquipBadge();
   }
 
-  /* ✅ OUTBOUND 저장 고정: 섹션을 type으로 정확히 찍어서 읽기 */
+  /* ✅ OUTBOUND 저장 확정(섹션을 data-type으로 정확히 읽음) */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
     data.hasIn = inChk.checked;
@@ -927,27 +1060,31 @@
       memos.push(data);
     }
 
-    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    // ✅ 저장 실패(Quota 등) 즉시 알림
+    try{
+      localStorage.setItem("jas_memos", JSON.stringify(memos));
+    }catch(err){
+      alert("SAVE FAILED (STORAGE)\n" + err + "\n\nTIP: SAFARI > WEBSITE DATA CLEAR");
+      return;
+    }
+
     closeModal();
     renderList(data.id);
   }
 
-  // ✅ 표기 고정
+  // ✅ 표기 고정(요구사항)
   function buildLineText(m){
-    const inLineTwo = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
+    const inLineTwo  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
     const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
 
-    const oneIn = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
+    const oneIn  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
     const oneOut = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
 
     if(m.hasIn && m.hasOut){
-      return [
-        {tag:"IN",  text: inLineTwo},
-        {tag:"OUT", text: outLineTwo}
-      ];
+      return [{tag:"IN", text:inLineTwo}, {tag:"OUT", text:outLineTwo}];
     }
-    if(m.hasIn) return [{tag:"IN", text: oneIn}];
-    if(m.hasOut) return [{tag:"OUT", text: oneOut}];
+    if(m.hasIn) return [{tag:"IN", text:oneIn}];
+    if(m.hasOut) return [{tag:"OUT", text:oneOut}];
     return [{tag:"IN", text:"EMPTY"}];
   }
 
@@ -1057,28 +1194,14 @@
     const checks = document.querySelectorAll('.selBox:checked');
     const ids = [...checks].map(c=>Number(c.dataset.id));
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    try{
+      localStorage.setItem("jas_memos", JSON.stringify(memos));
+    }catch(err){
+      alert("DELETE FAILED\n" + err);
+      return;
+    }
     renderList();
   }
-
-  /* PHOTO */
-  function addPhoto(){ photoInput.value=""; photoInput.click(); }
-  photoInput.onchange = (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    const r = new FileReader();
-    r.onload = ()=>{
-      photo = r.result;
-      localStorage.setItem("jas_photo", photo);
-    };
-    r.readAsDataURL(f);
-  };
-  function openPhoto(){
-    if(!photo) return;
-    photoImg.src = photo;
-    photoLayer.style.display = "flex";
-  }
-  function closePhoto(){ photoLayer.style.display = "none"; }
 
   /* EQUIP */
   function openEquip(){
@@ -1156,8 +1279,11 @@
   window.addEventListener("mouseup", ()=> onEnd());
 
   /* INIT */
-  renderList();
-  updateEquipBadge();
+  (async ()=>{
+    await loadPhotoFromDB();
+    renderList();
+    updateEquipBadge();
+  })();
 </script>
 
 </body>
