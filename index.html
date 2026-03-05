@@ -27,8 +27,8 @@
   html, body{
     width:100%;
     max-width:100%;
-    overflow-x:hidden;            /* ✅ 가로 밀림 방지 */
-    overscroll-behavior-x:none;   /* ✅ iOS 좌우 튕김 방지 */
+    overflow-x:hidden;
+    overscroll-behavior-x:none;
   }
 
   body{
@@ -39,6 +39,7 @@
       radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
       linear-gradient(180deg,var(--bg1),var(--bg2));
     min-height:100vh;
+    text-transform:uppercase; /* ✅ 모든 영문 대문자 */
   }
 
   /* ====== HOME HEADER ====== */
@@ -85,6 +86,7 @@
     font-size:calc(18px * var(--s));
     box-shadow:0 10px 20px rgba(0,0,0,.18);
     cursor:pointer;
+    text-transform:uppercase; /* ✅ */
   }
   button:active{transform:scale(.99)}
 
@@ -188,7 +190,7 @@
     box-shadow:0 12px 22px rgba(0,0,0,.18);
   }
 
-  /* ✅ 동그라미친 빈 공간 제거: min-width 제거 + padding 조정 */
+  /* ✅ 동그라미친 빈 공간 제거 */
   #equipBadge{
     position:fixed;
     right:calc(14px * var(--s));
@@ -228,7 +230,7 @@
     padding:calc(10px * var(--s)) calc(14px * var(--s)) calc(16px * var(--s));
     max-height:92vh;
     overflow:auto;
-    overflow-x:hidden;          /* ✅ 가로 밀림 방지 */
+    overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     pointer-events:auto;
     transform:translateY(0);
@@ -320,6 +322,7 @@
     font-size:calc(16px * var(--s));
     color:#111;
     border-radius:calc(10px * var(--s));
+    text-transform:uppercase;
   }
   .timeBtn:active{background:rgba(226,27,27,.08);}
   .timeVal{
@@ -356,10 +359,9 @@
     outline:none;
     background:#fff;
     max-width:100%;
+    text-transform:uppercase; /* ✅ 입력도 영문 대문자 */
   }
-  input{
-    height:calc(48px * var(--s));
-  }
+  input{ height:calc(48px * var(--s)); }
   textarea{
     width:100%;
     height:calc(76px * var(--s));
@@ -409,6 +411,7 @@
     color:var(--blue);
     font-size:calc(28px * var(--s));
     font-weight:1000;
+    text-transform:uppercase;
   }
   .extraRow{
     display:flex;
@@ -439,6 +442,7 @@
     font-weight:1000;
     font-size:calc(22px * var(--s));
     box-shadow:none;
+    text-transform:uppercase;
   }
 
   .bottomBtns{
@@ -454,7 +458,6 @@
     border-radius:calc(14px * var(--s));
   }
 
-  /* ====== PHOTO LAYER ====== */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -466,7 +469,6 @@
   }
   #photoLayer img{max-width:100%;max-height:100%;}
 
-  /* ✅ 7C HL # 한줄 grid */
   .rowGrid3{
     display:grid;
     grid-template-columns:
@@ -480,7 +482,6 @@
     max-width:100%;
   }
 
-  /* ✅ T D BB 한줄 grid */
   .rowGridTDBB{
     display:grid;
     grid-template-columns:
@@ -494,13 +495,6 @@
     max-width:100%;
   }
 
-  .rowGrid3 input,
-  .rowGridTDBB input{
-    width:100%;
-    min-width:0;
-  }
-
-  /* ✅ OUTBOUND T/T T/B 한줄 */
   .rowGridTTTB{
     display:grid;
     grid-template-columns:
@@ -513,7 +507,6 @@
     max-width:100%;
   }
 
-  /* ✅ iOS 폰트 자동 확대 방지(가로밀림 원인 중 하나) */
   input, textarea, select, button{
     -webkit-text-size-adjust:100%;
   }
@@ -622,7 +615,6 @@
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
 
-  // ✅ INBOUND -> OUTBOUND HL/# 연동 (각 항목별로 끊을 수 있게)
   let outSyncHL = true;
   let outSyncHASH = true;
 
@@ -633,6 +625,8 @@
     const v = onlyNum(val, len);
     return v ? v.padStart(len, "0") : "";
   }
+  function up(v){ return (v || "").toString().toUpperCase(); } /* ✅ 영문 대문자 */
+
   function nowTime(){
     const d = new Date();
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
@@ -658,7 +652,6 @@
 
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
 
-    // ✅ INBOUND HL/# 입력 시 OUTBOUND가 연동 상태면 따라감
     if(outChk.checked){
       if(k === "INBOUND-HL" && outSyncHL){
         const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
@@ -670,10 +663,91 @@
       }
     }
 
-    // ✅ OUTBOUND를 직접 만지면 해당 항목만 연동 해제 (수정 가능)
     if(k === "OUTBOUND-HL") outSyncHL = false;
     if(k === "OUTBOUND-HASH") outSyncHASH = false;
   });
+
+  /* ✅ 체크 토글해도 값 안 날아가게: 현재 입력 스냅샷 */
+  function snapshot(type){
+    const exists = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
+    if(!exists("c7") && !exists("HL") && !exists("HASH")) return null;
+
+    const snap = {};
+    const g = (k)=>document.querySelector(`[data-k="${type}-${k}"]`);
+    snap[type+"-c7"]   = g("c7")?.value || "";
+    snap[type+"-HL"]   = g("HL")?.value || "";
+    snap[type+"-HASH"] = g("HASH")?.value || "";
+
+    snap[type+"-t"]  = g("t")?.value || "";
+    snap[type+"-d"]  = g("d")?.value || "";
+    snap[type+"-bb"] = g("bb")?.value || "";
+
+    snap[type+"-cmpt1"] = document.querySelector(`[data-k="${type}-cmpt1"]`)?.value || "";
+    snap[type+"-cmpt2"] = document.querySelector(`[data-k="${type}-cmpt2"]`)?.value || "";
+    [3,4].forEach(i=>{
+      snap[type+`-cmpt${i}`] = document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+    });
+
+    if(type==="OUTBOUND"){
+      snap[type+"-tt"] = g("tt")?.value || "";
+      snap[type+"-tb"] = g("tb")?.value || "";
+    }
+
+    snap[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+    snap[type+"-TIME"] = document.getElementById(type+"-TIMESHOWN")?.textContent || "";
+
+    const extras = [];
+    const box = document.getElementById(type+"-EXTRAS");
+    if(box){
+      [...box.querySelectorAll(".extraRow")].forEach(r=>{
+        const key = r.querySelector("select")?.value || "";
+        const val = r.querySelector("input")?.value || "";
+        extras.push({key, val});
+      });
+    }
+    snap[type+"-EXTRAS"] = extras;
+    return snap;
+  }
+
+  function applySnapshot(type, memoData){
+    if(!memoData) return;
+    const setV=(k,val)=>{
+      const el = document.querySelector(`[data-k="${type}-${k}"]`);
+      if(el) el.value = val || "";
+    };
+    setV("c7", memoData[type+"-c7"]);
+    setV("HL", memoData[type+"-HL"]);
+    setV("HASH", memoData[type+"-HASH"]);
+    setV("t", memoData[type+"-t"]);
+    setV("d", memoData[type+"-d"]);
+    setV("bb", memoData[type+"-bb"]);
+
+    const c1 = document.querySelector(`[data-k="${type}-cmpt1"]`);
+    const c2 = document.querySelector(`[data-k="${type}-cmpt2"]`);
+    if(c1) c1.value = memoData[type+"-cmpt1"] || "F";
+    if(c2) c2.value = memoData[type+"-cmpt2"] || "F";
+    [3,4].forEach(i=>{
+      const el = document.querySelector(`[data-k="${type}-cmpt${i}"]`);
+      if(el) el.value = memoData[type+`-cmpt${i}`] || "";
+    });
+
+    if(type==="OUTBOUND"){
+      setV("tt", memoData[type+"-tt"]);
+      setV("tb", memoData[type+"-tb"]);
+    }
+
+    const note = document.querySelector(`[data-k="${type}-note"]`);
+    if(음표) note.value = memoData[type+"-note"] || "";
+
+    const shown = document.getElementById(type+"-TIMESHOWN");
+    if(shown) shown.textContent = memoData[type+"-TIME"] || "";
+
+    const box = document.getElementById(type+"-EXTRAS");
+    if(box){
+      box.innerHTML = "";
+      (memoData[type+"-EXTRAS"] || []).forEach(ex=>box.appendChild(makeExtraRow(type, ex.key, ex.val)));
+    }
+  }
 
   function makeSection(type, memoData){
     const d = document.createElement("div");
@@ -752,7 +826,7 @@
     timeBtn.addEventListener("dblclick", ()=>{
       const cur = timeShown.textContent || nowTime();
       const t = prompt("TIME (HH:MM 24H)", cur);
-      if(t) timeShown.textContent = t;
+      if(t) timeShown.textContent = up(t);
     });
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
@@ -781,24 +855,32 @@
     box.appendChild(makeExtraRow(type, "W", ""));
   }
 
-  // ✅ 체크 변경시 섹션 렌더 + 연동 초기화
+  /* ✅ 체크 변경시: 현재 값 스냅샷 → 다시 그림 → 복원 */
   inChk.onchange = outChk.onchange = ()=>{
-    sections.innerHTML = "";
-    if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
-    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", null));
+    const snapIn = snapshot("INBOUND");
+    const snapOut = snapshot("OUTBOUND");
 
-    // 새 작성에서 둘 다 체크면 연동 ON
+    sections.innerHTML = "";
+    if(inChk.checked) sections.appendChild(makeSection("INBOUND", snapIn));
+    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", snapOut));
+
+    applySnapshot("INBOUND", snapIn);
+    applySnapshot("OUTBOUND", snapOut);
+
     outSyncHL = true;
     outSyncHASH = true;
 
-    // INBOUND 값이 이미 있으면 즉시 OUT에 복사
     if(inChk.checked && outChk.checked){
       const inHL = document.querySelector(`[data-k="INBOUND-HL"]`);
       const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`);
       const outHL = document.querySelector(`[data-k="OUTBOUND-HL"]`);
       const outHash = document.querySelector(`[data-k="OUTBOUND-HASH"]`);
-      if(inHL && outHL) outHL.value = inHL.value;
-      if(inHash && outHash) outHash.value = inHash.value;
+
+      if(inHL && outHL && !outHL.value) outHL.value = inHL.value;
+      if(inHash && outHash && !outHash.value) outHash.value = inHash.value;
+
+      outSyncHL = (outHL?.value || "") === (inHL?.value || "");
+      outSyncHASH = (outHash?.value || "") === (inHash?.value || "");
     }
   };
 
@@ -832,7 +914,10 @@
     data.hasIn = inChk.checked;
     data.hasOut = outChk.checked;
 
-    const normalizeF = (v)=> (v && v.trim() ? v : "F");
+    const normalizeF = (v)=> {
+      const s = up(v).trim();
+      return s ? s : "F";
+    };
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
@@ -851,7 +936,7 @@
       data[type+"-cmpt1"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt1"]`)?.value || "");
       data[type+"-cmpt2"] = normalizeF(document.querySelector(`[data-k="${type}-cmpt2"]`)?.value || "");
       [3,4].forEach(i=>{
-        data[type+`-cmpt${i}`] = document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "";
+        data[type+`-cmpt${i}`] = up(document.querySelector(`[data-k="${type}-cmpt${i}"]`)?.value || "");
       });
 
       if(type==="OUTBOUND"){
@@ -859,16 +944,16 @@
         data[type+"-tb"] = pad(g("tb")?.value, 4);
       }
 
-      data[type+"-note"] = document.querySelector(`[data-k="${type}-note"]`)?.value || "";
+      data[type+"-note"] = up(document.querySelector(`[data-k="${type}-note"]`)?.value || "");
 
       const shown = document.getElementById(type+"-TIMESHOWN");
-      data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
+      data[type+"-TIME"] = shown ? up(shown.textContent || "") : "";
 
       const extras = [];
       const box = document.getElementById(type+"-EXTRAS");
       if(box){
         [...box.querySelectorAll(".extraRow")].forEach(r=>{
-          const key = r.querySelector("select")?.value || "";
+          const key = up(r.querySelector("select")?.value || "");
           const val = pad(r.querySelector("input")?.value, 3);
           if(key && val) extras.push({key, val});
         });
@@ -876,7 +961,6 @@
       data[type+"-EXTRAS"] = extras;
     });
 
-    // ✅ 공유 기본값 보장: OUTBOUND HL/# 비어있으면 INBOUND 복사
     if(data.hasIn && data.hasOut){
       if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
       if(!data["OUTBOUND-HASH"]) data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || "";
@@ -894,7 +978,6 @@
     renderList(data.id);
   }
 
-  // ✅ 표기 고정 (요구사항 그대로)
   function buildLineText(m){
     const inLineTwo = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
     const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
@@ -902,22 +985,14 @@
     const oneIn = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
     const oneOut = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
 
-    // 둘 다 있으면 2줄 고정
     if(m.hasIn && m.hasOut){
       return [
         {tag:"IN",  text: inLineTwo},
         {tag:"OUT", text: outLineTwo}
       ];
     }
-
-    // 하나만 있으면 1줄(7C->HL-># 순서)
-    if(m.hasIn){
-      return [{tag:"IN", text: oneIn}];
-    }
-    if(m.hasOut){
-      return [{tag:"OUT", text: oneOut}];
-    }
-
+    if(m.hasIn) return [{tag:"IN", text: oneIn}];
+    if(m.hasOut) return [{tag:"OUT", text: oneOut}];
     return [{tag:"IN", text:"EMPTY"}];
   }
 
@@ -941,7 +1016,6 @@
       memoList.appendChild(card);
     });
 
-    // ✅ 클릭 이벤트를 JS로 묶어서 “안열림” 방지
     memoList.querySelectorAll(".lines").forEach(el=>{
       el.addEventListener("click", ()=>{
         const id = Number(el.dataset.open);
@@ -964,7 +1038,6 @@
 
     openModal();
 
-    // ✅ 수정 진입 시: 현재 값이 같으면 연동 ON, 다르면 OFF
     outSyncHL = true;
     outSyncHASH = true;
 
@@ -973,41 +1046,9 @@
         const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
         if(!enabled) return;
 
-        const setV=(k,val)=>{
-          const el = document.querySelector(`[data-k="${type}-${k}"]`);
-          if(el) el.value = val || "";
-        };
-
-        setV("c7",   m[type+"-c7"]);
-        setV("HL",   m[type+"-HL"]);
-        setV("HASH", m[type+"-HASH"]);
-        setV("t",  m[type+"-t"]);
-        setV("d",  m[type+"-d"]);
-        setV("bb", m[type+"-bb"]);
-
-        const c1 = document.querySelector(`[data-k="${type}-cmpt1"]`);
-        const c2 = document.querySelector(`[data-k="${type}-cmpt2"]`);
-        if(c1) c1.value = (m[type+"-cmpt1"] && m[type+"-cmpt1"].trim()) ? m[type+"-cmpt1"] : "F";
-        if(c2) c2.value = (m[type+"-cmpt2"] && m[type+"-cmpt2"].trim()) ? m[type+"-cmpt2"] : "F";
-
-        [3,4].forEach(i=>{
-          const el = document.querySelector(`[data-k="${type}-cmpt${i}"]`);
-          if(el) el.value = m[type+`-cmpt${i}`] || "";
-        });
-
-        if(type==="OUTBOUND"){
-          setV("tt", m[type+"-tt"]);
-          setV("tb", m[type+"-tb"]);
-        }
-
-        const note = document.querySelector(`[data-k="${type}-note"]`);
-        if(음표) note.value = m[type+"-note"] || "";
-
-        const shown = document.getElementById(type+"-TIMESHOWN");
-        if(shown) shown.textContent = m[type+"-TIME"] || "";
+        applySnapshot(type, m);
       });
 
-      // ✅ 둘 다 있을 때: OUT 값이 비어있으면 IN에서 복사 + 연동 판별
       if(m.hasIn && m.hasOut){
         const inHL = document.querySelector(`[data-k="INBOUND-HL"]`)?.value || "";
         const inHash = document.querySelector(`[data-k="INBOUND-HASH"]`)?.value || "";
