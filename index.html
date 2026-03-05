@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.6</title>
+<title>JAS MEMO VER 4.7</title>
 
 <style>
   :root{
@@ -19,11 +19,9 @@
     --red:#e20000;
     --line:#cfcfcf;
 
-    /* ✅ UI만 20% 더 작게 (기존 .66 -> 0.528) */
-    --s: .528;
-
-    /* ✅ 타이틀/헤더는 기존 크기 유지 */
-    --t: .66;
+    /* ✅ UI 전체 20% 더 작게(타이틀 제외) */
+    --s: .528;     /* 기존 .66 * 0.8 */
+    --ts: .66;     /* 타이틀은 기존 크기 유지 */
   }
 
   *{box-sizing:border-box}
@@ -44,10 +42,10 @@
     min-height:100vh;
   }
 
-  /* ====== HOME HEADER (타이틀 크기 유지: --t 사용) ====== */
+  /* ====== HOME HEADER ====== (타이틀은 --ts 사용) */
   header{
     text-align:center;
-    padding:calc(22px * var(--t)) calc(14px * var(--t)) calc(10px * var(--t));
+    padding:calc(22px * var(--ts)) calc(14px * var(--ts)) calc(10px * var(--ts));
     user-select:none;
     cursor:pointer;
   }
@@ -55,23 +53,23 @@
     display:flex;
     justify-content:center;
     align-items:baseline;
-    gap:calc(10px * var(--t));
+    gap:calc(10px * var(--ts));
     flex-wrap:wrap;
   }
   .titleMain{
-    font-size:calc(42px * var(--t));
+    font-size:calc(42px * var(--ts));
     font-weight:1000;
     letter-spacing:-1px;
     color:#111;
   }
   .titleVer{
-    font-size:calc(18px * var(--t));
+    font-size:calc(18px * var(--ts));
     font-weight:1000;
     color:#111;
     opacity:.9;
   }
 
-  /* ====== TOP BUTTONS (UI 축소: --s) ====== */
+  /* ====== TOP BUTTONS ====== */
   .controls{
     display:flex;
     justify-content:center;
@@ -123,11 +121,39 @@
     appearance:none;
     margin-top:calc(8px * var(--s));
     flex:0 0 auto;
+
+    position: relative;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
   }
+  .selBox:active{ transform: scale(0.96); }
   .selBox:checked{
+    border-color: rgba(0,0,0,.35);
+    box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
+    animation: checkPop .18s ease-out;
     background:
       linear-gradient(#fff,#fff),
       radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
+  }
+  .selBox:checked::after{
+    content:"";
+    position:absolute;
+    inset:calc(-10px * var(--s));
+    border-radius:calc(16px * var(--s));
+    border:calc(3px * var(--s)) solid rgba(47,125,246,.35);
+    opacity:0;
+    transform:scale(.7);
+    animation: ringPulse .35s ease-out;
+    pointer-events:none;
+  }
+  @keyframes checkPop{
+    0%{ transform:scale(.92); }
+    60%{ transform:scale(1.08); }
+    100%{ transform:scale(1.00); }
+  }
+  @keyframes ringPulse{
+    0%{ opacity:.9; transform:scale(.75); }
+    100%{ opacity:0; transform:scale(1.15); }
   }
 
   .lines{
@@ -158,8 +184,7 @@
     flex:0 0 auto;
     letter-spacing:.5px;
   }
-
-  /* ✅ 메모 제목(텍스트) 잘림 없게: 줄바꿈 허용 */
+  /* ✅ 메모 제목(리스트) 줄바꿈으로 “다 보이게” */
   .textPill{
     background:rgba(210,199,188,.45);
     border-radius:calc(18px * var(--s));
@@ -170,11 +195,11 @@
     flex:1;
     min-width:0;
     max-width:100%;
-    white-space:normal;     /* ✅ 줄바꿈 */
-    overflow:visible;       /* ✅ 잘림 방지 */
-    text-overflow:clip;     /* ✅ ... 제거 */
-    line-height:1.2;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
     word-break:break-word;
+    line-height:1.25;
   }
 
   .flash{animation:flash .55s;}
@@ -210,7 +235,7 @@
     text-align:right;
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
-    max-width:calc(260px * var(--s));
+    max-width:calc(240px * var(--s));
   }
   #equipBadge .b1{font-size:calc(18px * var(--s));}
   #equipBadge .b2{font-size:calc(18px * var(--s)); opacity:.95;}
@@ -462,7 +487,7 @@
     border-radius:calc(14px * var(--s));
   }
 
-  /* ====== PHOTO LAYER ====== */
+  /* PHOTO LAYER */
   #photoLayer{
     position:fixed;
     inset:0;
@@ -521,43 +546,10 @@
     max-width:100%;
   }
 
-  /* ✅ iOS 폰트 자동 확대 방지 + 모든 영문 대문자 */
+  /* ✅ iOS 확대 방지 + 영문 대문자 */
   input, textarea, select, button{
     -webkit-text-size-adjust:100%;
     text-transform:uppercase;
-  }
-
-  /* ✅ 체크박스 선택 모션(CSS만) */
-  .selBox{
-    position: relative;
-    cursor: pointer;
-    transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .selBox:active{ transform: scale(0.96); }
-  .selBox:checked{
-    border-color: rgba(0,0,0,.35);
-    box-shadow: 0 0 0 calc(6px * var(--s)) rgba(47,125,246,.18);
-    animation: checkPop .18s ease-out;
-  }
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    inset:calc(-10px * var(--s));
-    border-radius:calc(16px * var(--s));
-    border:calc(3px * var(--s)) solid rgba(47,125,246,.35);
-    opacity:0;
-    transform:scale(.7);
-    animation: ringPulse .35s ease-out;
-    pointer-events:none;
-  }
-  @keyframes checkPop{
-    0%{ transform:scale(.92); }
-    60%{ transform:scale(1.08); }
-    100%{ transform:scale(1.00); }
-  }
-  @keyframes ringPulse{
-    0%{ opacity:.9; transform:scale(.75); }
-    100%{ opacity:0; transform:scale(1.15); }
   }
 </style>
 </head>
@@ -567,7 +559,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.6</div>
+    <div class="titleVer">VER 4.7</div>
   </div>
 </header>
 
@@ -681,7 +673,7 @@
   }
 
   /* =========================
-     ✅ PHOTO: IndexedDB
+     ✅ PHOTO: IndexedDB 저장
   ========================== */
   const DB_NAME = "JAS_MEMO_DB";
   const DB_STORE = "KV";
@@ -743,9 +735,7 @@
   }
 
   function blobFromCanvas(canvas, quality=0.78){
-    return new Promise((resolve)=>{
-      canvas.toBlob((b)=> resolve(b), "image/jpeg", quality);
-    });
+    return new Promise((resolve)=> canvas.toBlob((b)=> resolve(b), "image/jpeg", quality));
   }
 
   async function fileToCompressedBlob(file){
@@ -768,14 +758,12 @@
     const canvas = document.createElement("canvas");
     canvas.width = nw;
     canvas.height = nh;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(img, 0, 0, nw, nh);
+    canvas.getContext("2d").drawImage(img, 0, 0, nw, nh);
 
-    const blob = await blobFromCanvas(canvas, 0.78);
-    return blob;
+    return await blobFromCanvas(canvas, 0.78);
   }
 
-  function addPhoto(){
+  async function addPhoto(){
     photoInput.value="";
     photoInput.click();
   }
@@ -836,11 +824,11 @@
 
     if(outChk.checked){
       if(k === "INBOUND-HL" && outSyncHL){
-        const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
+        const outHL = sections.querySelector('.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]');
         if(outHL) outHL.value = t.value;
       }
       if(k === "INBOUND-HASH" && outSyncHASH){
-        const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
+        const outHash = sections.querySelector('.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]');
         if(outHash) outHash.value = t.value;
       }
     }
@@ -953,21 +941,9 @@
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex=>extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
-    // ✅ 기존 메모 열었을 때 NOTE/CMPT3/4 포함 자동 채우기(저장값 유실 방지)
-    if(memoData){
-      const noteEl = d.querySelector(`textarea[data-k="${type}-note"]`);
-      if(noteEl) noteEl.value = memoData[type+"-note"] || "";
-
-      [3,4].forEach(i=>{
-        const el = d.querySelector(`input[data-k="${type}-cmpt${i}"]`);
-        if(el) el.value = memoData[type+`-cmpt${i}`] || "";
-      });
-    }
-
     return d;
   }
 
-  // ✅ 체크 변경시 섹션 렌더 + 연동 초기화
   inChk.onchange = outChk.onchange = ()=>{
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", null));
@@ -977,10 +953,10 @@
     outSyncHASH = true;
 
     if(inChk.checked && outChk.checked){
-      const inHL = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HL"]`);
-      const inHash = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HASH"]`);
-      const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
-      const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
+      const inHL = sections.querySelector('input[data-k="INBOUND-HL"]');
+      const inHash = sections.querySelector('input[data-k="INBOUND-HASH"]');
+      const outHL = sections.querySelector('input[data-k="OUTBOUND-HL"]');
+      const outHash = sections.querySelector('input[data-k="OUTBOUND-HASH"]');
       if(inHL && outHL) outHL.value = inHL.value;
       if(inHash && outHash) outHash.value = inHash.value;
     }
@@ -1011,11 +987,11 @@
     updateEquipBadge();
   }
 
-  /* ✅ OUTBOUND 포함 TEXT/NOTE/CMPT 전부 저장 확정 */
+  /* ✅ 저장/불러오기 핵심: data-type 섹션 기준으로 100% 고정 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
 
-    // ✅ iOS 체크값 불안정 대비: 섹션 존재로 판정
+    // ✅ 체크박스 값이 아니라 “섹션 존재”로 저장 여부 판단(모바일 꼬임 방지)
     data.hasIn  = !!sections.querySelector('.section[data-type="INBOUND"]');
     data.hasOut = !!sections.querySelector('.section[data-type="OUTBOUND"]');
 
@@ -1028,42 +1004,39 @@
       const root = sections.querySelector(`.section[data-type="${type}"]`);
       if(!root) return;
 
-      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
+      const q = (k)=> root.querySelector(`[data-k="${type}-${k}"]`);
+      const qExtraVal = ()=> root.querySelectorAll(".extraRow");
 
-      data[type+"-c7"]   = pad(gi("c7")?.value, 4);
-      data[type+"-HL"]   = pad(gi("HL")?.value, 4);
-      data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
+      data[type+"-c7"]   = pad(q("c7")?.value, 4);
+      data[type+"-HL"]   = pad(q("HL")?.value, 4);
+      data[type+"-HASH"] = pad(q("HASH")?.value, 3);
 
-      data[type+"-t"]  = pad(gi("t")?.value, 3);
-      data[type+"-d"]  = pad(gi("d")?.value, 2);
-      data[type+"-bb"] = pad(gi("bb")?.value, 2);
+      data[type+"-t"]  = pad(q("t")?.value, 3);
+      data[type+"-d"]  = pad(q("d")?.value, 2);
+      data[type+"-bb"] = pad(q("bb")?.value, 2);
 
-      data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
-      data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
+      data[type+"-cmpt1"] = normalizeF(q("cmpt1")?.value || "");
+      data[type+"-cmpt2"] = normalizeF(q("cmpt2")?.value || "");
       [3,4].forEach(i=>{
-        data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
+        data[type+`-cmpt${i}`] = (q(`cmpt${i}`)?.value || "");
       });
 
       if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(gi("tt")?.value, 4);
-        data[type+"-tb"] = pad(gi("tb")?.value, 4);
+        data[type+"-tt"] = pad(q("tt")?.value, 4);
+        data[type+"-tb"] = pad(q("tb")?.value, 4);
       }
 
-      data[type+"-note"] = (gt("note")?.value || "");
+      data[type+"-note"] = (root.querySelector(`textarea[data-k="${type}-note"]`)?.value || "");
 
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
 
       const extras = [];
-      const box = root.querySelector(`#${type}-EXTRAS`);
-      if(box){
-        [...box.querySelectorAll(".extraRow")].forEach(r=>{
-          const key = (r.querySelector("select")?.value || "").toUpperCase();
-          const val = pad(r.querySelector("input")?.value, 3);
-          if(key && val) extras.push({key, val});
-        });
-      }
+      root.querySelectorAll(".extraRow").forEach(r=>{
+        const key = (r.querySelector("select")?.value || "").toUpperCase();
+        const val = pad(r.querySelector("input")?.value, 3);
+        if(key && val) extras.push({key, val});
+      });
       data[type+"-EXTRAS"] = extras;
     });
 
@@ -1076,6 +1049,7 @@
     if(editId){
       const idx = memos.findIndex(m=>m.id===editId);
       if(idx>=0) memos[idx] = data;
+      else memos.push(data);
     }else{
       memos.push(data);
     }
@@ -1083,7 +1057,7 @@
     try{
       localStorage.setItem("jas_memos", JSON.stringify(memos));
     }catch(err){
-      alert("SAVE FAILED (STORAGE)\n" + err + "\n\nTIP: SAFARI > WEBSITE DATA CLEAR");
+      alert("SAVE FAILED (STORAGE)\n" + err);
       return;
     }
 
@@ -1091,7 +1065,6 @@
     renderList(data.id);
   }
 
-  /* ✅ 리스트 표기 */
   function buildLineText(m){
     const inLineTwo  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
     const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
@@ -1099,9 +1072,7 @@
     const oneIn  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}] #[${m["INBOUND-HASH"]||""}]`;
     const oneOut = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${m["OUTBOUND-HL"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
 
-    if(m.hasIn && m.hasOut){
-      return [{tag:"IN", text:inLineTwo}, {tag:"OUT", text:outLineTwo}];
-    }
+    if(m.hasIn && m.hasOut) return [{tag:"IN", text:inLineTwo}, {tag:"OUT", text:outLineTwo}];
     if(m.hasIn) return [{tag:"IN", text:oneIn}];
     if(m.hasOut) return [{tag:"OUT", text:oneOut}];
     return [{tag:"IN", text:"EMPTY"}];
@@ -1152,7 +1123,6 @@
     outSyncHL = true;
     outSyncHASH = true;
 
-    // ✅ 저장값 전부 정확히 채우기
     setTimeout(()=>{
       ["INBOUND","OUTBOUND"].forEach(type=>{
         const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
@@ -1162,16 +1132,16 @@
         if(!root) return;
 
         const setV=(k,val)=>{
-          const el = root.querySelector(`input[data-k="${type}-${k}"]`);
+          const el = root.querySelector(`[data-k="${type}-${k}"]`);
           if(el) el.value = val || "";
         };
 
         setV("c7",   m[type+"-c7"]);
         setV("HL",   m[type+"-HL"]);
         setV("HASH", m[type+"-HASH"]);
-        setV("t",  m[type+"-t"]);
-        setV("d",  m[type+"-d"]);
-        setV("bb", m[type+"-bb"]);
+        setV("t",    m[type+"-t"]);
+        setV("d",    m[type+"-d"]);
+        setV("bb",   m[type+"-bb"]);
 
         const c1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
         const c2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
@@ -1193,14 +1163,22 @@
 
         const shown = document.getElementById(type+"-TIMESHOWN");
         if(shown) shown.textContent = m[type+"-TIME"] || "";
+
+        // extras 재구성
+        const box = root.querySelector(`#${type}-EXTRAS`);
+        if(box){
+          box.innerHTML = "";
+          (m[type+"-EXTRAS"] || []).forEach(ex=>{
+            box.appendChild(makeExtraRow(type, ex.key, ex.val));
+          });
+        }
       });
 
-      // ✅ 둘 다 있을 때 HL/# 동기화 상태 갱신
       if(m.hasIn && m.hasOut){
-        const inHL = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HL"]`)?.value || "";
-        const inHash = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HASH"]`)?.value || "";
-        const outHL = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HL"]`);
-        const outHash = sections.querySelector(`.section[data-type="OUTBOUND"] input[data-k="OUTBOUND-HASH"]`);
+        const inHL = sections.querySelector('input[data-k="INBOUND-HL"]')?.value || "";
+        const inHash = sections.querySelector('input[data-k="INBOUND-HASH"]')?.value || "";
+        const outHL = sections.querySelector('input[data-k="OUTBOUND-HL"]');
+        const outHash = sections.querySelector('input[data-k="OUTBOUND-HASH"]');
 
         if(outHL && !outHL.value) outHL.value = inHL;
         if(outHash && !outHash.value) outHash.value = inHash;
