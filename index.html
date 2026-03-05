@@ -995,58 +995,62 @@
 
   /* ✅ OUTBOUND 저장 확정(섹션을 data-type으로 정확히 읽음) */
   function saveMemo(){
-    const data = { id: editId ?? Date.now() };
-    data.hasIn = inChk.checked;
-    data.hasOut = outChk.checked;
+  const data = { id: editId ?? Date.now() };
 
-    const normalizeF = (v)=> (v && v.trim() ? v : "F");
+  // ✅ iOS에서 체크값이 가끔 틀리게 읽혀서 "섹션 존재 여부"로 저장판단
+  data.hasIn  = !!sections.querySelector('.section[data-type="INBOUND"]');
+  data.hasOut = !!sections.querySelector('.section[data-type="OUTBOUND"]');
 
-    ["INBOUND","OUTBOUND"].forEach(type=>{
-      const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
-      if(!enabled) return;
+  const normalizeF = (v)=> (v && v.trim() ? v : "F");
 
-      const root = sections.querySelector(`.section[data-type="${type}"]`);
-      if(!root) return;
+  ["INBOUND","OUTBOUND"].forEach(type=>{
+    const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
+    if(!enabled) return;
 
-      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    if(!root) return;
 
-      data[type+"-c7"]   = pad(gi("c7")?.value, 4);
-      data[type+"-HL"]   = pad(gi("HL")?.value, 4);
-      data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
+    const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+    const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
 
-      data[type+"-t"]  = pad(gi("t")?.value, 3);
-      data[type+"-d"]  = pad(gi("d")?.value, 2);
-      data[type+"-bb"] = pad(gi("bb")?.value, 2);
+    data[type+"-c7"]   = pad(gi("c7")?.value, 4);
+    data[type+"-HL"]   = pad(gi("HL")?.value, 4);
+    data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
 
-      data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
-      data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
-      [3,4].forEach(i=>{
-        data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
-      });
+    data[type+"-t"]  = pad(gi("t")?.value, 3);
+    data[type+"-d"]  = pad(gi("d")?.value, 2);
+    data[type+"-bb"] = pad(gi("bb")?.value, 2);
 
-      if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(gi("tt")?.value, 4);
-        data[type+"-tb"] = pad(gi("tb")?.value, 4);
-      }
-
-      data[type+"-note"] = (gt("note")?.value || "");
-
-      const shown = document.getElementById(type+"-TIMESHOWN");
-      data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
-
-      const extras = [];
-      const box = root.querySelector(`#${type}-EXTRAS`);
-      if(box){
-        [...box.querySelectorAll(".extraRow")].forEach(r=>{
-          const key = (r.querySelector("select")?.value || "").toUpperCase();
-          const val = pad(r.querySelector("input")?.value, 3);
-          if(key && val) extras.push({key, val});
-        });
-      }
-      data[type+"-EXTRAS"] = extras;
+    data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
+    data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
+    [3,4].forEach(i=>{
+      data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
     });
 
+    if(type==="OUTBOUND"){
+      data[type+"-tt"] = pad(gi("tt")?.value, 4);
+      data[type+"-tb"] = pad(gi("tb")?.value, 4);
+    }
+
+    data[type+"-note"] = (gt("note")?.value || "");
+
+    const shown = document.getElementById(type+"-TIMESHOWN");
+    data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
+
+    const extras = [];
+    const box = root.querySelector(`#${type}-EXTRAS`);
+    if(box){
+      [...box.querySelectorAll(".extraRow")].forEach(r=>{
+        const key = (r.querySelector("select")?.value || "").toUpperCase();
+        const val = pad(r.querySelector("input")?.value, 3);
+        if(key && val) extras.push({key, val});
+      });
+    }
+    data[type+"-EXTRAS"] = extras;
+  });
+
+  // (아래 기존 저장/렌더 로직은 그대로 두면 됨)
+}
     // ✅ 공유 기본값 보장
     if(data.hasIn && data.hasOut){
       if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
@@ -1288,3 +1292,4 @@
 
 </body>
 </html>
+
