@@ -19,8 +19,11 @@
     --red:#e20000;
     --line:#cfcfcf;
 
-    /* ✅ 전체 크기 3분의2 */
-    --s: .66;
+    /* ✅ UI만 20% 더 작게 (기존 .66 -> 0.528) */
+    --s: .528;
+
+    /* ✅ 타이틀/헤더는 기존 크기 유지 */
+    --t: .66;
   }
 
   *{box-sizing:border-box}
@@ -41,10 +44,10 @@
     min-height:100vh;
   }
 
-  /* ====== HOME HEADER ====== */
+  /* ====== HOME HEADER (타이틀 크기 유지: --t 사용) ====== */
   header{
     text-align:center;
-    padding:calc(22px * var(--s)) calc(14px * var(--s)) calc(10px * var(--s));
+    padding:calc(22px * var(--t)) calc(14px * var(--t)) calc(10px * var(--t));
     user-select:none;
     cursor:pointer;
   }
@@ -52,23 +55,23 @@
     display:flex;
     justify-content:center;
     align-items:baseline;
-    gap:calc(10px * var(--s));
+    gap:calc(10px * var(--t));
     flex-wrap:wrap;
   }
   .titleMain{
-    font-size:calc(42px * var(--s));
+    font-size:calc(42px * var(--t));
     font-weight:1000;
     letter-spacing:-1px;
     color:#111;
   }
   .titleVer{
-    font-size:calc(18px * var(--s));
+    font-size:calc(18px * var(--t));
     font-weight:1000;
     color:#111;
     opacity:.9;
   }
 
-  /* ====== TOP BUTTONS ====== */
+  /* ====== TOP BUTTONS (UI 축소: --s) ====== */
   .controls{
     display:flex;
     justify-content:center;
@@ -138,7 +141,7 @@
   }
   .line{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     gap:calc(10px * var(--s));
     min-width:0;
     max-width:100%;
@@ -155,9 +158,11 @@
     flex:0 0 auto;
     letter-spacing:.5px;
   }
+
+  /* ✅ 메모 제목(텍스트) 잘림 없게: 줄바꿈 허용 */
   .textPill{
     background:rgba(210,199,188,.45);
-    border-radius:999px;
+    border-radius:calc(18px * var(--s));
     padding:calc(10px * var(--s)) calc(14px * var(--s));
     font-weight:1000;
     font-size:calc(18px * var(--s));
@@ -165,9 +170,11 @@
     flex:1;
     min-width:0;
     max-width:100%;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    white-space:normal;     /* ✅ 줄바꿈 */
+    overflow:visible;       /* ✅ 잘림 방지 */
+    text-overflow:clip;     /* ✅ ... 제거 */
+    line-height:1.2;
+    word-break:break-word;
   }
 
   .flash{animation:flash .55s;}
@@ -203,7 +210,7 @@
     text-align:right;
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
-    max-width:calc(240px * var(--s));
+    max-width:calc(260px * var(--s));
   }
   #equipBadge .b1{font-size:calc(18px * var(--s));}
   #equipBadge .b2{font-size:calc(18px * var(--s)); opacity:.95;}
@@ -446,6 +453,7 @@
     padding:calc(12px * var(--s)) calc(6px * var(--s)) 0;
     justify-content:flex-start;
     align-items:center;
+    flex-wrap:wrap;
   }
   .bottomBtns button{
     padding:calc(10px * var(--s)) calc(14px * var(--s));
@@ -673,7 +681,7 @@
   }
 
   /* =========================
-     ✅ PHOTO: IndexedDB 저장(메모 저장 안정화)
+     ✅ PHOTO: IndexedDB
   ========================== */
   const DB_NAME = "JAS_MEMO_DB";
   const DB_STORE = "KV";
@@ -718,7 +726,7 @@
     });
   }
 
-  let photoURL = null; // objectURL
+  let photoURL = null;
 
   async function loadPhotoFromDB(){
     try{
@@ -741,7 +749,6 @@
   }
 
   async function fileToCompressedBlob(file){
-    // iPhone 사진 그대로 저장하면 커서 용량 문제 유발 → 리사이즈+jpg
     const img = new Image();
     const url = URL.createObjectURL(file);
     await new Promise((res, rej)=>{
@@ -751,7 +758,7 @@
     });
     URL.revokeObjectURL(url);
 
-    const maxW = 1600; // 충분히 선명 + 용량 절감
+    const maxW = 1600;
     const w = img.naturalWidth || img.width;
     const h = img.naturalHeight || img.height;
     const scale = Math.min(1, maxW / Math.max(w,h));
@@ -768,7 +775,7 @@
     return blob;
   }
 
-  async function addPhoto(){
+  function addPhoto(){
     photoInput.value="";
     photoInput.click();
   }
@@ -856,8 +863,8 @@
   }
 
   function addExtraRow(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
+    const box = root ? root.querySelector(\`#\${type}-EXTRAS\`) : null;
     if(!box) return;
     box.appendChild(makeExtraRow(type, "W", ""));
   }
@@ -865,7 +872,7 @@
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
-    d.dataset.type = type; // ✅ OUTBOUND 저장 고정
+    d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
@@ -946,6 +953,17 @@
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex=>extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
+    // ✅ 기존 메모 열었을 때 NOTE/CMPT3/4 포함 자동 채우기(저장값 유실 방지)
+    if(memoData){
+      const noteEl = d.querySelector(`textarea[data-k="${type}-note"]`);
+      if(noteEl) noteEl.value = memoData[type+"-note"] || "";
+
+      [3,4].forEach(i=>{
+        const el = d.querySelector(`input[data-k="${type}-cmpt${i}"]`);
+        if(el) el.value = memoData[type+`-cmpt${i}`] || "";
+      });
+    }
+
     return d;
   }
 
@@ -993,65 +1011,63 @@
     updateEquipBadge();
   }
 
-  /* ✅ OUTBOUND 저장 확정(섹션을 data-type으로 정확히 읽음) */
+  /* ✅ OUTBOUND 포함 TEXT/NOTE/CMPT 전부 저장 확정 */
   function saveMemo(){
-  const data = { id: editId ?? Date.now() };
+    const data = { id: editId ?? Date.now() };
 
-  // ✅ iOS에서 체크값이 가끔 틀리게 읽혀서 "섹션 존재 여부"로 저장판단
-  data.hasIn  = !!sections.querySelector('.section[data-type="INBOUND"]');
-  data.hasOut = !!sections.querySelector('.section[data-type="OUTBOUND"]');
+    // ✅ iOS 체크값 불안정 대비: 섹션 존재로 판정
+    data.hasIn  = !!sections.querySelector('.section[data-type="INBOUND"]');
+    data.hasOut = !!sections.querySelector('.section[data-type="OUTBOUND"]');
 
-  const normalizeF = (v)=> (v && v.trim() ? v : "F");
+    const normalizeF = (v)=> (v && v.trim() ? v : "F");
 
-  ["INBOUND","OUTBOUND"].forEach(type=>{
-    const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
-    if(!enabled) return;
+    ["INBOUND","OUTBOUND"].forEach(type=>{
+      const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
+      if(!enabled) return;
 
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
+      const root = sections.querySelector(`.section[data-type="${type}"]`);
+      if(!root) return;
 
-    const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-    const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
+      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const gt = (k)=> root.querySelector(`textarea[data-k="${type}-${k}"]`);
 
-    data[type+"-c7"]   = pad(gi("c7")?.value, 4);
-    data[type+"-HL"]   = pad(gi("HL")?.value, 4);
-    data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
+      data[type+"-c7"]   = pad(gi("c7")?.value, 4);
+      data[type+"-HL"]   = pad(gi("HL")?.value, 4);
+      data[type+"-HASH"] = pad(gi("HASH")?.value, 3);
 
-    data[type+"-t"]  = pad(gi("t")?.value, 3);
-    data[type+"-d"]  = pad(gi("d")?.value, 2);
-    data[type+"-bb"] = pad(gi("bb")?.value, 2);
+      data[type+"-t"]  = pad(gi("t")?.value, 3);
+      data[type+"-d"]  = pad(gi("d")?.value, 2);
+      data[type+"-bb"] = pad(gi("bb")?.value, 2);
 
-    data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
-    data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
-    [3,4].forEach(i=>{
-      data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
+      data[type+"-cmpt1"] = normalizeF(gi("cmpt1")?.value || "");
+      data[type+"-cmpt2"] = normalizeF(gi("cmpt2")?.value || "");
+      [3,4].forEach(i=>{
+        data[type+`-cmpt${i}`] = (gi(`cmpt${i}`)?.value || "");
+      });
+
+      if(type==="OUTBOUND"){
+        data[type+"-tt"] = pad(gi("tt")?.value, 4);
+        data[type+"-tb"] = pad(gi("tb")?.value, 4);
+      }
+
+      data[type+"-note"] = (gt("note")?.value || "");
+
+      const shown = document.getElementById(type+"-TIMESHOWN");
+      data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
+
+      const extras = [];
+      const box = root.querySelector(`#${type}-EXTRAS`);
+      if(box){
+        [...box.querySelectorAll(".extraRow")].forEach(r=>{
+          const key = (r.querySelector("select")?.value || "").toUpperCase();
+          const val = pad(r.querySelector("input")?.value, 3);
+          if(key && val) extras.push({key, val});
+        });
+      }
+      data[type+"-EXTRAS"] = extras;
     });
 
-    if(type==="OUTBOUND"){
-      data[type+"-tt"] = pad(gi("tt")?.value, 4);
-      data[type+"-tb"] = pad(gi("tb")?.value, 4);
-    }
-
-    data[type+"-note"] = (gt("note")?.value || "");
-
-    const shown = document.getElementById(type+"-TIMESHOWN");
-    data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
-
-    const extras = [];
-    const box = root.querySelector(`#${type}-EXTRAS`);
-    if(box){
-      [...box.querySelectorAll(".extraRow")].forEach(r=>{
-        const key = (r.querySelector("select")?.value || "").toUpperCase();
-        const val = pad(r.querySelector("input")?.value, 3);
-        if(key && val) extras.push({key, val});
-      });
-    }
-    data[type+"-EXTRAS"] = extras;
-  });
-
-  // (아래 기존 저장/렌더 로직은 그대로 두면 됨)
-}
-    // ✅ 공유 기본값 보장
+    // ✅ HL/# 공유 기본값 보장
     if(data.hasIn && data.hasOut){
       if(!data["OUTBOUND-HL"]) data["OUTBOUND-HL"] = data["INBOUND-HL"] || "";
       if(!data["OUTBOUND-HASH"]) data["OUTBOUND-HASH"] = data["INBOUND-HASH"] || "";
@@ -1064,7 +1080,6 @@
       memos.push(data);
     }
 
-    // ✅ 저장 실패(Quota 등) 즉시 알림
     try{
       localStorage.setItem("jas_memos", JSON.stringify(memos));
     }catch(err){
@@ -1076,7 +1091,7 @@
     renderList(data.id);
   }
 
-  // ✅ 표기 고정(요구사항)
+  /* ✅ 리스트 표기 */
   function buildLineText(m){
     const inLineTwo  = `IN 7C[${m["INBOUND-c7"]||""}] HL[${m["INBOUND-HL"]||""}]`;
     const outLineTwo = `OUT 7C[${m["OUTBOUND-c7"]||""}] #[${m["OUTBOUND-HASH"]||""}]`;
@@ -1137,6 +1152,7 @@
     outSyncHL = true;
     outSyncHASH = true;
 
+    // ✅ 저장값 전부 정확히 채우기
     setTimeout(()=>{
       ["INBOUND","OUTBOUND"].forEach(type=>{
         const enabled = (type==="INBOUND") ? m.hasIn : m.hasOut;
@@ -1179,6 +1195,7 @@
         if(shown) shown.textContent = m[type+"-TIME"] || "";
       });
 
+      // ✅ 둘 다 있을 때 HL/# 동기화 상태 갱신
       if(m.hasIn && m.hasOut){
         const inHL = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HL"]`)?.value || "";
         const inHash = sections.querySelector(`.section[data-type="INBOUND"] input[data-k="INBOUND-HASH"]`)?.value || "";
@@ -1292,4 +1309,3 @@
 
 </body>
 </html>
-
