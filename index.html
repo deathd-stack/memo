@@ -806,7 +806,6 @@
       if(!root) return;
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const c  = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
@@ -855,24 +854,45 @@
     renderList(data.id);
   }
 
+  /* ✅✅ 제목 포맷 전용(공백 제거 + 선택 개수에 따라 표시 변경) */
+  function formatTitleLine(m, type){
+    const hl = (m.sharedHL || "").trim();
+    const hash = (m.sharedHASH || "").trim();
+
+    const c7 = String((m[`${type}-c7`] || "")).trim();
+
+    const both = !!m.hasIn && !!m.hasOut;
+
+    // 둘 다 선택 시:
+    // IN  : 7C + HL
+    // OUT : 7C + #
+    if(both){
+      if(type === "INBOUND"){
+        return `7C[${c7}] HL[${hl}]`.trim();
+      }else{
+        return `7C[${c7}] #[${hash}]`.trim();
+      }
+    }
+
+    // 하나만 선택 시: IN/OUT 공통으로 7C + HL + #
+    return `7C[${c7}] HL[${hl}] #[${hash}]`.trim();
+  }
+
   function renderList(flashId){
     memoList.innerHTML = "";
     memos.forEach(m=>{
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
-      const hl = m.sharedHL || "";
-      const hash = m.sharedHASH || "";
-
-      const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
-      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
-
       let lines = "";
+
       if(m.hasIn){
-        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${inText}</div></div>`;
+        const t = formatTitleLine(m, "INBOUND");
+        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${t}</div></div>`;
       }
       if(m.hasOut){
-        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${outText}</div></div>`;
+        const t = formatTitleLine(m, "OUTBOUND");
+        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${t}</div></div>`;
       }
       if(!m.hasIn && !m.hasOut){
         lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
@@ -1023,4 +1043,3 @@
 
 </body>
 </html>
-
