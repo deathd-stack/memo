@@ -99,36 +99,19 @@
     gap:calc(10px * var(--ui));
     align-items:flex-start;
   }
-
-  /* ✅✅ 리스트 체크(삭제) 가독성 강화 */
   .selBox{
-    width:calc(36px * var(--ui));
-    height:calc(36px * var(--ui));
-    border-radius:calc(12px * var(--ui));
-    border:calc(3px * var(--ui)) solid rgba(0,0,0,.35);
+    width:calc(30px * var(--ui));
+    height:calc(30px * var(--ui));
+    border-radius:calc(10px * var(--ui));
+    border:2px solid rgba(0,0,0,.25);
     background:#fff;
     appearance:none;
-    margin-top:calc(6px * var(--ui));
+    margin-top:calc(8px * var(--ui));
     flex:0 0 auto;
-    position:relative;
-    box-shadow:0 8px 16px rgba(0,0,0,.14);
   }
-  .selBox:active{transform:scale(.98)}
   .selBox:checked{
-    border-color:rgba(47,125,246,.95);
-    background:rgba(47,125,246,.15);
-    box-shadow:0 0 0 calc(6px * var(--ui)) rgba(47,125,246,.16), 0 8px 16px rgba(0,0,0,.14);
-  }
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    left:calc(11px * var(--ui));
-    top:calc(6px * var(--ui));
-    width:calc(10px * var(--ui));
-    height:calc(18px * var(--ui));
-    border-right:calc(4px * var(--ui)) solid rgba(47,125,246,1);
-    border-bottom:calc(4px * var(--ui)) solid rgba(47,125,246,1);
-    transform:rotate(40deg);
+    background:linear-gradient(#fff,#fff),
+      radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
   }
 
   .lines{
@@ -157,7 +140,7 @@
     flex:0 0 auto;
     text-transform:uppercase;
   }
-  /* ✅ 메모 제목: 줄바꿈 허용(2줄 표출도 가능) */
+  /* ✅ 메모 제목 안 짤리게: 줄바꿈 허용 */
   .textPill{
     background:rgba(210,199,188,.45);
     border-radius:999px;
@@ -172,7 +155,6 @@
     text-overflow:clip;
     word-break:break-word;
     text-transform:uppercase;
-    line-height:1.18;
   }
 
   .flash{animation:flash .55s;}
@@ -265,11 +247,10 @@
   .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
   .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
 
-  /* ✅✅ 모달 IN/OUT 체크 가독성 강화 */
   .check-line{
     display:flex;
     justify-content:center;
-    gap:calc(12px * var(--ui));
+    gap:calc(18px * var(--ui));
     align-items:center;
     padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
     white-space:nowrap;
@@ -278,20 +259,14 @@
   .check-line label{
     display:flex;
     align-items:center;
-    gap:calc(10px * var(--ui));
+    gap:calc(8px * var(--ui));
     font-size:calc(16px * var(--ui));
     font-weight:1000;
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-    background:rgba(0,0,0,.06);
-    border:2px solid rgba(0,0,0,.08);
-    border-radius:999px;
-    box-shadow:0 8px 16px rgba(0,0,0,.08);
   }
   .check-line input[type="checkbox"]{
-    width:calc(26px * var(--ui));
-    height:calc(26px * var(--ui));
+    width:calc(22px * var(--ui));
+    height:calc(22px * var(--ui));
     accent-color:var(--blue);
-    transform:translateY(1px);
   }
 
   .section{
@@ -631,12 +606,14 @@
     });
   }
 
+  /* ✅ 숫자 입력 제한 + HL/# 완전공유(양방향) */
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
     const k = t.dataset.k || "";
     if(!k) return;
 
+    // shared
     if(k === "SHARED-HL"){
       t.value = onlyNum(t.value, 4);
       syncByDataK("SHARED-HL", t.value);
@@ -657,6 +634,7 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
+  /* ✅✅ 섹션 루트에 data-type 심고, value도 초기 주입(저장/불러오기 안정) */
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
@@ -764,9 +742,10 @@
     return row;
   }
 
+  /* ✅ + 버튼이 항상 해당 섹션의 EXTRA에 붙게(중복 id 문제 예방) */
   function addExtraRow(type){
-    const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
-    const box = root ? root.querySelector(\`#\${type}-EXTRAS\`) : null;
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
     box.appendChild(makeExtraRow(type, "W", ""));
   }
@@ -808,6 +787,7 @@
     updateEquipBadge();
   }
 
+  /* ✅✅ 동그라미 부분 저장: 섹션(root) 기준으로 읽어서 저장 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
     data.hasIn = inChk.checked;
@@ -826,6 +806,7 @@
       if(!root) return;
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const c  = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
@@ -874,10 +855,8 @@
     renderList(data.id);
   }
 
-  /* ✅✅ 여기 renderList만 “표출 규칙” 적용 */
   function renderList(flashId){
     memoList.innerHTML = "";
-
     memos.forEach(m=>{
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
@@ -885,46 +864,16 @@
       const hl = m.sharedHL || "";
       const hash = m.sharedHASH || "";
 
-      const inC7  = m["INBOUND-c7"] || "";
-      const outC7 = m["OUTBOUND-c7"] || "";
-
-      // ✅ 2개 선택이면: "7C HL" 다음줄 "7C #"
-      const twoLine = (c7)=> `7C[${c7}] HL[${hl}]<br>7C[${c7}] #[${hash}]`;
-      // ✅ 1개 선택이면: 한줄 "7C HL #"
-      const oneLine = (c7)=> `7C[${c7}] HL[${hl}] #[${hash}]`;
+      const inText = `IN 7C[${m["INBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
+      const outText = `OUT 7C[${m["OUTBOUND-c7"]||""}] HL[${hl}] #[${hash}]`;
 
       let lines = "";
-
-      if(m.hasIn && m.hasOut){
-        lines += `
-          <div class="line">
-            <div class="tagPill">IN</div>
-            <div class="textPill">${twoLine(inC7)}</div>
-          </div>
-          <div class="line">
-            <div class="tagPill">OUT</div>
-            <div class="textPill">${twoLine(outC7)}</div>
-          </div>
-        `;
-      }else{
-        if(m.hasIn){
-          lines += `
-            <div class="line">
-              <div class="tagPill">IN</div>
-              <div class="textPill">${oneLine(inC7)}</div>
-            </div>
-          `;
-        }
-        if(m.hasOut){
-          lines += `
-            <div class="line">
-              <div class="tagPill">OUT</div>
-              <div class="textPill">${oneLine(outC7)}</div>
-            </div>
-          `;
-        }
+      if(m.hasIn){
+        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${inText}</div></div>`;
       }
-
+      if(m.hasOut){
+        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${outText}</div></div>`;
+      }
       if(!m.hasIn && !m.hasOut){
         lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
       }
@@ -960,6 +909,7 @@
 
     openModal();
 
+    /* ✅ 공유 HL/# 즉시 반영 (양쪽 동일) */
     syncByDataK("SHARED-HL", m.sharedHL || "");
     syncByDataK("SHARED-HASH", m.sharedHASH || "");
   }
@@ -972,6 +922,7 @@
     renderList();
   }
 
+  /* PHOTO */
   function addPhoto(){ photoInput.value=""; photoInput.click(); }
   photoInput.onchange = (e)=>{
     const f = e.target.files && e.target.files[0];
@@ -990,6 +941,7 @@
   }
   function closePhoto(){ photoLayer.style.display = "none"; }
 
+  /* EQUIP */
   function openEquip(){
     const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
     tug1.value = pad(eq.tug1,2);
@@ -1028,6 +980,7 @@
     if(e.target === equipModal) closeEquip();
   });
 
+  /* DRAG TO CLOSE */
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
@@ -1063,9 +1016,11 @@
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
+  /* INIT */
   renderList();
   updateEquipBadge();
 </script>
 
 </body>
 </html>
+
