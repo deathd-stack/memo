@@ -35,7 +35,7 @@
 
   header{
     text-align:center;
-    padding:22px 14px 10px; /* ✅ 타이틀은 그대로 */
+    padding:22px 14px 10px;
     user-select:none;
     cursor:pointer;
   }
@@ -47,14 +47,14 @@
     flex-wrap:wrap;
   }
   .titleMain{
-    font-size:42px; /* ✅ 그대로 */
+    font-size:42px;
     font-weight:1000;
     letter-spacing:-1px;
     color:#111;
     text-transform:uppercase;
   }
   .titleVer{
-    font-size:18px; /* ✅ 그대로 */
+    font-size:18px;
     font-weight:1000;
     color:#111;
     opacity:.9;
@@ -140,7 +140,6 @@
     flex:0 0 auto;
     text-transform:uppercase;
   }
-  /* ✅ 메모 제목 안 짤리게: 줄바꿈 허용 */
   .textPill{
     background:rgba(210,199,188,.45);
     border-radius:999px;
@@ -442,6 +441,26 @@
     text-transform:uppercase;
   }
 
+  /* ✅ OUTBOUND 전용 LIR 버튼 */
+  .lirRow{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    margin:calc(10px * var(--ui)) 0;
+  }
+  .lirBtn{
+    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
+    font-size:calc(14px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    box-shadow:none;
+  }
+  .lirInfo{
+    font-size:calc(13px * var(--ui));
+    color:#666;
+    font-weight:1000;
+    text-transform:uppercase;
+  }
+
   .bottomBtns{
     display:flex;
     gap:calc(18px * var(--ui));
@@ -507,6 +526,7 @@
 <div id="equipBadge"></div>
 
 <input type="file" id="photoInput" accept="image/*" hidden />
+<input type="file" id="lirPhotoInput" accept="image/*" hidden />
 
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
@@ -570,6 +590,7 @@
   const sections = document.getElementById("sections");
   const memoList = document.getElementById("memoList");
   const photoInput = document.getElementById("photoInput");
+  const lirPhotoInput = document.getElementById("lirPhotoInput");
   const photoLayer = document.getElementById("photoLayer");
   const photoImg = document.getElementById("photoImg");
   const inChk = document.getElementById("inChk");
@@ -585,6 +606,9 @@
   let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
   let photo = localStorage.getItem("jas_photo");
   let editId = null;
+
+  /* ✅ 현재 편집중 메모의 OUTBOUND 전용 LIR 사진 */
+  let currentLirPhoto = "";
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS"];
 
@@ -606,14 +630,47 @@
     });
   }
 
-  /* ✅ 숫자 입력 제한 + HL/# 완전공유(양방향) */
+  function updateLirInfo(){
+    const el = sections.querySelector("#lirInfo");
+    if(el){
+      el.textContent = currentLirPhoto ? "PHOTO SAVED" : "NO PHOTO";
+    }
+  }
+
+  function addLirPhoto(){
+    lirPhotoInput.value = "";
+    lirPhotoInput.click();
+  }
+
+  function viewLirPhoto(){
+    if(!currentLirPhoto) return;
+    photoImg.src = currentLirPhoto;
+    photoLayer.style.display = "flex";
+  }
+
+  function clearLirPhoto(){
+    currentLirPhoto = "";
+    updateLirInfo();
+  }
+
+  lirPhotoInput.onchange = (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{
+      /* ✅ 새 사진 추가 시 이전 사진 자동 삭제(덮어쓰기) */
+      currentLirPhoto = r.result;
+      updateLirInfo();
+    };
+    r.readAsDataURL(f);
+  };
+
   document.addEventListener("input", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLInputElement)) return;
     const k = t.dataset.k || "";
     if(!k) return;
 
-    // shared
     if(k === "SHARED-HL"){
       t.value = onlyNum(t.value, 4);
       syncByDataK("SHARED-HL", t.value);
@@ -634,20 +691,16 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
-  /* ✅✅ 섹션 루트에 data-type 심고, value도 초기 주입(저장/불러오기 안정) */
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
     d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-
     const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
     const cmpt2Default = memoData ? (memoData[type+"-cmpt2"] || "F") : "F";
-
     const sharedHL = memoData ? (memoData.sharedHL || "") : "";
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
-
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
 
@@ -700,6 +753,13 @@
           <div class="lab" style="min-width:60px;">T/B</div>
           <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
         </div>
+
+        <div class="lirRow">
+          <button type="button" class="lirBtn" onclick="addLirPhoto()">LIR</button>
+          <button type="button" class="lirBtn" onclick="viewLirPhoto()">VIEW</button>
+          <button type="button" class="lirBtn" onclick="clearLirPhoto()">CLEAR</button>
+          <div class="lirInfo" id="lirInfo">NO PHOTO</div>
+        </div>
       ` : ""}
 
       <div class="extraBox">
@@ -742,7 +802,6 @@
     return row;
   }
 
-  /* ✅ + 버튼이 항상 해당 섹션의 EXTRA에 붙게(중복 id 문제 예방) */
   function addExtraRow(type){
     const root = sections.querySelector(`.section[data-type="${type}"]`);
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
@@ -760,6 +819,11 @@
 
     syncByDataK("SHARED-HL", keepHL);
     syncByDataK("SHARED-HASH", keepHASH);
+
+    if(!outChk.checked){
+      currentLirPhoto = "";
+    }
+    updateLirInfo();
   };
 
   function newMemo(){
@@ -767,6 +831,7 @@
     inChk.checked = false;
     outChk.checked = false;
     sections.innerHTML = "";
+    currentLirPhoto = "";
     openModal();
   }
 
@@ -787,7 +852,6 @@
     updateEquipBadge();
   }
 
-  /* ✅✅ 동그라미 부분 저장: 섹션(root) 기준으로 읽어서 저장 */
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
     data.hasIn = inChk.checked;
@@ -823,6 +887,7 @@
       if(type==="OUTBOUND"){
         data[type+"-tt"] = pad(gi("tt")?.value, 4);
         data[type+"-tb"] = pad(gi("tb")?.value, 4);
+        data[type+"-LIRPHOTO"] = currentLirPhoto || "";
       }
 
       data[type+"-note"] = note ? (note.value || "") : "";
@@ -854,28 +919,20 @@
     renderList(data.id);
   }
 
-  /* ✅✅ 제목 포맷 전용(공백 제거 + 선택 개수에 따라 표시 변경) */
   function formatTitleLine(m, type){
     const hl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
-
     const c7 = String((m[`${type}-c7`] || "")).trim();
-
     const both = !!m.hasIn && !!m.hasOut;
 
-    // 둘 다 선택 시:
-    // IN  : 7C + HL
-    // OUT : 7C + #
     if(both){
       if(type === "INBOUND"){
-        return `7C[${c7}] HL[${hl}]`.trim();
+        return `7C[${c7}] HL[${hl}]`;
       }else{
-        return `7C[${c7}] #[${hash}]`.trim();
+        return `7C[${c7}] #[${hash}]`;
       }
     }
-
-    // 하나만 선택 시: IN/OUT 공통으로 7C + HL + #
-    return `7C[${c7}] HL[${hl}] #[${hash}]`.trim();
+    return `7C[${c7}] HL[${hl}] #[${hash}]`;
   }
 
   function renderList(flashId){
@@ -922,16 +979,17 @@
     editId = id;
     inChk.checked = !!m.hasIn;
     outChk.checked = !!m.hasOut;
+    currentLirPhoto = m["OUTBOUND-LIRPHOTO"] || "";
 
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", m));
     if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", m));
 
-    openModal();
-
-    /* ✅ 공유 HL/# 즉시 반영 (양쪽 동일) */
     syncByDataK("SHARED-HL", m.sharedHL || "");
     syncByDataK("SHARED-HASH", m.sharedHASH || "");
+
+    openModal();
+    updateLirInfo();
   }
 
   function deleteSelected(){
