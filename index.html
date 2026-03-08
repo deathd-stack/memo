@@ -18,9 +18,11 @@
     --blue:#2f7df6;
     --red:#e20000;
     --line:#cfcfcf;
-    --ui: .8;
+    --ui:.8;
   }
+
   *{box-sizing:border-box}
+
   body{
     margin:0;
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
@@ -64,7 +66,8 @@
     display:flex;
     justify-content:center;
     gap:calc(14px * var(--ui));
-    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(8px * var(--ui));
+    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(6px * var(--ui));
+    flex-wrap:wrap;
   }
   button{
     border:none;
@@ -76,14 +79,51 @@
     font-size:calc(18px * var(--ui));
     box-shadow:0 10px 20px rgba(0,0,0,.18);
     text-transform:uppercase;
+    cursor:pointer;
   }
   button:active{transform:scale(.99)}
+
+  .weekBar{
+    width:min(780px, calc(100% - 28px));
+    margin:0 auto calc(10px * var(--ui));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:calc(8px * var(--ui));
+    flex-wrap:wrap;
+  }
+  .weekBtn{
+    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
+    font-size:calc(14px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    box-shadow:none;
+  }
+  .weekLabel{
+    background:rgba(255,255,255,.92);
+    border-radius:calc(14px * var(--ui));
+    padding:calc(9px * var(--ui)) calc(14px * var(--ui));
+    font-size:calc(14px * var(--ui));
+    font-weight:1000;
+    color:#111;
+    box-shadow:0 6px 16px rgba(0,0,0,.12);
+    text-transform:uppercase;
+  }
 
   #memoList{
     padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(110px * var(--ui));
     max-width:780px;
     margin:0 auto;
   }
+  .emptyWeek{
+    background:rgba(255,255,255,.22);
+    border-radius:calc(20px * var(--ui));
+    padding:calc(18px * var(--ui));
+    color:#111;
+    text-align:center;
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
+  }
+
   .memoCard{
     background:rgba(246,231,215,.92);
     border-radius:calc(24px * var(--ui));
@@ -98,19 +138,33 @@
     gap:calc(10px * var(--ui));
     align-items:flex-start;
   }
+
   .selBox{
     width:calc(30px * var(--ui));
     height:calc(30px * var(--ui));
     border-radius:calc(10px * var(--ui));
-    border:2px solid rgba(0,0,0,.25);
+    border:2px solid rgba(0,0,0,.28);
     background:#fff;
     appearance:none;
     margin-top:calc(8px * var(--ui));
     flex:0 0 auto;
+    position:relative;
   }
   .selBox:checked{
-    background:linear-gradient(#fff,#fff),
-      radial-gradient(circle at 50% 50%, #222 0 40%, transparent 41%);
+    background:#fff;
+    border-color:#1e63d8;
+    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(47,125,246,.14);
+  }
+  .selBox:checked::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:calc(10px * var(--ui));
+    height:calc(16px * var(--ui));
+    border-right:calc(3px * var(--ui)) solid #1e63d8;
+    border-bottom:calc(3px * var(--ui)) solid #1e63d8;
+    transform:translate(-50%,-60%) rotate(45deg);
   }
 
   .lines{
@@ -150,8 +204,15 @@
     min-width:0;
     white-space:normal;
     overflow:visible;
-    text-overflow:clip;
     word-break:break-word;
+    text-transform:uppercase;
+  }
+  .datePill{
+    margin-top:calc(6px * var(--ui));
+    margin-left:calc(40px * var(--ui));
+    font-size:calc(12px * var(--ui));
+    color:#5a5147;
+    font-weight:1000;
     text-transform:uppercase;
   }
 
@@ -185,7 +246,7 @@
     font-weight:1000;
     line-height:1.15;
     text-align:right;
-    min-width:calc(190px * var(--ui));
+    min-width:unset;
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
     text-transform:uppercase;
@@ -245,6 +306,26 @@
   .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
   .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
 
+  .dateLine{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    margin-bottom:calc(8px * var(--ui));
+  }
+  .dateLine .dateLab{
+    font-size:calc(15px * var(--ui));
+    font-weight:1000;
+    color:#111;
+    text-transform:uppercase;
+  }
+  .dateInput{
+    width:auto !important;
+    min-width:calc(180px * var(--ui));
+    text-align:center;
+    padding:0 calc(10px * var(--ui));
+  }
+
   .check-line{
     display:flex;
     justify-content:center;
@@ -270,14 +351,14 @@
   .section{
     background:#f2f2f2;
     border-radius:calc(16px * var(--ui));
-    padding:calc(12px * var(--ui)) calc(12px * var(--ui));
+    padding:calc(12px * var(--ui));
     margin:calc(10px * var(--ui)) 0;
     overflow:hidden;
     border:1px solid #e6e6e6;
   }
   .sectionHead{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:space-between;
     margin-bottom:calc(10px * var(--ui));
     gap:calc(10px * var(--ui));
@@ -287,6 +368,31 @@
     font-weight:1000;
     letter-spacing:.3px;
     text-transform:uppercase;
+  }
+
+  .headRight{
+    display:flex;
+    align-items:flex-start;
+    gap:calc(10px * var(--ui));
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .staStdWrap{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    white-space:nowrap;
+  }
+  .staStdLab{
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
+    color:#111;
+    text-transform:uppercase;
+  }
+  .staStdInput{
+    width:calc(92px * var(--ui)) !important;
+    min-width:calc(92px * var(--ui));
+    text-align:center;
   }
 
   .timeWrap{
@@ -315,7 +421,7 @@
     color:var(--red);
     min-width:calc(64px * var(--ui));
     text-align:right;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric:tabular-nums;
   }
 
   .row{
@@ -344,7 +450,7 @@
     outline:none;
     background:#fff;
     -webkit-text-size-adjust:100%;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric:tabular-nums;
     text-transform:uppercase;
   }
   input{
@@ -359,7 +465,7 @@
     height:calc(76px * var(--ui));
     resize:none;
     font-weight:800;
-    padding:calc(10px * var(--ui)) calc(10px * var(--ui));
+    padding:calc(10px * var(--ui));
     text-transform:none;
   }
   select{
@@ -371,7 +477,6 @@
     font-size:calc(18px * var(--ui));
     letter-spacing:.6px;
   }
-
   .long{
     flex:1;
     min-width:0;
@@ -445,19 +550,13 @@
     align-items:center;
     gap:calc(8px * var(--ui));
     margin:calc(10px * var(--ui)) 0;
+    flex-wrap:wrap;
   }
   .lirBtn{
     padding:calc(8px * var(--ui)) calc(12px * var(--ui));
     font-size:calc(14px * var(--ui));
     border-radius:calc(14px * var(--ui));
     box-shadow:none;
-  }
-  .lirInfo{
-    font-size:calc(13px * var(--ui));
-    color:#666;
-    font-weight:1000;
-    text-transform:uppercase;
-    min-width:1px;
   }
 
   .bottomBtns{
@@ -466,6 +565,7 @@
     padding:calc(12px * var(--ui)) calc(6px * var(--ui)) 0;
     justify-content:flex-start;
     text-transform:uppercase;
+    flex-wrap:wrap;
   }
   .bottomBtns button{
     padding:calc(10px * var(--ui)) calc(14px * var(--ui));
@@ -483,11 +583,17 @@
     align-items:center;
     z-index:90;
   }
-  #photoLayer img{max-width:100%;max-height:100%;}
+  #photoLayer img{
+    max-width:100%;
+    max-height:100%;
+  }
 
   .rowGrid3{
     display:grid;
-    grid-template-columns: calc(34px * var(--ui)) 1fr calc(34px * var(--ui)) 1fr calc(14px * var(--ui)) .95fr;
+    grid-template-columns:
+      calc(34px * var(--ui)) 1fr
+      calc(34px * var(--ui)) 1fr
+      calc(14px * var(--ui)) .95fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
@@ -495,7 +601,10 @@
   }
   .rowGridTDBB{
     display:grid;
-    grid-template-columns: calc(18px * var(--ui)) 1fr calc(18px * var(--ui)) .9fr calc(26px * var(--ui)) .9fr;
+    grid-template-columns:
+      calc(18px * var(--ui)) 1fr
+      calc(18px * var(--ui)) .9fr
+      calc(26px * var(--ui)) .9fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
@@ -519,6 +628,14 @@
   <button type="button" onclick="addPhoto()">PHOTO</button>
 </div>
 
+<div class="weekBar">
+  <button type="button" class="weekBtn" onclick="moveWeek(-1)">PREV WEEK</button>
+  <div class="weekLabel" id="weekLabel">THIS WEEK</div>
+  <button type="button" class="weekBtn" onclick="goThisWeek()">TODAY</button>
+  <button type="button" class="weekBtn" onclick="deleteCurrentWeek()">DEL WEEK</button>
+  <button type="button" class="weekBtn" onclick="moveWeek(1)">NEXT WEEK</button>
+</div>
+
 <div id="memoList"></div>
 
 <button id="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
@@ -536,6 +653,11 @@
     <div class="modalTitleTap" onclick="openPhoto()">
       <div class="m1">JAS MEMO</div>
       <div class="m2">TAP TO OPEN PHOTO</div>
+    </div>
+
+    <div class="dateLine">
+      <div class="dateLab">DATE</div>
+      <input type="date" id="memoDate" class="dateInput">
     </div>
 
     <div class="check-line">
@@ -594,6 +716,8 @@
   const photoImg = document.getElementById("photoImg");
   const inChk = document.getElementById("inChk");
   const outChk = document.getElementById("outChk");
+  const memoDate = document.getElementById("memoDate");
+  const weekLabel = document.getElementById("weekLabel");
 
   const equipBtn = document.getElementById("equipBtn");
   const equipBadge = document.getElementById("equipBadge");
@@ -606,32 +730,103 @@
   let photo = localStorage.getItem("jas_photo");
   let editId = null;
   let currentLirPhoto = "";
+  let weekOffset = 0;
 
   const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGPIN"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
+
   function pad(val, len){
     const v = onlyNum(val, len);
     return v ? v.padStart(len, "0") : "";
   }
+
   function nowTime(){
     const d = new Date();
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+  }
+
+  function todayStr(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function dateToStr(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function getMonday(dateLike){
+    const d = new Date(dateLike);
+    d.setHours(0,0,0,0);
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() - day + 1);
+    return d;
+  }
+
+  function getSunday(dateLike){
+    const d = getMonday(dateLike);
+    d.setDate(d.getDate() + 6);
+    return d;
+  }
+
+  function getWeekKey(dateLike){
+    const monday = getMonday(dateLike);
+    return dateToStr(monday);
+  }
+
+  function getViewingDate(){
+    const d = new Date();
+    d.setDate(d.getDate() + (weekOffset * 7));
+    return d;
+  }
+
+  function getViewingWeekKey(){
+    return getWeekKey(getViewingDate());
+  }
+
+  function updateWeekLabel(){
+    const monday = getMonday(getViewingDate());
+    const sunday = getSunday(getViewingDate());
+    weekLabel.textContent = `${dateToStr(monday)} ~ ${dateToStr(sunday)}`;
+  }
+
+  function moveWeek(n){
+    weekOffset += n;
+    updateWeekLabel();
+    renderList();
+  }
+
+  function goThisWeek(){
+    weekOffset = 0;
+    updateWeekLabel();
+    renderList();
+  }
+
+  function deleteCurrentWeek(){
+    const wk = getViewingWeekKey();
+    const target = memos.filter(m => m.weekKey === wk);
+    if(!target.length){
+      alert("NO MEMO IN THIS WEEK");
+      return;
+    }
+    if(!confirm("DELETE ALL MEMOS IN THIS WEEK?")) return;
+    memos = memos.filter(m => m.weekKey !== wk);
+    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    renderList();
   }
 
   function syncByDataK(dataK, value){
     document.querySelectorAll(`input[data-k="${dataK}"]`).forEach(el=>{
       if(el !== document.activeElement) el.value = value;
     });
-  }
-
-  function updateLirInfo(){
-    const el = sections.querySelector("#lirInfo");
-    if(el){
-      el.textContent = "";
-    }
   }
 
   function addLirPhoto(){
@@ -650,8 +845,7 @@
     if(!f) return;
     const r = new FileReader();
     r.onload = ()=>{
-      currentLirPhoto = r.result;
-      updateLirInfo();
+      currentLirPhoto = r.result || "";
     };
     r.readAsDataURL(f);
   };
@@ -673,6 +867,8 @@
       return;
     }
 
+    if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
+    if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-c7")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
@@ -694,13 +890,21 @@
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+    const staStdLabel = type === "INBOUND" ? "STA" : "STD";
+    const staStdKey = type === "INBOUND" ? "STA" : "STD";
 
     d.innerHTML = `
       <div class="sectionHead">
         <div class="sectionTitle">${type}</div>
-        <div class="timeWrap">
-          <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
-          <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+        <div class="headRight">
+          <div class="staStdWrap">
+            <div class="staStdLab">${staStdLabel}</div>
+            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-${staStdKey}" value="${v(staStdKey)}">
+          </div>
+          <div class="timeWrap">
+            <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
+            <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+          </div>
         </div>
       </div>
 
@@ -721,7 +925,7 @@
         <div class="lab" style="min-width:96px;">CMPT 2</div>
         <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${cmpt2Default}">
       </div>
-      ${[3,4].map(i=>`
+      ${[3,4].map(i => `
         <div class="row">
           <div class="lab" style="min-width:96px;">CMPT ${i}</div>
           <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt"+i]||"") : ""}">
@@ -748,7 +952,6 @@
         <div class="lirRow">
           <button type="button" class="lirBtn" onclick="addLirPhoto()">LIR</button>
           <button type="button" class="lirBtn" onclick="viewLirPhoto()">VIEW</button>
-          <div class="lirInfo" id="lirInfo"></div>
         </div>
       ` : ""}
 
@@ -784,7 +987,7 @@
     row.className = "extraRow";
     row.innerHTML = `
       <select>
-        ${EXTRA_KEYS.map(k=>`<option value="${k}" ${k===key?"selected":""}>${k}</option>`).join("")}
+        ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
       </select>
       <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
       <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
@@ -802,18 +1005,19 @@
   inChk.onchange = outChk.onchange = ()=>{
     const keepHL = document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "";
     const keepHASH = document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "";
+    const keepDate = memoDate.value || todayStr();
 
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
     if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
 
+    memoDate.value = keepDate;
     syncByDataK("SHARED-HL", keepHL);
     syncByDataK("SHARED-HASH", keepHASH);
 
     if(!outChk.checked){
       currentLirPhoto = "";
     }
-    updateLirInfo();
   };
 
   function newMemo(){
@@ -822,6 +1026,7 @@
     outChk.checked = false;
     sections.innerHTML = "";
     currentLirPhoto = "";
+    memoDate.value = todayStr();
     openModal();
   }
 
@@ -847,6 +1052,9 @@
     data.hasIn = inChk.checked;
     data.hasOut = outChk.checked;
 
+    data.memoDate = memoDate.value || todayStr();
+    data.weekKey = getWeekKey(data.memoDate);
+
     data.sharedHL = pad(document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "", 4);
     data.sharedHASH = pad(document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "", 3);
 
@@ -863,8 +1071,10 @@
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
-      data[type+"-c7"] = pad(gi("c7")?.value, 4);
+      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
+      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
 
+      data[type+"-c7"] = pad(gi("c7")?.value, 4);
       data[type+"-t"]  = pad(gi("t")?.value, 3);
       data[type+"-d"]  = pad(gi("d")?.value, 2);
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
@@ -899,14 +1109,23 @@
 
     if(editId){
       const idx = memos.findIndex(m=>m.id===editId);
-      if(idx>=0) memos[idx] = data;
+      if(idx >= 0) memos[idx] = data;
     }else{
       memos.push(data);
     }
 
     localStorage.setItem("jas_memos", JSON.stringify(memos));
+    weekOffset = calcWeekOffsetFromDate(data.memoDate);
+    updateWeekLabel();
     closeModal();
     renderList(data.id);
+  }
+
+  function calcWeekOffsetFromDate(dateStr){
+    const thisMonday = getMonday(new Date());
+    const targetMonday = getMonday(dateStr);
+    const diff = Math.round((targetMonday - thisMonday) / 86400000);
+    return Math.round(diff / 7);
   }
 
   function formatTitleLine(m, type){
@@ -927,19 +1146,32 @@
 
   function renderList(flashId){
     memoList.innerHTML = "";
-    memos.forEach(m=>{
+
+    const viewingWeek = getViewingWeekKey();
+    const weekMemos = memos
+      .filter(m => (m.weekKey || getWeekKey(m.memoDate || todayStr())) === viewingWeek)
+      .sort((a,b)=>{
+        const da = a.memoDate || "";
+        const db = b.memoDate || "";
+        if(da === db) return Number(b.id) - Number(a.id);
+        return da < db ? 1 : -1;
+      });
+
+    if(!weekMemos.length){
+      memoList.innerHTML = `<div class="emptyWeek">NO MEMO IN THIS WEEK</div>`;
+      return;
+    }
+
+    weekMemos.forEach(m=>{
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
 
       let lines = "";
-
       if(m.hasIn){
-        const t = formatTitleLine(m, "INBOUND");
-        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${t}</div></div>`;
+        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatTitleLine(m, "INBOUND")}</div></div>`;
       }
       if(m.hasOut){
-        const t = formatTitleLine(m, "OUTBOUND");
-        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${t}</div></div>`;
+        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatTitleLine(m, "OUTBOUND")}</div></div>`;
       }
       if(!m.hasIn && !m.hasOut){
         lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
@@ -950,6 +1182,7 @@
           <input class="selBox" type="checkbox" data-id="${m.id}">
           <div class="lines" data-open="${m.id}">${lines}</div>
         </div>
+        <div class="datePill">${m.memoDate || ""}</div>
       `;
       memoList.appendChild(card);
     });
@@ -970,6 +1203,7 @@
     inChk.checked = !!m.hasIn;
     outChk.checked = !!m.hasOut;
     currentLirPhoto = m["OUTBOUND-LIRPHOTO"] || "";
+    memoDate.value = m.memoDate || todayStr();
 
     sections.innerHTML = "";
     if(inChk.checked) sections.appendChild(makeSection("INBOUND", m));
@@ -979,18 +1213,21 @@
     syncByDataK("SHARED-HASH", m.sharedHASH || "");
 
     openModal();
-    updateLirInfo();
   }
 
   function deleteSelected(){
-    const checks = document.querySelectorAll('.selBox:checked');
+    const checks = document.querySelectorAll(".selBox:checked");
     const ids = [...checks].map(c=>Number(c.dataset.id));
     memos = memos.filter(m=>!ids.includes(m.id));
     localStorage.setItem("jas_memos", JSON.stringify(memos));
     renderList();
   }
 
-  function addPhoto(){ photoInput.value=""; photoInput.click(); }
+  function addPhoto(){
+    photoInput.value = "";
+    photoInput.click();
+  }
+
   photoInput.onchange = (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
@@ -1001,12 +1238,16 @@
     };
     r.readAsDataURL(f);
   };
+
   function openPhoto(){
     if(!photo) return;
     photoImg.src = photo;
     photoLayer.style.display = "flex";
   }
-  function closePhoto(){ photoLayer.style.display = "none"; }
+
+  function closePhoto(){
+    photoLayer.style.display = "none";
+  }
 
   function openEquip(){
     const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
@@ -1016,16 +1257,23 @@
     equipModal.style.display = "flex";
     equipModal.setAttribute("aria-hidden","false");
   }
+
   function closeEquip(){
     equipModal.style.display = "none";
     equipModal.setAttribute("aria-hidden","true");
   }
+
   function saveEquip(){
-    const eq = { tug1: pad(tug1.value,2), tug2: pad(tug2.value,2), belt: pad(belt.value,2) };
+    const eq = {
+      tug1: pad(tug1.value,2),
+      tug2: pad(tug2.value,2),
+      belt: pad(belt.value,2)
+    };
     localStorage.setItem("jas_equipment", JSON.stringify(eq));
     updateEquipBadge();
     closeEquip();
   }
+
   function updateEquipBadge(){
     const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
     if(!eq.tug1 && !eq.tug2 && !eq.belt){
@@ -1034,7 +1282,7 @@
     }
     const t1 = eq.tug1 || "00";
     const t2 = eq.tug2 || "00";
-    const b  = eq.belt || "00";
+    const b = eq.belt || "00";
     equipBadge.innerHTML = `
       <div class="b1">TUG ${t1}/${t2}</div>
       <div class="b2">BELT ${b}</div>
@@ -1055,12 +1303,14 @@
     startY = y;
     sheet.style.transition = "none";
   }
+
   function onMove(y){
     if(!dragging) return;
     const dy = Math.max(0, y - startY);
     currentTranslate = dy;
     sheet.style.transform = `translateY(${dy}px)`;
   }
+
   function onEnd(){
     if(!dragging) return;
     dragging = false;
@@ -1081,6 +1331,8 @@
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
+  memoDate.value = todayStr();
+  updateWeekLabel();
   renderList();
   updateEquipBadge();
 </script>
