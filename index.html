@@ -358,7 +358,7 @@
   }
   .sectionHead{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:space-between;
     margin-bottom:calc(10px * var(--ui));
     gap:calc(10px * var(--ui));
@@ -368,6 +368,31 @@
     font-weight:1000;
     letter-spacing:.3px;
     text-transform:uppercase;
+  }
+
+  .headRight{
+    display:flex;
+    align-items:flex-start;
+    gap:calc(10px * var(--ui));
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .staStdWrap{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    white-space:nowrap;
+  }
+  .staStdLab{
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
+    color:#111;
+    text-transform:uppercase;
+  }
+  .staStdInput{
+    width:calc(92px * var(--ui)) !important;
+    min-width:calc(92px * var(--ui));
+    text-align:center;
   }
 
   .timeWrap{
@@ -845,7 +870,8 @@
       syncByDataK("SHARED-HASH", t.value);
       return;
     }
-
+    if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
+    if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-c7")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
@@ -867,13 +893,21 @@
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+    const staStdLabel = type === "INBOUND" ? "STA" : "STD";
+    const staStdKey = type === "INBOUND" ? "STA" : "STD";
 
     d.innerHTML = `
       <div class="sectionHead">
         <div class="sectionTitle">${type}</div>
-        <div class="timeWrap">
-          <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
-          <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+        <div class="headRight">
+          <div class="staStdWrap">
+            <div class="staStdLab">${staStdLabel}</div>
+            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-${staStdKey}" value="${v(staStdKey)}">
+          </div>
+          <div class="timeWrap">
+            <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
+            <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+          </div>
         </div>
       </div>
 
@@ -1042,6 +1076,9 @@
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
+
+      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
+      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
 
       data[type+"-c7"] = pad(gi("c7")?.value, 4);
       data[type+"-t"]  = pad(gi("t")?.value, 3);
