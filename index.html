@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 4.4</title>
+<title>JAS MEMO VER 5</title>
 
 <style>
   :root{
@@ -247,12 +247,16 @@
   .itMemoBtn,
   .akMemoBtn,
   .equipBtn{
-    width:calc(180px * var(--ui));
-    height:calc(60px * var(--ui));
-    border-radius:calc(30px * var(--ui));
-    font-size:calc(20px * var(--ui));
+    width:calc(144px * var(--ui));
+    height:calc(48px * var(--ui));
+    border-radius:calc(24px * var(--ui));
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
     box-shadow:0 12px 22px rgba(0,0,0,.20);
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
   }
 
   .itMemoBtn{
@@ -653,9 +657,9 @@
     .itMemoBtn,
     .akMemoBtn,
     .equipBtn{
-      width:150px;
-      height:52px;
-      font-size:17px;
+      width:120px;
+      height:42px;
+      font-size:14px;
     }
   }
 </style>
@@ -666,7 +670,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 4.4</div>
+    <div class="titleVer">VER 5</div>
   </div>
 </header>
 
@@ -769,8 +773,8 @@
   const tug2 = document.getElementById("tug2");
   const belt = document.getElementById("belt");
 
-  let memos = JSON.parse(localStorage.getItem("jas_memos_v44") || "[]");
-  let photo = localStorage.getItem("jas_photo_v44");
+  let memos = JSON.parse(localStorage.getItem("jas_memos_v5") || "[]");
+  let photo = localStorage.getItem("jas_photo_v5");
   let editId = null;
   let weekOffset = 0;
 
@@ -866,7 +870,7 @@
     }
     if(!confirm("DELETE ALL MEMOS IN THIS WEEK?")) return;
     memos = memos.filter(m => m.weekKey !== wk);
-    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v5", JSON.stringify(memos));
     renderList();
   }
 
@@ -1092,7 +1096,7 @@
       memos.push(data);
     }
 
-    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v5", JSON.stringify(memos));
     weekOffset = calcWeekOffsetFromDate(data.memoDate);
     updateWeekLabel();
     closeModal();
@@ -1144,8 +1148,8 @@
       .sort((a,b)=>{
         const da = a.memoDate || "";
         const db = b.memoDate || "";
-        if(da === db) return Number(a.id) - Number(b.id);
-        return da < db ? -1 : 1;
+        if(da === db) return Number(b.id) - Number(a.id);
+        return da < db ? 1 : -1;
       });
 
     if(!weekMemos.length){
@@ -1196,7 +1200,7 @@
       return;
     }
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v5", JSON.stringify(memos));
     renderList();
   }
 
@@ -1211,7 +1215,7 @@
     const r = new FileReader();
     r.onload = ()=>{
       photo = r.result;
-      localStorage.setItem("jas_photo_v44", photo);
+      localStorage.setItem("jas_photo_v5", photo);
     };
     r.readAsDataURL(f);
   };
@@ -1227,7 +1231,7 @@
   }
 
   function openEquip(){
-    const eq = JSON.parse(localStorage.getItem("jas_equipment_v44") || "{}");
+    const eq = JSON.parse(localStorage.getItem("jas_equipment_v5") || "{}");
     tug1.value = pad(eq.tug1,2);
     tug2.value = pad(eq.tug2,2);
     belt.value = pad(eq.belt,2);
@@ -1246,13 +1250,13 @@
       tug2: pad(tug2.value,2),
       belt: pad(belt.value,2)
     };
-    localStorage.setItem("jas_equipment_v44", JSON.stringify(eq));
+    localStorage.setItem("jas_equipment_v5", JSON.stringify(eq));
     updateEquipBadge();
     closeEquip();
   }
 
   function updateEquipBadge(){
-    const eq = JSON.parse(localStorage.getItem("jas_equipment_v44") || "{}");
+    const eq = JSON.parse(localStorage.getItem("jas_equipment_v5") || "{}");
     if(!eq.tug1 && !eq.tug2 && !eq.belt){
       equipBadge.style.display = "none";
       return;
