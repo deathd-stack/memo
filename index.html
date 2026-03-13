@@ -10,11 +10,9 @@
 
 <style>
   :root{
-    --bg1:#ff9800;
-    --bg2:#ff7a1a;
+    --bg1:#ffd36a;
+    --bg2:#ff9200;
     --card:#f6e7d7;
-    --pill:#111;
-    --shadow:0 14px 26px rgba(0,0,0,.18);
     --blue:#2f7df6;
     --red:#e20000;
     --line:#cfcfcf;
@@ -28,10 +26,11 @@
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-weight:700;
     background:
-      radial-gradient(1200px 700px at 50% -10%, #ffd18a 0%, transparent 55%),
+      radial-gradient(1200px 700px at 50% -10%, #ffe9aa 0%, transparent 55%),
       linear-gradient(180deg,var(--bg1),var(--bg2));
     min-height:100vh;
     overflow-x:hidden;
+    color:#111;
   }
 
   header{
@@ -40,6 +39,7 @@
     user-select:none;
     cursor:pointer;
   }
+
   .titleWrap{
     display:flex;
     justify-content:center;
@@ -47,19 +47,22 @@
     gap:10px;
     flex-wrap:wrap;
   }
+
   .titleMain{
     font-size:42px;
     font-weight:1000;
     letter-spacing:-1px;
-    color:#111;
     text-transform:uppercase;
+    line-height:1;
+    color:#111;
   }
+
   .titleVer{
     font-size:18px;
     font-weight:1000;
-    color:#111;
-    opacity:.9;
+    opacity:.95;
     text-transform:uppercase;
+    color:#111;
   }
 
   .controls{
@@ -69,6 +72,7 @@
     padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(6px * var(--ui));
     flex-wrap:wrap;
   }
+
   button{
     border:none;
     border-radius:calc(22px * var(--ui));
@@ -81,6 +85,7 @@
     text-transform:uppercase;
     cursor:pointer;
   }
+
   button:active{transform:scale(.99)}
 
   .weekBar{
@@ -92,12 +97,14 @@
     gap:calc(8px * var(--ui));
     flex-wrap:wrap;
   }
+
   .weekBtn{
     padding:calc(8px * var(--ui)) calc(12px * var(--ui));
     font-size:calc(14px * var(--ui));
     border-radius:calc(14px * var(--ui));
     box-shadow:none;
   }
+
   .weekLabel{
     background:rgba(255,255,255,.92);
     border-radius:calc(14px * var(--ui));
@@ -110,10 +117,11 @@
   }
 
   #memoList{
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(110px * var(--ui));
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
     max-width:780px;
     margin:0 auto;
   }
+
   .emptyWeek{
     background:rgba(255,255,255,.22);
     border-radius:calc(20px * var(--ui));
@@ -133,6 +141,7 @@
     border:2px solid rgba(255,255,255,.45);
     overflow:hidden;
   }
+
   .memoRow{
     display:flex;
     gap:calc(10px * var(--ui));
@@ -150,11 +159,13 @@
     flex:0 0 auto;
     position:relative;
   }
+
   .selBox:checked{
     background:#fff;
     border-color:#1e63d8;
     box-shadow:0 0 0 calc(4px * var(--ui)) rgba(47,125,246,.14);
   }
+
   .selBox:checked::after{
     content:"";
     position:absolute;
@@ -175,12 +186,14 @@
     cursor:pointer;
     min-width:0;
   }
+
   .line{
     display:flex;
     align-items:flex-start;
     gap:calc(10px * var(--ui));
     min-width:0;
   }
+
   .tagPill{
     background:#111;
     color:#fff;
@@ -193,6 +206,7 @@
     flex:0 0 auto;
     text-transform:uppercase;
   }
+
   .textPill{
     background:rgba(210,199,188,.45);
     border-radius:999px;
@@ -207,6 +221,7 @@
     word-break:break-word;
     text-transform:uppercase;
   }
+
   .datePill{
     margin-top:calc(6px * var(--ui));
     margin-left:calc(40px * var(--ui));
@@ -219,21 +234,42 @@
   .flash{animation:flash .55s;}
   @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
 
-  #equipBtn{
+  .bottomAppButtons{
     position:fixed;
     left:calc(14px * var(--ui));
     bottom:calc(18px * var(--ui));
-    z-index:20;
-    border:none;
-    border-radius:calc(18px * var(--ui));
-    background:#fff;
-    padding:calc(12px * var(--ui)) calc(18px * var(--ui));
-    font-weight:1000;
-    color:var(--blue);
-    font-size:calc(16px * var(--ui));
-    box-shadow:0 12px 22px rgba(0,0,0,.18);
-    text-transform:uppercase;
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    gap:calc(12px * var(--ui));
   }
+
+  .itMemoBtn,
+  .akMemoBtn,
+  .equipBtn{
+    width:calc(180px * var(--ui));
+    height:calc(60px * var(--ui));
+    border-radius:calc(30px * var(--ui));
+    font-size:calc(20px * var(--ui));
+    font-weight:1000;
+    box-shadow:0 12px 22px rgba(0,0,0,.20);
+  }
+
+  .itMemoBtn{
+    background:#ffd400;
+    color:#111;
+  }
+
+  .akMemoBtn{
+    background:#e60023;
+    color:#fff;
+  }
+
+  .equipBtn{
+    background:#fff;
+    color:#2f6fd1;
+  }
+
   #equipBadge{
     position:fixed;
     right:calc(14px * var(--ui));
@@ -246,11 +282,11 @@
     font-weight:1000;
     line-height:1.15;
     text-align:right;
-    min-width:unset;
     box-shadow:0 14px 26px rgba(0,0,0,.22);
     display:none;
     text-transform:uppercase;
   }
+
   #equipBadge .b1{font-size:calc(18px * var(--ui));}
   #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
 
@@ -265,6 +301,7 @@
     overscroll-behavior:contain;
     pointer-events:none;
   }
+
   .box{
     width:100%;
     max-width:820px;
@@ -286,6 +323,7 @@
     background:#fff;
     z-index:2;
   }
+
   .drag-handle{
     width:calc(60px * var(--ui));
     height:calc(7px * var(--ui));
@@ -303,6 +341,7 @@
     user-select:none;
     text-transform:uppercase;
   }
+
   .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
   .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
 
@@ -313,39 +352,19 @@
     gap:calc(8px * var(--ui));
     margin-bottom:calc(8px * var(--ui));
   }
+
   .dateLine .dateLab{
     font-size:calc(15px * var(--ui));
     font-weight:1000;
     color:#111;
     text-transform:uppercase;
   }
+
   .dateInput{
     width:auto !important;
     min-width:calc(180px * var(--ui));
     text-align:center;
     padding:0 calc(10px * var(--ui));
-  }
-
-  .check-line{
-    display:flex;
-    justify-content:center;
-    gap:calc(18px * var(--ui));
-    align-items:center;
-    padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
-    white-space:nowrap;
-    text-transform:uppercase;
-  }
-  .check-line label{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-  }
-  .check-line input[type="checkbox"]{
-    width:calc(22px * var(--ui));
-    height:calc(22px * var(--ui));
-    accent-color:var(--blue);
   }
 
   .section{
@@ -356,6 +375,7 @@
     overflow:hidden;
     border:1px solid #e6e6e6;
   }
+
   .sectionHead{
     display:flex;
     align-items:flex-start;
@@ -363,6 +383,7 @@
     margin-bottom:calc(10px * var(--ui));
     gap:calc(10px * var(--ui));
   }
+
   .sectionTitle{
     font-size:calc(24px * var(--ui));
     font-weight:1000;
@@ -377,18 +398,21 @@
     flex-wrap:wrap;
     justify-content:flex-end;
   }
+
   .staStdWrap{
     display:flex;
     align-items:center;
     gap:calc(8px * var(--ui));
     white-space:nowrap;
   }
+
   .staStdLab{
     font-size:calc(16px * var(--ui));
     font-weight:1000;
     color:#111;
     text-transform:uppercase;
   }
+
   .staStdInput{
     width:calc(92px * var(--ui)) !important;
     min-width:calc(92px * var(--ui));
@@ -402,6 +426,7 @@
     white-space:nowrap;
     text-transform:uppercase;
   }
+
   .timeBtn{
     border:none;
     background:transparent;
@@ -414,6 +439,7 @@
     border-radius:calc(10px * var(--ui));
     text-transform:uppercase;
   }
+
   .timeBtn:active{background:rgba(226,27,27,.08);}
   .timeVal{
     font-weight:1000;
@@ -432,6 +458,7 @@
     flex-wrap:nowrap;
     min-width:0;
   }
+
   .lab{
     font-size:calc(20px * var(--ui));
     font-weight:1000;
@@ -453,6 +480,7 @@
     font-variant-numeric:tabular-nums;
     text-transform:uppercase;
   }
+
   input{
     width:100%;
     height:calc(54px * var(--ui));
@@ -460,6 +488,7 @@
     padding:0 calc(10px * var(--ui));
     text-align:center;
   }
+
   textarea{
     width:100%;
     height:calc(76px * var(--ui));
@@ -468,6 +497,7 @@
     padding:calc(10px * var(--ui));
     text-transform:none;
   }
+
   select{
     height:calc(54px * var(--ui));
     padding:0 calc(10px * var(--ui));
@@ -477,6 +507,7 @@
     font-size:calc(18px * var(--ui));
     letter-spacing:.6px;
   }
+
   .long{
     flex:1;
     min-width:0;
@@ -486,6 +517,11 @@
     text-align:left;
   }
 
+  .fixedField{
+    background:#f6f6f6;
+    color:#111;
+  }
+
   .extraBox{
     background:#fff;
     border:2px solid #e2e2e2;
@@ -493,6 +529,7 @@
     padding:calc(12px * var(--ui));
     margin-top:calc(10px * var(--ui));
   }
+
   .extraHead{
     display:flex;
     justify-content:space-between;
@@ -500,11 +537,13 @@
     margin-bottom:calc(10px * var(--ui));
     text-transform:uppercase;
   }
+
   .extraTitle{
     font-size:calc(20px * var(--ui));
     font-weight:1000;
     letter-spacing:.4px;
   }
+
   .iconBtn{
     width:calc(48px * var(--ui));
     height:calc(48px * var(--ui));
@@ -517,21 +556,25 @@
     font-weight:1000;
     text-transform:uppercase;
   }
+
   .extraRow{
     display:flex;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin-top:calc(10px * var(--ui));
   }
+
   .extraRow select{
     width:calc(130px * var(--ui));
     font-size:calc(16px * var(--ui));
     font-weight:1000;
   }
+
   .extraRow input{
     width:calc(130px * var(--ui));
     font-size:calc(18px * var(--ui));
   }
+
   .minusBtn{
     width:calc(60px * var(--ui));
     height:calc(54px * var(--ui));
@@ -545,20 +588,6 @@
     text-transform:uppercase;
   }
 
-  .lirRow{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    margin:calc(10px * var(--ui)) 0;
-    flex-wrap:wrap;
-  }
-  .lirBtn{
-    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
-    font-size:calc(14px * var(--ui));
-    border-radius:calc(14px * var(--ui));
-    box-shadow:none;
-  }
-
   .bottomBtns{
     display:flex;
     gap:calc(18px * var(--ui));
@@ -567,6 +596,7 @@
     text-transform:uppercase;
     flex-wrap:wrap;
   }
+
   .bottomBtns button{
     padding:calc(10px * var(--ui)) calc(14px * var(--ui));
     font-size:calc(16px * var(--ui));
@@ -583,6 +613,7 @@
     align-items:center;
     z-index:90;
   }
+
   #photoLayer img{
     max-width:100%;
     max-height:100%;
@@ -591,14 +622,15 @@
   .rowGrid3{
     display:grid;
     grid-template-columns:
-      calc(34px * var(--ui)) 1fr
-      calc(34px * var(--ui)) 1fr
+      calc(26px * var(--ui)) 1.1fr
+      calc(20px * var(--ui)) 1fr
       calc(14px * var(--ui)) .95fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
     min-width:0;
   }
+
   .rowGridTDBB{
     display:grid;
     grid-template-columns:
@@ -609,6 +641,22 @@
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
     min-width:0;
+  }
+
+  @media (max-width:520px){
+    .bottomAppButtons{
+      left:12px;
+      bottom:14px;
+      gap:10px;
+    }
+
+    .itMemoBtn,
+    .akMemoBtn,
+    .equipBtn{
+      width:150px;
+      height:52px;
+      font-size:17px;
+    }
   }
 </style>
 </head>
@@ -638,11 +686,15 @@
 
 <div id="memoList"></div>
 
-<button id="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
+<div class="bottomAppButtons">
+  <button class="itMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS2/'">IT MEMO</button>
+  <button class="akMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS1/'">AK MEMO</button>
+  <button class="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
+</div>
+
 <div id="equipBadge"></div>
 
 <input type="file" id="photoInput" accept="image/*" hidden />
-<input type="file" id="lirPhotoInput" accept="image/*" hidden />
 
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
@@ -658,11 +710,6 @@
     <div class="dateLine">
       <div class="dateLab">DATE</div>
       <input type="date" id="memoDate" class="dateInput">
-    </div>
-
-    <div class="check-line">
-      <label><input type="checkbox" id="inChk"> INBOUND</label>
-      <label><input type="checkbox" id="outChk"> OUTBOUND</label>
     </div>
 
     <div id="sections"></div>
@@ -711,28 +758,23 @@
   const sections = document.getElementById("sections");
   const memoList = document.getElementById("memoList");
   const photoInput = document.getElementById("photoInput");
-  const lirPhotoInput = document.getElementById("lirPhotoInput");
   const photoLayer = document.getElementById("photoLayer");
   const photoImg = document.getElementById("photoImg");
-  const inChk = document.getElementById("inChk");
-  const outChk = document.getElementById("outChk");
   const memoDate = document.getElementById("memoDate");
   const weekLabel = document.getElementById("weekLabel");
 
-  const equipBtn = document.getElementById("equipBtn");
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
   const tug1 = document.getElementById("tug1");
   const tug2 = document.getElementById("tug2");
   const belt = document.getElementById("belt");
 
-  let memos = JSON.parse(localStorage.getItem("jas_memos") || "[]");
-  let photo = localStorage.getItem("jas_photo");
+  let memos = JSON.parse(localStorage.getItem("jas_memos_v44") || "[]");
+  let photo = localStorage.getItem("jas_photo_v44");
   let editId = null;
-  let currentLirPhoto = "";
   let weekOffset = 0;
 
-  const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
+  const EXTRA_KEYS = ["CREW","C","W","TS"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -778,13 +820,12 @@
   }
 
   function getWeekKey(dateLike){
-    const monday = getMonday(dateLike);
-    return dateToStr(monday);
+    return dateToStr(getMonday(dateLike));
   }
 
   function getViewingDate(){
     const d = new Date();
-    d.setDate(d.getDate() + (weekOffset * 7));
+    d.setDate(d.getDate() + weekOffset * 7);
     return d;
   }
 
@@ -796,6 +837,12 @@
     const monday = getMonday(getViewingDate());
     const sunday = getSunday(getViewingDate());
     weekLabel.textContent = `${dateToStr(monday)} ~ ${dateToStr(sunday)}`;
+  }
+
+  function calcWeekOffsetFromDate(dateStr){
+    const thisMonday = getMonday(new Date());
+    const targetMonday = getMonday(dateStr);
+    return Math.round((targetMonday - thisMonday) / 86400000 / 7);
   }
 
   function moveWeek(n){
@@ -819,36 +866,9 @@
     }
     if(!confirm("DELETE ALL MEMOS IN THIS WEEK?")) return;
     memos = memos.filter(m => m.weekKey !== wk);
-    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
     renderList();
   }
-
-  function syncByDataK(dataK, value){
-    document.querySelectorAll(`input[data-k="${dataK}"]`).forEach(el=>{
-      if(el !== document.activeElement) el.value = value;
-    });
-  }
-
-  function addLirPhoto(){
-    lirPhotoInput.value = "";
-    lirPhotoInput.click();
-  }
-
-  function viewLirPhoto(){
-    if(!currentLirPhoto) return;
-    photoImg.src = currentLirPhoto;
-    photoLayer.style.display = "flex";
-  }
-
-  lirPhotoInput.onchange = (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    const r = new FileReader();
-    r.onload = ()=>{
-      currentLirPhoto = r.result || "";
-    };
-    r.readAsDataURL(f);
-  };
 
   document.addEventListener("input", (e)=>{
     const t = e.target;
@@ -856,27 +876,49 @@
     const k = t.dataset.k || "";
     if(!k) return;
 
-    if(k === "SHARED-HL"){
-      t.value = onlyNum(t.value, 4);
-      syncByDataK("SHARED-HL", t.value);
+    if(k === "SHARED-B"){
+      t.value = onlyNum(t.value, 5);
+      document.querySelectorAll('input[data-k="SHARED-B"]').forEach(el=>{
+        if(el !== t) el.value = t.value;
+      });
       return;
     }
+
     if(k === "SHARED-HASH"){
       t.value = onlyNum(t.value, 3);
-      syncByDataK("SHARED-HASH", t.value);
+      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
+        if(el !== t) el.value = t.value;
+      });
       return;
     }
 
     if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-c7")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
     if(k.endsWith("-bb")) t.value = onlyNum(t.value, 2);
-    if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
+
+  function makeExtraRow(type, key="CREW", val=""){
+    const row = document.createElement("div");
+    row.className = "extraRow";
+    row.innerHTML = `
+      <select>
+        ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
+      </select>
+      <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
+    `;
+    return row;
+  }
+
+  function addExtraRow(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    box.appendChild(makeExtraRow(type, "CREW", ""));
+  }
 
   function makeSection(type, memoData){
     const d = document.createElement("div");
@@ -884,14 +926,13 @@
     d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-    const cmpt1Default = memoData ? (memoData[type+"-cmpt1"] || "F") : "F";
-    const cmpt2Default = memoData ? (memoData[type+"-cmpt2"] || "F") : "F";
-    const sharedHL = memoData ? (memoData.sharedHL || "") : "";
+    const sharedB = memoData ? (memoData.sharedB || "") : "";
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
+    const fixedItText = type === "INBOUND" ? "IT602" : "IT603";
 
     d.innerHTML = `
       <div class="sectionHead">
@@ -909,28 +950,33 @@
       </div>
 
       <div class="rowGrid3">
-        <div class="lab">7C</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-c7" value="${v("c7")}">
-        <div class="lab">HL</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HL" value="${sharedHL}">
+        <div class="lab">IT</div>
+        <input class="long fixedField" value="${fixedItText}" readonly tabindex="-1">
+        <div class="lab">B</div>
+        <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-B" value="${sharedB}">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" placeholder="TEXT" value="${cmpt1Default}">
+        <input class="long" data-k="${type}-cmpt1" value="${memoData ? (memoData[type+"-cmpt1"] || "F3") : "F3"}" placeholder="TEXT">
       </div>
+
       <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${cmpt2Default}">
+        <div class="lab" style="min-width:96px;">CMPT 3</div>
+        <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt2"] || "") : ""}">
       </div>
-      ${[3,4].map(i => `
-        <div class="row">
-          <div class="lab" style="min-width:96px;">CMPT ${i}</div>
-          <input class="long" data-k="${type}-cmpt${i}" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt"+i]||"") : ""}">
-        </div>
-      `).join("")}
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 4</div>
+        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt3"] || "") : ""}">
+      </div>
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 5</div>
+        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt4"] || "") : ""}">
+      </div>
 
       <div class="rowGridTDBB">
         <div class="lab">T</div>
@@ -940,20 +986,6 @@
         <div class="lab">BB</div>
         <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
       </div>
-
-      ${type==="OUTBOUND" ? `
-        <div class="row">
-          <div class="lab" style="min-width:60px;">T/T</div>
-          <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
-          <div class="lab" style="min-width:60px;">T/B</div>
-          <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
-        </div>
-
-        <div class="lirRow">
-          <button type="button" class="lirBtn" onclick="addLirPhoto()">LIR</button>
-          <button type="button" class="lirBtn" onclick="viewLirPhoto()">VIEW</button>
-        </div>
-      ` : ""}
 
       <div class="extraBox">
         <div class="extraHead">
@@ -977,64 +1009,27 @@
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
-    extras.forEach(ex=>extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
+    extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
     return d;
   }
 
-  function makeExtraRow(type, key="W", val=""){
-    const row = document.createElement("div");
-    row.className = "extraRow";
-    row.innerHTML = `
-      <select>
-        ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
-      </select>
-      <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
-    `;
-    return row;
-  }
-
-  function addExtraRow(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
-    if(!box) return;
-    box.appendChild(makeExtraRow(type, "W", ""));
-  }
-
-  inChk.onchange = outChk.onchange = ()=>{
-    const keepHL = document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "";
-    const keepHASH = document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "";
-    const keepDate = memoDate.value || todayStr();
-
+  function buildFixedSections(memoData){
     sections.innerHTML = "";
-    if(inChk.checked) sections.appendChild(makeSection("INBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
-    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", {sharedHL: keepHL, sharedHASH: keepHASH}));
-
-    memoDate.value = keepDate;
-    syncByDataK("SHARED-HL", keepHL);
-    syncByDataK("SHARED-HASH", keepHASH);
-
-    if(!outChk.checked){
-      currentLirPhoto = "";
-    }
-  };
+    sections.appendChild(makeSection("INBOUND", memoData));
+    sections.appendChild(makeSection("OUTBOUND", memoData));
+  }
 
   function newMemo(){
     editId = null;
-    inChk.checked = false;
-    outChk.checked = false;
-    sections.innerHTML = "";
-    currentLirPhoto = "";
     memoDate.value = todayStr();
+    buildFixedSections(null);
     openModal();
   }
 
   function openModal(){
     modal.style.display = "flex";
     modal.setAttribute("aria-hidden","false");
-    equipBtn.style.display = "none";
-    equipBadge.style.display = "none";
     sheet.style.transform = "translateY(0)";
     currentTranslate = 0;
   }
@@ -1043,27 +1038,18 @@
     modal.style.display = "none";
     modal.setAttribute("aria-hidden","true");
     editId = null;
-    equipBtn.style.display = "block";
     updateEquipBadge();
   }
 
   function saveMemo(){
-    const data = { id: editId ?? Date.now() };
-    data.hasIn = inChk.checked;
-    data.hasOut = outChk.checked;
-
+    const data = { id: editId ?? Date.now(), hasIn:true, hasOut:true };
     data.memoDate = memoDate.value || todayStr();
     data.weekKey = getWeekKey(data.memoDate);
 
-    data.sharedHL = pad(document.querySelector(`input[data-k="SHARED-HL"]`)?.value || "", 4);
-    data.sharedHASH = pad(document.querySelector(`input[data-k="SHARED-HASH"]`)?.value || "", 3);
-
-    const normalizeF = (v)=> (v && v.trim() ? v : "F");
+    data.sharedB = pad(document.querySelector('input[data-k="SHARED-B"]')?.value || "", 5);
+    data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
-      const enabled = (type==="INBOUND") ? data.hasIn : data.hasOut;
-      if(!enabled) return;
-
       const root = sections.querySelector(`.section[data-type="${type}"]`);
       if(!root) return;
 
@@ -1073,22 +1059,14 @@
 
       data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
       data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
-
-      data[type+"-c7"] = pad(gi("c7")?.value, 4);
       data[type+"-t"]  = pad(gi("t")?.value, 3);
       data[type+"-d"]  = pad(gi("d")?.value, 2);
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
 
-      data[type+"-cmpt1"] = normalizeF(cm(1)?.value || "");
-      data[type+"-cmpt2"] = normalizeF(cm(2)?.value || "");
+      data[type+"-cmpt1"] = cm(1)?.value || "";
+      data[type+"-cmpt2"] = cm(2)?.value || "";
       data[type+"-cmpt3"] = cm(3)?.value || "";
       data[type+"-cmpt4"] = cm(4)?.value || "";
-
-      if(type==="OUTBOUND"){
-        data[type+"-tt"] = pad(gi("tt")?.value, 4);
-        data[type+"-tb"] = pad(gi("tb")?.value, 4);
-        data[type+"-LIRPHOTO"] = currentLirPhoto || "";
-      }
 
       data[type+"-note"] = note ? (note.value || "") : "";
 
@@ -1114,34 +1092,47 @@
       memos.push(data);
     }
 
-    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
     weekOffset = calcWeekOffsetFromDate(data.memoDate);
     updateWeekLabel();
     closeModal();
     renderList(data.id);
   }
 
-  function calcWeekOffsetFromDate(dateStr){
-    const thisMonday = getMonday(new Date());
-    const targetMonday = getMonday(dateStr);
-    const diff = Math.round((targetMonday - thisMonday) / 86400000);
-    return Math.round(diff / 7);
-  }
-
   function formatTitleLine(m, type){
-    const hl = (m.sharedHL || "").trim();
+    const b = (m.sharedB || "").trim();
     const hash = (m.sharedHASH || "").trim();
-    const c7 = String((m[`${type}-c7`] || "")).trim();
-    const both = !!m.hasIn && !!m.hasOut;
+    const it = type === "INBOUND" ? "IT602" : "IT603";
+    const staOrStd = type === "INBOUND" ? (m["INBOUND-STA"] || "").trim() : (m["OUTBOUND-STD"] || "").trim();
+    const cmpt1 = (m[type+"-cmpt1"] || "").trim();
+    const cmpt2 = (m[type+"-cmpt2"] || "").trim();
+    const cmpt3 = (m[type+"-cmpt3"] || "").trim();
+    const cmpt4 = (m[type+"-cmpt4"] || "").trim();
 
-    if(both){
-      if(type === "INBOUND"){
-        return `7C[${c7}] HL[${hl}]`;
-      }else{
-        return `7C[${c7}] #[${hash}]`;
-      }
+    const td = [
+      (m[type+"-t"] || "").trim(),
+      (m[type+"-d"] || "").trim(),
+      (m[type+"-bb"] || "").trim()
+    ].filter(Boolean).join("/");
+
+    const extras = (m[type+"-EXTRAS"] || [])
+      .map(x => `${x.key}${x.val}`)
+      .join(" ");
+
+    const bits = [];
+    if(type === "INBOUND"){
+      bits.push(`${it} B[${b}]`);
+    }else{
+      bits.push(`${it} #[${hash}]`);
     }
-    return `7C[${c7}] HL[${hl}] #[${hash}]`;
+    if(staOrStd) bits.push(staOrStd);
+    if(cmpt1) bits.push(cmpt1);
+    if(cmpt2) bits.push(cmpt2);
+    if(cmpt3) bits.push(cmpt3);
+    if(cmpt4) bits.push(cmpt4);
+    if(td) bits.push(td);
+    if(extras) bits.push(extras);
+    return bits.join(" ");
   }
 
   function renderList(flashId){
@@ -1153,8 +1144,8 @@
       .sort((a,b)=>{
         const da = a.memoDate || "";
         const db = b.memoDate || "";
-        if(da === db) return Number(b.id) - Number(a.id);
-        return da < db ? 1 : -1;
+        if(da === db) return Number(a.id) - Number(b.id);
+        return da < db ? -1 : 1;
       });
 
     if(!weekMemos.length){
@@ -1165,22 +1156,13 @@
     weekMemos.forEach(m=>{
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
-
-      let lines = "";
-      if(m.hasIn){
-        lines += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatTitleLine(m, "INBOUND")}</div></div>`;
-      }
-      if(m.hasOut){
-        lines += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatTitleLine(m, "OUTBOUND")}</div></div>`;
-      }
-      if(!m.hasIn && !m.hasOut){
-        lines = `<div class="line"><div class="tagPill">IN</div><div class="textPill">EMPTY</div></div>`;
-      }
-
       card.innerHTML = `
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" data-open="${m.id}">${lines}</div>
+          <div class="lines" data-open="${m.id}">
+            <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatTitleLine(m, "INBOUND")}</div></div>
+            <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatTitleLine(m, "OUTBOUND")}</div></div>
+          </div>
         </div>
         <div class="datePill">${m.memoDate || ""}</div>
       `;
@@ -1198,33 +1180,28 @@
   function editMemo(id){
     const m = memos.find(x=>x.id===id);
     if(!m) return;
-
     editId = id;
-    inChk.checked = !!m.hasIn;
-    outChk.checked = !!m.hasOut;
-    currentLirPhoto = m["OUTBOUND-LIRPHOTO"] || "";
     memoDate.value = m.memoDate || todayStr();
-
-    sections.innerHTML = "";
-    if(inChk.checked) sections.appendChild(makeSection("INBOUND", m));
-    if(outChk.checked) sections.appendChild(makeSection("OUTBOUND", m));
-
-    syncByDataK("SHARED-HL", m.sharedHL || "");
-    syncByDataK("SHARED-HASH", m.sharedHASH || "");
-
+    buildFixedSections(m);
+    document.querySelectorAll('input[data-k="SHARED-B"]').forEach(el => el.value = m.sharedB || "");
+    document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
     openModal();
   }
 
   function deleteSelected(){
-    const checks = document.querySelectorAll(".selBox:checked");
+    const checks = document.querySelectorAll('.selBox:checked');
     const ids = [...checks].map(c=>Number(c.dataset.id));
+    if(!ids.length){
+      alert("SELECT MEMO");
+      return;
+    }
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem("jas_memos", JSON.stringify(memos));
+    localStorage.setItem("jas_memos_v44", JSON.stringify(memos));
     renderList();
   }
 
   function addPhoto(){
-    photoInput.value = "";
+    photoInput.value="";
     photoInput.click();
   }
 
@@ -1234,7 +1211,7 @@
     const r = new FileReader();
     r.onload = ()=>{
       photo = r.result;
-      localStorage.setItem("jas_photo", photo);
+      localStorage.setItem("jas_photo_v44", photo);
     };
     r.readAsDataURL(f);
   };
@@ -1250,7 +1227,7 @@
   }
 
   function openEquip(){
-    const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
+    const eq = JSON.parse(localStorage.getItem("jas_equipment_v44") || "{}");
     tug1.value = pad(eq.tug1,2);
     tug2.value = pad(eq.tug2,2);
     belt.value = pad(eq.belt,2);
@@ -1269,13 +1246,13 @@
       tug2: pad(tug2.value,2),
       belt: pad(belt.value,2)
     };
-    localStorage.setItem("jas_equipment", JSON.stringify(eq));
+    localStorage.setItem("jas_equipment_v44", JSON.stringify(eq));
     updateEquipBadge();
     closeEquip();
   }
 
   function updateEquipBadge(){
-    const eq = JSON.parse(localStorage.getItem("jas_equipment") || "{}");
+    const eq = JSON.parse(localStorage.getItem("jas_equipment_v44") || "{}");
     if(!eq.tug1 && !eq.tug2 && !eq.belt){
       equipBadge.style.display = "none";
       return;
