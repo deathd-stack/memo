@@ -1174,7 +1174,10 @@
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
 
-    const staOrStd = type === "INBOUND" ? (m["INBOUND-STA"] || "").trim() : (m["OUTBOUND-STD"] || "").trim();
+    const staOrStd = type === "INBOUND"
+      ? (m["INBOUND-STA"] || "").trim()
+      : (m["OUTBOUND-STD"] || "").trim();
+
     const cmpt1 = (m[type+"-cmpt1"] || "").trim();
     const cmpt2 = (m[type+"-cmpt2"] || "").trim();
     const cmpt3 = (m[type+"-cmpt3"] || "").trim();
@@ -1195,9 +1198,15 @@
       .join(" ");
 
     const bits = [];
+
     if(v7c) bits.push(`7C[${v7c}]`);
-    if(vhl) bits.push(`HL[${vhl}]`);
-    bits.push(`#[${hash}]`);
+
+    if(type === "INBOUND"){
+      if(vhl) bits.push(`HL[${vhl}]`);
+    }else{
+      if(hash) bits.push(`#[${hash}]`);
+    }
+
     if(staOrStd) bits.push(staOrStd);
     if(cmpt1 && cmpt1 !== "F") bits.push(cmpt1);
     if(cmpt2 && cmpt2 !== "F") bits.push(cmpt2);
