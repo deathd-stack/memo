@@ -12,7 +12,6 @@
   :root{
     --bg1:#ffd36a;
     --bg2:#ff9200;
-    --card:#f6e7d7;
     --blue:#2f7df6;
     --red:#e20000;
     --line:#cfcfcf;
@@ -626,9 +625,9 @@
   .rowGrid3{
     display:grid;
     grid-template-columns:
-      calc(26px * var(--ui)) 1.1fr
-      calc(20px * var(--ui)) 1fr
-      calc(14px * var(--ui)) .95fr;
+      calc(26px * var(--ui)) .9fr
+      calc(26px * var(--ui)) .9fr
+      calc(14px * var(--ui)) .9fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
@@ -641,6 +640,17 @@
       calc(18px * var(--ui)) 1fr
       calc(18px * var(--ui)) .9fr
       calc(26px * var(--ui)) .9fr;
+    gap:calc(10px * var(--ui));
+    align-items:center;
+    margin:calc(10px * var(--ui)) 0;
+    min-width:0;
+  }
+
+  .rowGridTTTB{
+    display:grid;
+    grid-template-columns:
+      calc(26px * var(--ui)) 1fr
+      calc(26px * var(--ui)) 1fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
@@ -784,6 +794,10 @@
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
 
+  function onlyText(val, len){
+    return (val || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, len).toUpperCase();
+  }
+
   function pad(val, len){
     const v = onlyNum(val, len);
     return v ? v.padStart(len, "0") : "";
@@ -880,9 +894,17 @@
     const k = t.dataset.k || "";
     if(!k) return;
 
-    if(k === "SHARED-B"){
-      t.value = onlyNum(t.value, 5);
-      document.querySelectorAll('input[data-k="SHARED-B"]').forEach(el=>{
+    if(k === "SHARED-7C"){
+      t.value = onlyText(t.value, 4);
+      document.querySelectorAll('input[data-k="SHARED-7C"]').forEach(el=>{
+        if(el !== t) el.value = t.value;
+      });
+      return;
+    }
+
+    if(k === "SHARED-HL"){
+      t.value = onlyText(t.value, 4);
+      document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
       return;
@@ -901,6 +923,8 @@
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
     if(k.endsWith("-bb")) t.value = onlyNum(t.value, 2);
+    if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
+    if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
@@ -930,13 +954,14 @@
     d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-    const sharedB = memoData ? (memoData.sharedB || "") : "";
+    const shared7C = memoData ? (memoData.shared7C || "") : "";
+    const sharedHL = memoData ? (memoData.sharedHL || "") : "";
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
-    const fixedItText = type === "INBOUND" ? "IT602" : "IT603";
 
     d.innerHTML = `
       <div class="sectionHead">
@@ -954,10 +979,10 @@
       </div>
 
       <div class="rowGrid3">
-        <div class="lab">IT</div>
-        <input class="long fixedField" value="${fixedItText}" readonly tabindex="-1">
-        <div class="lab">B</div>
-        <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-B" value="${sharedB}">
+        <div class="lab">7C</div>
+        <input class="numBox" inputmode="text" maxlength="4" placeholder="TEXT" data-k="SHARED-7C" value="${shared7C}">
+        <div class="lab">HL</div>
+        <input class="numBox" inputmode="text" maxlength="4" placeholder="TEXT" data-k="SHARED-HL" value="${sharedHL}">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
       </div>
@@ -991,6 +1016,15 @@
         <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
       </div>
 
+      ${type === "OUTBOUND" ? `
+      <div class="rowGridTTTB">
+        <div class="lab">T/T</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
+        <div class="lab">T/B</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
+      </div>
+      ` : ""}
+
       <div class="extraBox">
         <div class="extraHead">
           <div class="extraTitle">EXTRA</div>
@@ -1004,7 +1038,11 @@
 
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
     const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
-    timeBtn.addEventListener("click", ()=>{ timeShown.textContent = nowTime(); });
+
+    timeBtn.addEventListener("click", ()=>{
+      timeShown.textContent = nowTime();
+    });
+
     timeBtn.addEventListener("dblclick", ()=>{
       const cur = timeShown.textContent || nowTime();
       const t = prompt("TIME (HH:MM 24H)", cur);
@@ -1050,7 +1088,8 @@
     data.memoDate = memoDate.value || todayStr();
     data.weekKey = getWeekKey(data.memoDate);
 
-    data.sharedB = pad(document.querySelector('input[data-k="SHARED-B"]')?.value || "", 5);
+    data.shared7C = onlyText(document.querySelector('input[data-k="SHARED-7C"]')?.value || "", 4);
+    data.sharedHL = onlyText(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
@@ -1063,9 +1102,11 @@
 
       data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
       data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
-      data[type+"-t"]  = pad(gi("t")?.value, 3);
-      data[type+"-d"]  = pad(gi("d")?.value, 2);
+      data[type+"-t"] = pad(gi("t")?.value, 3);
+      data[type+"-d"] = pad(gi("d")?.value, 2);
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
+      data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
+      data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
 
       data[type+"-cmpt1"] = cm(1)?.value || "";
       data[type+"-cmpt2"] = cm(2)?.value || "";
@@ -1104,9 +1145,10 @@
   }
 
   function formatTitleLine(m, type){
-    const b = (m.sharedB || "").trim();
+    const v7c = (m.shared7C || "").trim();
+    const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
-    const it = type === "INBOUND" ? "IT602" : "IT603";
+
     const staOrStd = type === "INBOUND" ? (m["INBOUND-STA"] || "").trim() : (m["OUTBOUND-STD"] || "").trim();
     const cmpt1 = (m[type+"-cmpt1"] || "").trim();
     const cmpt2 = (m[type+"-cmpt2"] || "").trim();
@@ -1119,23 +1161,27 @@
       (m[type+"-bb"] || "").trim()
     ].filter(Boolean).join("/");
 
+    const ttTb = type === "OUTBOUND"
+      ? [(m["OUTBOUND-tt"] || "").trim(), (m["OUTBOUND-tb"] || "").trim()].filter(Boolean).join("/")
+      : "";
+
     const extras = (m[type+"-EXTRAS"] || [])
       .map(x => `${x.key}${x.val}`)
       .join(" ");
 
     const bits = [];
-    if(type === "INBOUND"){
-      bits.push(`${it} B[${b}]`);
-    }else{
-      bits.push(`${it} #[${hash}]`);
-    }
+    if(v7c) bits.push(`7C[${v7c}]`);
+    if(vhl) bits.push(`HL[${vhl}]`);
+    bits.push(`#[${hash}]`);
     if(staOrStd) bits.push(staOrStd);
     if(cmpt1) bits.push(cmpt1);
     if(cmpt2) bits.push(cmpt2);
     if(cmpt3) bits.push(cmpt3);
     if(cmpt4) bits.push(cmpt4);
     if(td) bits.push(td);
+    if(ttTb) bits.push(ttTb);
     if(extras) bits.push(extras);
+
     return bits.join(" ");
   }
 
@@ -1148,8 +1194,8 @@
       .sort((a,b)=>{
         const da = a.memoDate || "";
         const db = b.memoDate || "";
-        if(da === db) return Number(b.id) - Number(a.id);
-        return da < db ? 1 : -1;
+        if(da === db) return Number(a.id) - Number(b.id);
+        return da < db ? -1 : 1;
       });
 
     if(!weekMemos.length){
@@ -1187,7 +1233,8 @@
     editId = id;
     memoDate.value = m.memoDate || todayStr();
     buildFixedSections(m);
-    document.querySelectorAll('input[data-k="SHARED-B"]').forEach(el => el.value = m.sharedB || "");
+    document.querySelectorAll('input[data-k="SHARED-7C"]').forEach(el => el.value = m.shared7C || "");
+    document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
     openModal();
   }
