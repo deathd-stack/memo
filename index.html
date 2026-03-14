@@ -129,6 +129,7 @@
     text-align:center;
     font-size:calc(16px * var(--ui));
     font-weight:1000;
+    margin-bottom:calc(40px * var(--ui));
   }
 
   .memoCard{
@@ -465,7 +466,7 @@
   .lab{
     font-size:calc(20px * var(--ui));
     font-weight:1000;
-    min-width:calc(40px * var(--ui));
+    min-width:calc(46px * var(--ui));
     color:#111;
     white-space:nowrap;
     text-transform:uppercase;
@@ -518,11 +519,6 @@
     font-weight:1000;
     padding-left:calc(14px * var(--ui));
     text-align:left;
-  }
-
-  .fixedField{
-    background:#f6f6f6;
-    color:#111;
   }
 
   .extraBox{
@@ -788,19 +784,24 @@
   let editId = null;
   let weekOffset = 0;
 
-  const EXTRA_KEYS = ["W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
+  const EXTRA_KEYS = ["CREW","W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
 
-  function onlyText(val, len){
-    return (val || "").replace(/[^a-zA-Z0-9]/g, "").slice(0, len).toUpperCase();
-  }
-
   function pad(val, len){
     const v = onlyNum(val, len);
     return v ? v.padStart(len, "0") : "";
+  }
+
+  function cleanTextUpper(val){
+    return (val || "").toUpperCase().trim();
+  }
+
+  function defaultF(val){
+    const v = cleanTextUpper(val);
+    return v ? v : "F";
   }
 
   function nowTime(){
@@ -894,16 +895,8 @@
     const k = t.dataset.k || "";
     if(!k) return;
 
-    if(k === "SHARED-7C"){
-      t.value = onlyText(t.value, 4);
-      document.querySelectorAll('input[data-k="SHARED-7C"]').forEach(el=>{
-        if(el !== t) el.value = t.value;
-      });
-      return;
-    }
-
     if(k === "SHARED-HL"){
-      t.value = onlyText(t.value, 4);
+      t.value = onlyNum(t.value, 4);
       document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
@@ -918,6 +911,11 @@
       return;
     }
 
+    if(k.endsWith("-7C")){
+      t.value = onlyNum(t.value, 4);
+      return;
+    }
+
     if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
@@ -928,7 +926,7 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
-  function makeExtraRow(type, key="W", val=""){
+  function makeExtraRow(type, key="CREW", val=""){
     const row = document.createElement("div");
     row.className = "extraRow";
     row.innerHTML = `
@@ -945,7 +943,7 @@
     const root = sections.querySelector(`.section[data-type="${type}"]`);
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
-    box.appendChild(makeExtraRow(type, "W", ""));
+    box.appendChild(makeExtraRow(type, "CREW", ""));
   }
 
   function makeSection(type, memoData){
@@ -954,11 +952,14 @@
     d.dataset.type = type;
 
     const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-    const shared7C = memoData ? (memoData.shared7C || "") : "";
+    const local7C = memoData ? (memoData[type+"-7C"] || "") : "";
     const sharedHL = memoData ? (memoData.sharedHL || "") : "";
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+
+    const cmpt1Val = memoData ? defaultF(memoData[type+"-cmpt1"]) : "F";
+    const cmpt2Val = memoData ? defaultF(memoData[type+"-cmpt2"]) : "F";
 
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
@@ -980,21 +981,21 @@
 
       <div class="rowGrid3">
         <div class="lab">7C</div>
-        <input class="numBox" inputmode="text" maxlength="4" placeholder="TEXT" data-k="SHARED-7C" value="${shared7C}">
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-7C" value="${local7C}">
         <div class="lab">HL</div>
-        <input class="numBox" inputmode="text" maxlength="4" placeholder="TEXT" data-k="SHARED-HL" value="${sharedHL}">
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HL" value="${sharedHL}">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" value="${memoData ? (memoData[type+'-cmpt1'] || 'F') : 'F'}" placeholder="TEXT">
+        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" value="${memoData ? (memoData[type+'-cmpt2'] || 'F') : 'F'}" placeholder="TEXT">
+        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
@@ -1088,8 +1089,7 @@
     data.memoDate = memoDate.value || todayStr();
     data.weekKey = getWeekKey(data.memoDate);
 
-    data.shared7C = onlyText(document.querySelector('input[data-k="SHARED-7C"]')?.value || "", 4);
-    data.sharedHL = onlyText(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
+    data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
@@ -1100,6 +1100,7 @@
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
+      data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
       data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
       data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
       data[type+"-t"] = pad(gi("t")?.value, 3);
@@ -1108,10 +1109,10 @@
       data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
       data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
 
-      data[type+"-cmpt1"] = cm(1)?.value || "";
-      data[type+"-cmpt2"] = cm(2)?.value || "";
-      data[type+"-cmpt3"] = cm(3)?.value || "";
-      data[type+"-cmpt4"] = cm(4)?.value || "";
+      data[type+"-cmpt1"] = defaultF(cm(1)?.value || "");
+      data[type+"-cmpt2"] = defaultF(cm(2)?.value || "");
+      data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
+      data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
 
       data[type+"-note"] = note ? (note.value || "") : "";
 
@@ -1145,13 +1146,13 @@
   }
 
   function formatTitleLine(m, type){
-    const v7c = (m.shared7C || "").trim();
+    const v7c = (m[type+"-7C"] || "").trim();
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
 
     const staOrStd = type === "INBOUND" ? (m["INBOUND-STA"] || "").trim() : (m["OUTBOUND-STD"] || "").trim();
-    const cmpt1 = (m[type+"-cmpt1"] || "").trim();
-    const cmpt2 = (m[type+"-cmpt2"] || "").trim();
+    const cmpt1 = defaultF(m[type+"-cmpt1"] || "");
+    const cmpt2 = defaultF(m[type+"-cmpt2"] || "");
     const cmpt3 = (m[type+"-cmpt3"] || "").trim();
     const cmpt4 = (m[type+"-cmpt4"] || "").trim();
 
@@ -1233,7 +1234,6 @@
     editId = id;
     memoDate.value = m.memoDate || todayStr();
     buildFixedSections(m);
-    document.querySelectorAll('input[data-k="SHARED-7C"]').forEach(el => el.value = m.shared7C || "");
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
     openModal();
@@ -1367,4 +1367,3 @@
 
 </body>
 </html>
-오류가 났는데 수정좀 이제 CMPT1 2 에 처음에 F 없어도 되고 EXTRA에 CREW 추가 그리고 NO MEMO IN THIS WEEK 가리는거 없애줘
