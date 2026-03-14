@@ -452,6 +452,7 @@
     min-width:calc(64px * var(--ui));
     text-align:right;
     font-variant-numeric:tabular-nums;
+    cursor:pointer;
   }
 
   .row{
@@ -809,19 +810,19 @@
     return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
 
-  function todayStr(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
+  function normalizeTimeText(val){
+    const raw = (val || "").trim();
+    if(!raw) return "";
+    const digits = raw.replace(/[^0-9]/g, "");
+    if(digits.length === 3) return digits.slice(0,1) + ":" + digits.slice(1,3);
+    if(digits.length >= 4) return digits.slice(0,2) + ":" + digits.slice(2,4);
+    return raw.slice(0,5);
   }
 
-  function dateToStr(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
+  function askTime(currentValue=""){
+    const t = prompt("TIME (HH:MM 24H)", currentValue || nowTime());
+    if(t === null) return null;
+    return normalizeTimeText(t);
   }
 
   function getMonday(dateLike){
@@ -850,6 +851,21 @@
 
   function getViewingWeekKey(){
     return getWeekKey(getViewingDate());
+  }
+
+  function todayStr(){
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function dateToStr(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const day = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${day}`;
   }
 
   function updateWeekLabel(){
@@ -946,6 +962,14 @@
     box.appendChild(makeExtraRow(type, "CREW", ""));
   }
 
+  function bindEditableTime(el, initialValue){
+    el.textContent = initialValue || "";
+    el.addEventListener("click", ()=>{
+      const t = askTime(el.textContent || "");
+      if(t !== null) el.textContent = t;
+    });
+  }
+
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
@@ -974,7 +998,7 @@
           </div>
           <div class="timeWrap">
             <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
-            <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+            <div class="timeVal" id="${type}-TIMESHOWN"></div>
           </div>
         </div>
       </div>
@@ -1039,15 +1063,15 @@
 
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
     const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
+    bindEditableTime(timeShown, savedTime);
 
     timeBtn.addEventListener("click", ()=>{
       timeShown.textContent = nowTime();
     });
 
     timeBtn.addEventListener("dblclick", ()=>{
-      const cur = timeShown.textContent || nowTime();
-      const t = prompt("TIME (HH:MM 24H)", cur);
-      if(t) timeShown.textContent = t;
+      const t = askTime(timeShown.textContent || "");
+      if(t !== null) timeShown.textContent = t;
     });
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
@@ -1117,7 +1141,7 @@
       data[type+"-note"] = note ? (note.value || "") : "";
 
       const shown = document.getElementById(type+"-TIMESHOWN");
-      data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
+      data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
 
       const extras = [];
       const box = root.querySelector(`#${type}-EXTRAS`);
@@ -1151,8 +1175,8 @@
     const hash = (m.sharedHASH || "").trim();
 
     const staOrStd = type === "INBOUND" ? (m["INBOUND-STA"] || "").trim() : (m["OUTBOUND-STD"] || "").trim();
-    const cmpt1 = defaultF(m[type+"-cmpt1"] || "");
-    const cmpt2 = defaultF(m[type+"-cmpt2"] || "");
+    const cmpt1 = (m[type+"-cmpt1"] || "").trim();
+    const cmpt2 = (m[type+"-cmpt2"] || "").trim();
     const cmpt3 = (m[type+"-cmpt3"] || "").trim();
     const cmpt4 = (m[type+"-cmpt4"] || "").trim();
 
@@ -1175,8 +1199,8 @@
     if(vhl) bits.push(`HL[${vhl}]`);
     bits.push(`#[${hash}]`);
     if(staOrStd) bits.push(staOrStd);
-    if(cmpt1) bits.push(cmpt1);
-    if(cmpt2) bits.push(cmpt2);
+    if(cmpt1 && cmpt1 !== "F") bits.push(cmpt1);
+    if(cmpt2 && cmpt2 !== "F") bits.push(cmpt2);
     if(cmpt3) bits.push(cmpt3);
     if(cmpt4) bits.push(cmpt4);
     if(td) bits.push(td);
