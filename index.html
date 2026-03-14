@@ -928,7 +928,7 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
-  function makeExtraRow(type, key="CREW", val=""){
+  function makeExtraRow(type, key="W", val=""){
     const row = document.createElement("div");
     row.className = "extraRow";
     row.innerHTML = `
@@ -945,7 +945,7 @@
     const root = sections.querySelector(`.section[data-type="${type}"]`);
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
-    box.appendChild(makeExtraRow(type, "CREW", ""));
+    box.appendChild(makeExtraRow(type, "W", ""));
   }
 
   function makeSection(type, memoData){
@@ -989,22 +989,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" value="${memoData ? (memoData[type+"-cmpt1"] || "F") : "F}" placeholder="TEXT">
+        <input class="long" data-k="${type}-cmpt1" value="${memoData ? (memoData[type+'-cmpt1'] || 'F') : 'F'}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" value="${memoData ? (memoData[type+"-cmpt2"] || "F") : "F}" placeholder="TEXT">
+        <input class="long" data-k="${type}-cmpt2" value="${memoData ? (memoData[type+'-cmpt2'] || 'F') : 'F'}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt3"] || "") : ""}">
+        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+"-cmpt4"] || "") : ""}">
+        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
       </div>
 
       <div class="rowGridTDBB">
