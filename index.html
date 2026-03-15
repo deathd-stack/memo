@@ -631,10 +631,6 @@
     text-transform:uppercase;
   }
 
-  .bottomBtns{
-    display:none;
-  }
-
   #photoLayer{
     position:fixed;
     inset:0;
@@ -979,11 +975,7 @@
       return;
     }
 
-    if(k.endsWith("-7C")){
-      t.value = onlyNum(t.value, 4);
-      return;
-    }
-
+    if(k.endsWith("-7C")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
@@ -994,7 +986,7 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
-  function makeExtraRow(type, key="CREW", val=""){
+  function makeExtraRow(type, key="LIR", val=""){
     const row = document.createElement("div");
     row.className = "extraRow";
     row.innerHTML = `
@@ -1011,7 +1003,7 @@
     const root = sections.querySelector(`.section[data-type="${type}"]`);
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
-    box.appendChild(makeExtraRow(type, "CREW", ""));
+    box.appendChild(makeExtraRow(type, "LIR", ""));
   }
 
   function bindEditableTime(el, initialValue){
@@ -1133,68 +1125,16 @@
     return d;
   }
 
-  function rebuildSectionsFromPicks(memoData){
-    const prevIn = sections.querySelector('.section[data-type="INBOUND"]');
-    const prevOut = sections.querySelector('.section[data-type="OUTBOUND"]');
-
-    let inData = memoData;
-    let outData = memoData;
-
-    if(!memoData){
-      if(prevIn) inData = collectSectionData("INBOUND");
-      if(prevOut) outData = collectSectionData("OUTBOUND");
-    }
-
+  function buildSectionsBlank(){
     sections.innerHTML = "";
-
-    if(pickInbound.checked){
-      sections.appendChild(makeSection("INBOUND", inData));
-    }
-    if(pickOutbound.checked){
-      sections.appendChild(makeSection("OUTBOUND", outData));
-    }
+    if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
+    if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
   }
 
-  function collectSectionData(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return null;
-
-    const obj = {};
-    obj.sharedHL = document.querySelector('input[data-k="SHARED-HL"]')?.value || "";
-    obj.sharedHASH = document.querySelector('input[data-k="SHARED-HASH"]')?.value || "";
-
-    const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-    const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
-    const note = root.querySelector(`textarea[data-k="${type}-note"]`);
-    const shown = root.querySelector(`#${type}-TIMESHOWN`);
-
-    obj[type+"-7C"] = gi("7C")?.value || "";
-    obj[type+"-STA"] = type==="INBOUND" ? (gi("STA")?.value || "") : "";
-    obj[type+"-STD"] = type==="OUTBOUND" ? (gi("STD")?.value || "") : "";
-    obj[type+"-t"] = gi("t")?.value || "";
-    obj[type+"-d"] = gi("d")?.value || "";
-    obj[type+"-bb"] = gi("bb")?.value || "";
-    obj[type+"-tt"] = type==="OUTBOUND" ? (gi("tt")?.value || "") : "";
-    obj[type+"-tb"] = type==="OUTBOUND" ? (gi("tb")?.value || "") : "";
-    obj[type+"-cmpt1"] = cm(1)?.value || "";
-    obj[type+"-cmpt2"] = cm(2)?.value || "";
-    obj[type+"-cmpt3"] = cm(3)?.value || "";
-    obj[type+"-cmpt4"] = cm(4)?.value || "";
-    obj[type+"-note"] = note?.value || "";
-    obj[type+"-TIME"] = shown?.textContent || "";
-
-    const extras = [];
-    const box = root.querySelector(`#${type}-EXTRAS`);
-    if(box){
-      [...box.querySelectorAll(".extraRow")].forEach(r=>{
-        extras.push({
-          key: r.querySelector("select")?.value || "CREW",
-          val: r.querySelector("input")?.value || ""
-        });
-      });
-    }
-    obj[type+"-EXTRAS"] = extras;
-    return obj;
+  function rebuildSectionsFromMemo(memoData){
+    sections.innerHTML = "";
+    if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", memoData));
+    if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
   }
 
   function newMemo(){
@@ -1202,7 +1142,7 @@
     memoDate.value = todayStr();
     pickInbound.checked = true;
     pickOutbound.checked = true;
-    rebuildSectionsFromPicks(null);
+    buildSectionsBlank();
     openModal();
   }
 
@@ -1231,12 +1171,22 @@
 
   pickInbound.addEventListener("change", ()=>{
     if(!ensureAtLeastOnePick(pickInbound)) return;
-    rebuildSectionsFromPicks(null);
+    if(editId){
+      const m = memos.find(x=>x.id===editId);
+      rebuildSectionsFromMemo(m || null);
+    }else{
+      buildSectionsBlank();
+    }
   });
 
   pickOutbound.addEventListener("change", ()=>{
     if(!ensureAtLeastOnePick(pickOutbound)) return;
-    rebuildSectionsFromPicks(null);
+    if(editId){
+      const m = memos.find(x=>x.id===editId);
+      rebuildSectionsFromMemo(m || null);
+    }else{
+      buildSectionsBlank();
+    }
   });
 
   function saveMemo(){
@@ -1291,7 +1241,6 @@
       data[type+"-cmpt2"] = defaultF(cm(2)?.value || "");
       data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
       data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
-
       data[type+"-note"] = note ? (note.value || "") : "";
 
       const shown = document.getElementById(type+"-TIMESHOWN");
@@ -1329,15 +1278,12 @@
     const hash = (m.sharedHASH || "").trim();
 
     const bits = [];
-
     if(v7c) bits.push(`7C[${v7c}]`);
-
     if(type === "INBOUND"){
       if(vhl) bits.push(`HL[${vhl}]`);
     }else{
       if(hash) bits.push(`#[${hash}]`);
     }
-
     return bits.join(" ");
   }
 
@@ -1402,7 +1348,7 @@
     memoDate.value = m.memoDate || todayStr();
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
-    rebuildSectionsFromPicks(m);
+    rebuildSectionsFromMemo(m);
 
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
