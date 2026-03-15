@@ -1127,12 +1127,12 @@
         <div class="lab">T/B</div>
         <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
       </div>
-      ` : ""}
 
       <div class="lirRow">
         <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
         <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
       </div>
+      ` : ""}
 
       <div class="extraBox">
         <div class="extraHead">
@@ -1158,13 +1158,20 @@
       if(t !== null) timeShown.textContent = t;
     });
 
-    d.querySelector(`[data-lir-add="${type}"]`).addEventListener("click", ()=>{
-      openLirPicker(type);
-    });
+    const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
+    const lirViewBtn = d.querySelector(`[data-lir-view="${type}"]`);
 
-    d.querySelector(`[data-lir-view="${type}"]`).addEventListener("click", ()=>{
-      viewLirPhoto(type);
-    });
+    if(lirAddBtn){
+      lirAddBtn.addEventListener("click", ()=>{
+        openLirPicker(type);
+      });
+    }
+
+    if(lirViewBtn){
+      lirViewBtn.addEventListener("click", ()=>{
+        viewLirPhoto(type);
+      });
+    }
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
