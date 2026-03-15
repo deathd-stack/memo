@@ -631,6 +631,21 @@
     text-transform:uppercase;
   }
 
+  .lirRow{
+    display:flex;
+    align-items:center;
+    gap:calc(10px * var(--ui));
+    margin:calc(12px * var(--ui)) 0 calc(4px * var(--ui));
+    flex-wrap:wrap;
+  }
+
+  .lirBtn{
+    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
+    font-size:calc(14px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    box-shadow:none;
+  }
+
   #photoLayer{
     position:fixed;
     inset:0;
@@ -739,6 +754,7 @@
 <div id="equipBadge"></div>
 
 <input type="file" id="photoInput" accept="image/*" hidden />
+<input type="file" id="lirPhotoInput" accept="image/*" hidden />
 
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
@@ -815,6 +831,7 @@
   const sections = document.getElementById("sections");
   const memoList = document.getElementById("memoList");
   const photoInput = document.getElementById("photoInput");
+  const lirPhotoInput = document.getElementById("lirPhotoInput");
   const photoLayer = document.getElementById("photoLayer");
   const photoImg = document.getElementById("photoImg");
   const memoDate = document.getElementById("memoDate");
@@ -832,8 +849,10 @@
   let photo = localStorage.getItem(PHOTO_KEY) || "";
   let editId = null;
   let weekOffset = 0;
+  let activeLirType = null;
+  let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
 
-  const EXTRA_KEYS = ["CREW","W","C","COB","LIR","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
+  const EXTRA_KEYS = ["CREW","W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -986,7 +1005,7 @@
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
-  function makeExtraRow(type, key="LIR", val=""){
+  function makeExtraRow(type, key="CREW", val=""){
     const row = document.createElement("div");
     row.className = "extraRow";
     row.innerHTML = `
@@ -1003,7 +1022,7 @@
     const root = sections.querySelector(`.section[data-type="${type}"]`);
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
-    box.appendChild(makeExtraRow(type, "LIR", ""));
+    box.appendChild(makeExtraRow(type, "CREW", ""));
   }
 
   function bindEditableTime(el, initialValue){
@@ -1012,6 +1031,22 @@
       const t = askTime(el.textContent || "");
       if(t !== null) el.textContent = t;
     });
+  }
+
+  function openLirPicker(type){
+    activeLirType = type;
+    lirPhotoInput.value = "";
+    lirPhotoInput.click();
+  }
+
+  function viewLirPhoto(type){
+    const src = currentLirPhotos[type] || "";
+    if(!src){
+      alert("NO LIR PHOTO");
+      return;
+    }
+    photoImg.src = src;
+    photoLayer.style.display = "flex";
   }
 
   function makeSection(type, memoData){
@@ -1094,6 +1129,11 @@
       </div>
       ` : ""}
 
+      <div class="lirRow">
+        <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
+        <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
+      </div>
+
       <div class="extraBox">
         <div class="extraHead">
           <div class="extraTitle">EXTRA</div>
@@ -1116,6 +1156,14 @@
     timeBtn.addEventListener("dblclick", ()=>{
       const t = askTime(timeShown.textContent || "");
       if(t !== null) timeShown.textContent = t;
+    });
+
+    d.querySelector(`[data-lir-add="${type}"]`).addEventListener("click", ()=>{
+      openLirPicker(type);
+    });
+
+    d.querySelector(`[data-lir-view="${type}"]`).addEventListener("click", ()=>{
+      viewLirPhoto(type);
     });
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
@@ -1142,6 +1190,7 @@
     memoDate.value = todayStr();
     pickInbound.checked = true;
     pickOutbound.checked = true;
+    currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
     buildSectionsBlank();
     openModal();
   }
@@ -1157,6 +1206,7 @@
     modal.style.display = "none";
     modal.setAttribute("aria-hidden","true");
     editId = null;
+    activeLirType = null;
     updateEquipBadge();
   }
 
@@ -1221,6 +1271,7 @@
         data[type+"-note"] = "";
         data[type+"-TIME"] = "";
         data[type+"-EXTRAS"] = [];
+        data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
         return;
       }
 
@@ -1256,6 +1307,7 @@
         });
       }
       data[type+"-EXTRAS"] = extras;
+      data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
     });
 
     if(editId){
@@ -1348,6 +1400,10 @@
     memoDate.value = m.memoDate || todayStr();
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
+    currentLirPhotos = {
+      INBOUND: m["INBOUND-LIRPHOTO"] || "",
+      OUTBOUND: m["OUTBOUND-LIRPHOTO"] || ""
+    };
     rebuildSectionsFromMemo(m);
 
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
@@ -1448,10 +1504,27 @@
     }
   }
 
+  async function saveLirPhotoFile(file, type){
+    try{
+      const stableDataUrl = await makeStablePhotoData(file);
+      currentLirPhotos[type] = stableDataUrl;
+      alert("LIR PHOTO SAVED");
+    }catch(err){
+      console.error(err);
+      alert("LIR PHOTO SAVE FAIL");
+    }
+  }
+
   photoInput.onchange = async (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     await savePhotoFile(f);
+  };
+
+  lirPhotoInput.onchange = async (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f || !activeLirType) return;
+    await saveLirPhotoFile(f, activeLirType);
   };
 
   function openPhoto(){
