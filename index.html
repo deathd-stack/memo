@@ -1331,19 +1331,24 @@
     renderList(data.id);
   }
 
-  function formatTitleLine(m, type){
+  function formatCombinedLine(m){
+    const v7cIn = (m["INBOUND-7C"] || "").trim();
+    const v7cOut = (m["OUTBOUND-7C"] || "").trim();
+    const v7c = v7cIn || v7cOut || "";
+    const vhl = (m.sharedHL || "").trim();
+    const hash = (m.sharedHASH || "").trim();
+    return `7C[${v7c}] HL[${vhl}] #[${hash}]`;
+  }
+
+  function formatSplitLine(m, type){
     const v7c = (m[type+"-7C"] || "").trim();
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
 
-    const bits = [];
-    if(v7c) bits.push(`7C[${v7c}]`);
     if(type === "INBOUND"){
-      if(vhl) bits.push(`HL[${vhl}]`);
-    }else{
-      if(hash) bits.push(`#[${hash}]`);
+      return `7C[${v7c}] HL[${vhl}]`;
     }
-    return bits.join(" ");
+    return `7C[${v7c}] #[${hash}]`;
   }
 
   function renderList(flashId){
@@ -1368,13 +1373,19 @@
       const hasIn = m.hasIn !== false;
       const hasOut = m.hasOut !== false;
 
-      const inLine = hasIn
-        ? `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatTitleLine(m, "INBOUND") || "&nbsp;"}</div></div>`
-        : "";
+      let linesHtml = "";
 
-      const outLine = hasOut
-        ? `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatTitleLine(m, "OUTBOUND") || "&nbsp;"}</div></div>`
-        : "";
+      if(hasIn && hasOut){
+        linesHtml = `
+          <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>
+          <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>
+        `;
+      }else{
+        const singleTag = hasIn ? "IN" : "OUT";
+        linesHtml = `
+          <div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLine(m)}</div></div>
+        `;
+      }
 
       const card = document.createElement("div");
       card.className = "memoCard" + (m.id===flashId ? " flash" : "");
@@ -1382,8 +1393,7 @@
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
           <div class="lines" data-open="${m.id}">
-            ${inLine}
-            ${outLine}
+            ${linesHtml}
           </div>
         </div>
         <div class="datePill">${m.memoDate || ""}</div>
