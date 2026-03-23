@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 5.1</title>
+<title>JAS MEMO VER 5.2</title>
 
 <style>
   :root{
@@ -87,7 +87,7 @@
 
   button:active{transform:scale(.99)}
 
-  .weekBar{
+  .dayBar{
     width:min(780px, calc(100% - 28px));
     margin:0 auto calc(10px * var(--ui));
     display:flex;
@@ -97,14 +97,14 @@
     flex-wrap:wrap;
   }
 
-  .weekBtn{
+  .dayBtn{
     padding:calc(8px * var(--ui)) calc(12px * var(--ui));
     font-size:calc(14px * var(--ui));
     border-radius:calc(14px * var(--ui));
     box-shadow:none;
   }
 
-  .weekLabel{
+  .dayLabel{
     background:rgba(255,255,255,.92);
     border-radius:calc(14px * var(--ui));
     padding:calc(9px * var(--ui)) calc(14px * var(--ui));
@@ -121,7 +121,7 @@
     margin:0 auto;
   }
 
-  .emptyWeek{
+  .emptyDay{
     background:rgba(255,255,255,.22);
     border-radius:calc(20px * var(--ui));
     padding:calc(18px * var(--ui));
@@ -725,7 +725,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 5.1</div>
+    <div class="titleVer">VER 5.2</div>
   </div>
 </header>
 
@@ -735,12 +735,12 @@
   <button type="button" onclick="addPhoto()">PHOTO</button>
 </div>
 
-<div class="weekBar">
-  <button type="button" class="weekBtn" onclick="moveWeek(-1)">PREV WEEK</button>
-  <div class="weekLabel" id="weekLabel">THIS WEEK</div>
-  <button type="button" class="weekBtn" onclick="goThisWeek()">TODAY</button>
-  <button type="button" class="weekBtn" onclick="deleteCurrentWeek()">DEL WEEK</button>
-  <button type="button" class="weekBtn" onclick="moveWeek(1)">NEXT WEEK</button>
+<div class="dayBar">
+  <button type="button" class="dayBtn" onclick="moveDay(-1)">PREV DAY</button>
+  <div class="dayLabel" id="dayLabel">TODAY</div>
+  <button type="button" class="dayBtn" onclick="goToday()">TODAY</button>
+  <button type="button" class="dayBtn" onclick="deleteCurrentDay()">DEL DAY</button>
+  <button type="button" class="dayBtn" onclick="moveDay(1)">NEXT DAY</button>
 </div>
 
 <div id="memoList"></div>
@@ -835,7 +835,7 @@
   const photoLayer = document.getElementById("photoLayer");
   const photoImg = document.getElementById("photoImg");
   const memoDate = document.getElementById("memoDate");
-  const weekLabel = document.getElementById("weekLabel");
+  const dayLabel = document.getElementById("dayLabel");
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
 
@@ -848,7 +848,7 @@
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
   let editId = null;
-  let weekOffset = 0;
+  let dayOffset = 0;
   let activeLirType = null;
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
 
@@ -892,34 +892,6 @@
     return normalizeTimeText(t);
   }
 
-  function getMonday(dateLike){
-    const d = new Date(dateLike);
-    d.setHours(0,0,0,0);
-    const day = d.getDay() || 7;
-    d.setDate(d.getDate() - day + 1);
-    return d;
-  }
-
-  function getSunday(dateLike){
-    const d = getMonday(dateLike);
-    d.setDate(d.getDate() + 6);
-    return d;
-  }
-
-  function getWeekKey(dateLike){
-    return dateToStr(getMonday(dateLike));
-  }
-
-  function getViewingDate(){
-    const d = new Date();
-    d.setDate(d.getDate() + weekOffset * 7);
-    return d;
-  }
-
-  function getViewingWeekKey(){
-    return getWeekKey(getViewingDate());
-  }
-
   function todayStr(){
     const d = new Date();
     const y = d.getFullYear();
@@ -935,39 +907,50 @@
     return `${y}-${m}-${day}`;
   }
 
-  function updateWeekLabel(){
-    const monday = getMonday(getViewingDate());
-    const sunday = getSunday(getViewingDate());
-    weekLabel.textContent = `${dateToStr(monday)} ~ ${dateToStr(sunday)}`;
+  function getViewingDate(){
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() + dayOffset);
+    return d;
   }
 
-  function calcWeekOffsetFromDate(dateStr){
-    const thisMonday = getMonday(new Date());
-    const targetMonday = getMonday(dateStr);
-    return Math.round((targetMonday - thisMonday) / 86400000 / 7);
+  function getViewingDayKey(){
+    return dateToStr(getViewingDate());
   }
 
-  function moveWeek(n){
-    weekOffset += n;
-    updateWeekLabel();
+  function updateDayLabel(){
+    dayLabel.textContent = getViewingDayKey();
+  }
+
+  function calcDayOffsetFromDate(dateStr){
+    const base = new Date(todayStr());
+    const target = new Date(dateStr);
+    base.setHours(0,0,0,0);
+    target.setHours(0,0,0,0);
+    return Math.round((target - base) / 86400000);
+  }
+
+  function moveDay(n){
+    dayOffset += n;
+    updateDayLabel();
     renderList();
   }
 
-  function goThisWeek(){
-    weekOffset = 0;
-    updateWeekLabel();
+  function goToday(){
+    dayOffset = 0;
+    updateDayLabel();
     renderList();
   }
 
-  function deleteCurrentWeek(){
-    const wk = getViewingWeekKey();
-    const target = memos.filter(m => m.weekKey === wk);
+  function deleteCurrentDay(){
+    const dk = getViewingDayKey();
+    const target = memos.filter(m => (m.dayKey || m.memoDate) === dk);
     if(!target.length){
-      alert("NO MEMO IN THIS WEEK");
+      alert("NO MEMO IN THIS DAY");
       return;
     }
-    if(!confirm("DELETE ALL MEMOS IN THIS WEEK?")) return;
-    memos = memos.filter(m => m.weekKey !== wk);
+    if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
+    memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
   }
@@ -1194,7 +1177,7 @@
 
   function newMemo(){
     editId = null;
-    memoDate.value = todayStr();
+    memoDate.value = getViewingDayKey();
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
@@ -1253,8 +1236,8 @@
     }
 
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
-    data.memoDate = memoDate.value || todayStr();
-    data.weekKey = getWeekKey(data.memoDate);
+    data.memoDate = memoDate.value || getViewingDayKey();
+    data.dayKey = data.memoDate;
 
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
@@ -1325,8 +1308,8 @@
     }
 
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    weekOffset = calcWeekOffsetFromDate(data.memoDate);
-    updateWeekLabel();
+    dayOffset = calcDayOffsetFromDate(data.memoDate);
+    updateDayLabel();
     closeModal();
     renderList(data.id);
   }
@@ -1354,22 +1337,17 @@
   function renderList(flashId){
     memoList.innerHTML = "";
 
-    const viewingWeek = getViewingWeekKey();
-    const weekMemos = memos
-      .filter(m => (m.weekKey || getWeekKey(m.memoDate || todayStr())) === viewingWeek)
-      .sort((a,b)=>{
-        const da = a.memoDate || "";
-        const db = b.memoDate || "";
-        if(da === db) return Number(a.id) - Number(b.id);
-        return da < db ? -1 : 1;
-      });
+    const viewingDay = getViewingDayKey();
+    const dayMemos = memos
+      .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
+      .sort((a,b)=> Number(a.id) - Number(b.id));
 
-    if(!weekMemos.length){
-      memoList.innerHTML = `<div class="emptyWeek">NO MEMO IN THIS WEEK</div>`;
+    if(!dayMemos.length){
+      memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`;
       return;
     }
 
-    weekMemos.forEach(m=>{
+    dayMemos.forEach(m=>{
       const hasIn = m.hasIn !== false;
       const hasOut = m.hasOut !== false;
 
@@ -1414,7 +1392,7 @@
     if(!m) return;
 
     editId = id;
-    memoDate.value = m.memoDate || todayStr();
+    memoDate.value = m.memoDate || getViewingDayKey();
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
     currentLirPhotos = {
@@ -1646,8 +1624,8 @@
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
-  memoDate.value = todayStr();
-  updateWeekLabel();
+  memoDate.value = getViewingDayKey();
+  updateDayLabel();
   renderList();
   updateEquipBadge();
   syncPhotoFromStorage(false);
