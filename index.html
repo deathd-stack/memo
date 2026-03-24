@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 5.2</title>
+<title>JAS MEMO VER 6.1</title>
 
 <style>
   :root{
@@ -16,6 +16,8 @@
     --red:#e20000;
     --line:#cfcfcf;
     --ui:.8;
+    --panelBg:rgba(255,255,255,.28);
+    --panelBorder:rgba(255,255,255,.45);
   }
 
   *{box-sizing:border-box}
@@ -64,19 +66,43 @@
     color:#111;
   }
 
-  .controls{
-    display:flex;
-    justify-content:center;
-    gap:calc(14px * var(--ui));
-    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(6px * var(--ui));
-    flex-wrap:wrap;
+  .topPanel{
+    width:min(780px, calc(100% - 28px));
+    margin:0 auto calc(10px * var(--ui));
+    padding:calc(12px * var(--ui));
+    border-radius:calc(22px * var(--ui));
+    background:var(--panelBg);
+    border:2px solid var(--panelBorder);
+    box-shadow:0 14px 28px rgba(0,0,0,.12);
+    backdrop-filter:blur(6px);
+  }
+
+  .mainActions{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:calc(10px * var(--ui));
+    margin-bottom:calc(10px * var(--ui));
+  }
+
+  .subActions{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:calc(8px * var(--ui));
+    margin-bottom:calc(10px * var(--ui));
+  }
+
+  .searchRow{
+    display:grid;
+    grid-template-columns:1fr calc(150px * var(--ui));
+    gap:calc(8px * var(--ui));
+    align-items:center;
   }
 
   button{
     border:none;
-    border-radius:calc(22px * var(--ui));
+    border-radius:calc(18px * var(--ui));
     background:#fff;
-    padding:calc(14px * var(--ui)) calc(22px * var(--ui));
+    padding:calc(14px * var(--ui)) calc(18px * var(--ui));
     font-weight:1000;
     color:var(--blue);
     font-size:calc(18px * var(--ui));
@@ -86,6 +112,45 @@
   }
 
   button:active{transform:scale(.99)}
+
+  .mainBtn{
+    min-height:calc(54px * var(--ui));
+    font-size:calc(17px * var(--ui));
+  }
+
+  .smallBtn{
+    padding:calc(10px * var(--ui)) calc(12px * var(--ui));
+    font-size:calc(12px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    box-shadow:none;
+    min-height:calc(42px * var(--ui));
+  }
+
+  .searchRow input,
+  .searchRow select{
+    height:calc(48px * var(--ui));
+    font-size:calc(15px * var(--ui));
+    font-family:inherit;
+    font-weight:1000;
+    border:2px solid var(--line);
+    border-radius:calc(16px * var(--ui));
+    outline:none;
+    background:#fff;
+    -webkit-text-size-adjust:100%;
+    font-variant-numeric:tabular-nums;
+    text-transform:uppercase;
+  }
+
+  .searchRow input{
+    width:100%;
+    text-align:left;
+    padding:0 calc(14px * var(--ui));
+  }
+
+  .searchRow select{
+    width:100%;
+    padding:0 calc(10px * var(--ui));
+  }
 
   .dayBar{
     width:min(780px, calc(100% - 28px));
@@ -222,9 +287,12 @@
     text-transform:uppercase;
   }
 
-  .datePill{
+  .subInfo{
     margin-top:calc(6px * var(--ui));
     margin-left:calc(40px * var(--ui));
+    display:flex;
+    gap:calc(12px * var(--ui));
+    flex-wrap:wrap;
     font-size:calc(12px * var(--ui));
     color:#5a5147;
     font-weight:1000;
@@ -362,6 +430,15 @@
 
   .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
   .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
+
+  .draftState{
+    text-align:center;
+    font-size:calc(12px * var(--ui));
+    color:#666;
+    font-weight:1000;
+    padding-bottom:calc(8px * var(--ui));
+    text-transform:uppercase;
+  }
 
   .dateLine{
     display:flex;
@@ -697,7 +774,39 @@
     min-width:0;
   }
 
+  @media (max-width:720px){
+    .subActions{
+      grid-template-columns:repeat(2, 1fr);
+    }
+
+    .searchRow{
+      grid-template-columns:1fr;
+    }
+  }
+
   @media (max-width:520px){
+    .mainActions{
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+
+    .mainBtn{
+      min-height:46px;
+      font-size:13px;
+      padding:10px 8px;
+    }
+
+    .smallBtn{
+      min-height:40px;
+      font-size:11px;
+      padding:8px 6px;
+    }
+
+    .subActions{
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
     .bottomAppButtons{
       left:12px;
       bottom:14px;
@@ -725,14 +834,31 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 5.2</div>
+    <div class="titleVer">VER 6.1</div>
   </div>
 </header>
 
-<div class="controls">
-  <button type="button" onclick="newMemo()">ADD</button>
-  <button type="button" onclick="deleteSelected()">DELETE</button>
-  <button type="button" onclick="addPhoto()">PHOTO</button>
+<div class="topPanel">
+  <div class="mainActions">
+    <button type="button" class="mainBtn" onclick="newMemo()">ADD</button>
+    <button type="button" class="mainBtn" onclick="deleteSelected()">DELETE</button>
+    <button type="button" class="mainBtn" onclick="addPhoto()">PHOTO</button>
+  </div>
+
+  <div class="subActions">
+    <button type="button" class="smallBtn" onclick="copyPrevDayMemos()">COPY PREV DAY</button>
+    <button type="button" class="smallBtn" onclick="exportBackup()">EXPORT JSON</button>
+    <button type="button" class="smallBtn" onclick="importBackup()">IMPORT JSON</button>
+    <button type="button" class="smallBtn" onclick="clearDraft()">CLEAR DRAFT</button>
+  </div>
+
+  <div class="searchRow">
+    <input id="searchInput" type="text" placeholder="SEARCH 7C / HL / # / CMPT / NOTE">
+    <select id="sortSelect">
+      <option value="old">SORT: OLD</option>
+      <option value="new">SORT: NEW</option>
+    </select>
+  </div>
 </div>
 
 <div class="dayBar">
@@ -755,6 +881,7 @@
 
 <input type="file" id="photoInput" accept="image/*" hidden />
 <input type="file" id="lirPhotoInput" accept="image/*" hidden />
+<input type="file" id="importInput" accept=".json,application/json" hidden />
 
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
@@ -770,6 +897,8 @@
       <div class="m1">JAS MEMO</div>
       <div class="m2">TAP TO OPEN PHOTO</div>
     </div>
+
+    <div class="draftState" id="draftState">DRAFT READY</div>
 
     <div class="dateLine">
       <div class="dateLab">DATE</div>
@@ -821,9 +950,11 @@
 </div>
 
 <script>
-  const MEMO_KEY = "jas_memos_v5";
-  const PHOTO_KEY = "jas_photo_v5";
-  const EQUIP_KEY = "jas_equipment_v5";
+  const MEMO_KEY = "jas_memos_v6";
+  const PHOTO_KEY = "jas_photo_v6";
+  const EQUIP_KEY = "jas_equipment_v6";
+  const DRAFT_KEY = "jas_draft_v6";
+  const LAST_PICK_KEY = "jas_last_pick_v6";
 
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
@@ -832,12 +963,16 @@
   const memoList = document.getElementById("memoList");
   const photoInput = document.getElementById("photoInput");
   const lirPhotoInput = document.getElementById("lirPhotoInput");
+  const importInput = document.getElementById("importInput");
   const photoLayer = document.getElementById("photoLayer");
   const photoImg = document.getElementById("photoImg");
   const memoDate = document.getElementById("memoDate");
   const dayLabel = document.getElementById("dayLabel");
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
+  const searchInput = document.getElementById("searchInput");
+  const sortSelect = document.getElementById("sortSelect");
+  const draftState = document.getElementById("draftState");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -851,8 +986,9 @@
   let dayOffset = 0;
   let activeLirType = null;
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
+  let midnightTimer = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
+  const EXTRA_KEYS = ["CREW","W","C","COB","STRAP","GB","TS","EMS","CARSEAT","COMAT","LONGFIN","RUSH"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -865,6 +1001,10 @@
 
   function cleanTextUpper(val){
     return (val || "").toUpperCase().trim();
+  }
+
+  function cleanText(val){
+    return (val || "").trim();
   }
 
   function defaultF(val){
@@ -951,8 +1091,16 @@
     }
     if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
     memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
     renderList();
+  }
+
+  function persistMemos(){
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+  }
+
+  function setDraftState(msg){
+    draftState.textContent = msg;
   }
 
   document.addEventListener("input", (e)=>{
@@ -966,6 +1114,8 @@
       document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
+      autoNext(t, 4);
+      saveDraftFromUI();
       return;
     }
 
@@ -974,6 +1124,8 @@
       document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
+      autoNext(t, 3);
+      saveDraftFromUI();
       return;
     }
 
@@ -986,7 +1138,31 @@
     if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
+
+    const max = Number(t.getAttribute("maxlength") || "0");
+    if(max > 0) autoNext(t, max);
+    saveDraftFromUI();
   });
+
+  document.addEventListener("input", (e)=>{
+    if(e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement){
+      saveDraftFromUI();
+    }
+  });
+
+  function autoNext(el, maxLen){
+    if(!el || !maxLen) return;
+    if((el.value || "").length < maxLen) return;
+    const all = [...sheet.querySelectorAll("input, textarea, select")].filter(x=> !x.disabled && x.offsetParent !== null);
+    const idx = all.indexOf(el);
+    if(idx >= 0 && all[idx+1]){
+      const next = all[idx+1];
+      if(next instanceof HTMLInputElement || next instanceof HTMLTextAreaElement){
+        next.focus();
+        if(next.select) next.select();
+      }
+    }
+  }
 
   function makeExtraRow(type, key="CREW", val=""){
     const row = document.createElement("div");
@@ -996,9 +1172,15 @@
         ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
       </select>
       <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
+      <button type="button" class="minusBtn" onclick="removeExtraRow(this)">-</button>
     `;
+    row.querySelector("select").addEventListener("change", saveDraftFromUI);
     return row;
+  }
+
+  function removeExtraRow(btn){
+    btn.parentElement.remove();
+    saveDraftFromUI();
   }
 
   function addExtraRow(type){
@@ -1006,13 +1188,17 @@
     const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
     box.appendChild(makeExtraRow(type, "CREW", ""));
+    saveDraftFromUI();
   }
 
   function bindEditableTime(el, initialValue){
     el.textContent = initialValue || "";
     el.addEventListener("click", ()=>{
       const t = askTime(el.textContent || "");
-      if(t !== null) el.textContent = t;
+      if(t !== null){
+        el.textContent = t;
+        saveDraftFromUI();
+      }
     });
   }
 
@@ -1134,11 +1320,15 @@
 
     timeBtn.addEventListener("click", ()=>{
       timeShown.textContent = nowTime();
+      saveDraftFromUI();
     });
 
     timeBtn.addEventListener("dblclick", ()=>{
       const t = askTime(timeShown.textContent || "");
-      if(t !== null) timeShown.textContent = t;
+      if(t !== null){
+        timeShown.textContent = t;
+        saveDraftFromUI();
+      }
     });
 
     const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
@@ -1175,14 +1365,32 @@
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
   }
 
+  function getLastPick(){
+    return JSON.parse(localStorage.getItem(LAST_PICK_KEY) || '{"in":true,"out":true}');
+  }
+
+  function saveLastPick(){
+    localStorage.setItem(LAST_PICK_KEY, JSON.stringify({
+      in: !!pickInbound.checked,
+      out: !!pickOutbound.checked
+    }));
+  }
+
   function newMemo(){
     editId = null;
     memoDate.value = getViewingDayKey();
-    pickInbound.checked = true;
-    pickOutbound.checked = true;
+    const lp = getLastPick();
+    pickInbound.checked = lp.in !== false;
+    pickOutbound.checked = lp.out !== false;
+    if(!pickInbound.checked && !pickOutbound.checked){
+      pickInbound.checked = true;
+      pickOutbound.checked = true;
+    }
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
     buildSectionsBlank();
+    loadDraftIntoUI();
     openModal();
+    setDraftState("DRAFT READY");
   }
 
   function openModal(){
@@ -1206,6 +1414,8 @@
       alert("INBOUND OR OUTBOUND SELECT");
       return false;
     }
+    saveLastPick();
+    saveDraftFromUI();
     return true;
   }
 
@@ -1217,6 +1427,7 @@
     }else{
       buildSectionsBlank();
     }
+    saveDraftFromUI();
   });
 
   pickOutbound.addEventListener("change", ()=>{
@@ -1227,24 +1438,22 @@
     }else{
       buildSectionsBlank();
     }
+    saveDraftFromUI();
   });
 
-  function saveMemo(){
-    if(!pickInbound.checked && !pickOutbound.checked){
-      alert("INBOUND OR OUTBOUND SELECT");
-      return;
-    }
-
-    const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
-    data.memoDate = memoDate.value || getViewingDayKey();
-    data.dayKey = data.memoDate;
-
-    data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
-    data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
+  function collectDraftData(){
+    const data = {
+      editId,
+      memoDate: memoDate.value || getViewingDayKey(),
+      hasIn: !!pickInbound.checked,
+      hasOut: !!pickOutbound.checked,
+      sharedHL: pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4),
+      sharedHASH: pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3),
+      currentLirPhotos
+    };
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const root = sections.querySelector(`.section[data-type="${type}"]`);
-
       if(!root){
         data[type+"-7C"] = "";
         data[type+"-STA"] = "";
@@ -1268,7 +1477,6 @@
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
-
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
       data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
       data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
@@ -1277,13 +1485,11 @@
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
       data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
       data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
-
       data[type+"-cmpt1"] = defaultF(cm(1)?.value || "");
       data[type+"-cmpt2"] = defaultF(cm(2)?.value || "");
       data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
       data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
       data[type+"-note"] = note ? (note.value || "") : "";
-
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
 
@@ -1300,6 +1506,59 @@
       data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
     });
 
+    return data;
+  }
+
+  function saveDraftFromUI(){
+    if(modal.style.display !== "flex") return;
+    const draft = collectDraftData();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    setDraftState("DRAFT AUTO SAVED");
+  }
+
+  function loadDraftIntoUI(){
+    if(editId) return;
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(!raw) return;
+    let d;
+    try{
+      d = JSON.parse(raw);
+    }catch{
+      return;
+    }
+    if(!d) return;
+
+    if(confirm("LOAD SAVED DRAFT?")){
+      memoDate.value = d.memoDate || getViewingDayKey();
+      pickInbound.checked = d.hasIn !== false;
+      pickOutbound.checked = d.hasOut !== false;
+      if(!pickInbound.checked && !pickOutbound.checked){
+        pickInbound.checked = true;
+      }
+      currentLirPhotos = d.currentLirPhotos || { INBOUND:"", OUTBOUND:"" };
+      rebuildSectionsFromMemo(d);
+      document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = d.sharedHL || "");
+      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = d.sharedHASH || "");
+      setDraftState("DRAFT LOADED");
+    }
+  }
+
+  function clearDraft(silent=false){
+    localStorage.removeItem(DRAFT_KEY);
+    if(!silent) alert("DRAFT CLEARED");
+    setDraftState("DRAFT CLEARED");
+  }
+
+  function saveMemo(){
+    if(!pickInbound.checked && !pickOutbound.checked){
+      alert("INBOUND OR OUTBOUND SELECT");
+      return;
+    }
+
+    const data = collectDraftData();
+    data.id = editId ?? Date.now();
+    data.dayKey = data.memoDate;
+
     if(editId){
       const idx = memos.findIndex(m=>m.id===editId);
       if(idx >= 0) memos[idx] = data;
@@ -1307,7 +1566,10 @@
       memos.push(data);
     }
 
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
+    saveLastPick();
+    clearDraft(true);
+
     dayOffset = calcDayOffsetFromDate(data.memoDate);
     updateDayLabel();
     closeModal();
@@ -1334,13 +1596,36 @@
     return `7C[${v7c}] #[${hash}]`;
   }
 
+  function getSearchableText(m){
+    return [
+      m.memoDate,
+      m.sharedHL,
+      m.sharedHASH,
+      m["INBOUND-7C"], m["OUTBOUND-7C"],
+      m["INBOUND-STA"], m["OUTBOUND-STD"],
+      m["INBOUND-cmpt1"], m["INBOUND-cmpt2"], m["INBOUND-cmpt3"], m["INBOUND-cmpt4"],
+      m["OUTBOUND-cmpt1"], m["OUTBOUND-cmpt2"], m["OUTBOUND-cmpt3"], m["OUTBOUND-cmpt4"],
+      m["INBOUND-note"], m["OUTBOUND-note"],
+      ...(m["INBOUND-EXTRAS"] || []).map(x=>`${x.key} ${x.val}`),
+      ...(m["OUTBOUND-EXTRAS"] || []).map(x=>`${x.key} ${x.val}`)
+    ].join(" ").toUpperCase();
+  }
+
   function renderList(flashId){
     memoList.innerHTML = "";
 
     const viewingDay = getViewingDayKey();
-    const dayMemos = memos
+    const q = cleanTextUpper(searchInput.value || "");
+    const sortMode = sortSelect.value;
+
+    let dayMemos = memos
       .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .sort((a,b)=> Number(a.id) - Number(b.id));
+      .filter(m => !q || getSearchableText(m).includes(q));
+
+    dayMemos.sort((a,b)=>{
+      if(sortMode === "new") return Number(b.id) - Number(a.id);
+      return Number(a.id) - Number(b.id);
+    });
 
     if(!dayMemos.length){
       memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`;
@@ -1350,6 +1635,8 @@
     dayMemos.forEach(m=>{
       const hasIn = m.hasIn !== false;
       const hasOut = m.hasOut !== false;
+      const inTime = m["INBOUND-TIME"] || "";
+      const outTime = m["OUTBOUND-TIME"] || "";
 
       let linesHtml = "";
 
@@ -1374,7 +1661,11 @@
             ${linesHtml}
           </div>
         </div>
-        <div class="datePill">${m.memoDate || ""}</div>
+        <div class="subInfo">
+          <div>${m.memoDate || ""}</div>
+          ${inTime ? `<div>IN ${inTime}</div>` : ``}
+          ${outTime ? `<div>OUT ${outTime}</div>` : ``}
+        </div>
       `;
       memoList.appendChild(card);
     });
@@ -1400,11 +1691,10 @@
       OUTBOUND: m["OUTBOUND-LIRPHOTO"] || ""
     };
     rebuildSectionsFromMemo(m);
-
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
-
     openModal();
+    setDraftState("EDIT MODE");
   }
 
   function deleteSelected(){
@@ -1414,8 +1704,9 @@
       alert("SELECT MEMO");
       return;
     }
+    if(!confirm("DELETE SELECTED MEMOS?")) return;
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
     renderList();
   }
 
@@ -1462,15 +1753,16 @@
       { maxW:1600, maxH:1600, quality:0.70 },
       { maxW:1440, maxH:1440, quality:0.60 },
       { maxW:1280, maxH:1280, quality:0.52 },
-      { maxW:1080, maxH:1080, quality:0.48 }
+      { maxW:1080, maxH:1080, quality:0.48 },
+      { maxW:960,  maxH:960,  quality:0.42 }
     ];
 
     for(const t of tries){
       const dataUrl = compressImageToDataUrl(img, t.maxW, t.maxH, t.quality);
-      if(dataUrl.length < 3500000) return dataUrl;
+      if(dataUrl.length < 2800000) return dataUrl;
     }
 
-    return compressImageToDataUrl(img, 960, 960, 0.42);
+    return compressImageToDataUrl(img, 860, 860, 0.36);
   }
 
   function syncPhotoFromStorage(forceDraw = false){
@@ -1503,6 +1795,7 @@
     try{
       const stableDataUrl = await makeStablePhotoData(file);
       currentLirPhotos[type] = stableDataUrl;
+      saveDraftFromUI();
       alert("LIR PHOTO SAVED");
     }catch(err){
       console.error(err);
@@ -1534,11 +1827,13 @@
 
   window.addEventListener("pageshow", ()=>{
     syncPhotoFromStorage(true);
+    checkDayRollover();
   });
 
   document.addEventListener("visibilitychange", ()=>{
     if(document.visibilityState === "visible"){
       syncPhotoFromStorage(true);
+      checkDayRollover();
     }
   });
 
@@ -1587,6 +1882,120 @@
     if(e.target === equipModal) closeEquip();
   });
 
+  function copyPrevDayMemos(){
+    const currentDay = getViewingDayKey();
+    const prev = new Date(currentDay);
+    prev.setDate(prev.getDate() - 1);
+    const prevDay = dateToStr(prev);
+
+    const prevMemos = memos.filter(m => (m.dayKey || m.memoDate) === prevDay);
+    if(!prevMemos.length){
+      alert("NO MEMO IN PREV DAY");
+      return;
+    }
+    if(!confirm(`COPY ${prevDay} MEMOS TO ${currentDay}?`)) return;
+
+    const clones = prevMemos.map(m=>{
+      const c = JSON.parse(JSON.stringify(m));
+      c.id = Date.now() + Math.floor(Math.random() * 1000000) + Math.floor(Math.random() * 1000);
+      c.memoDate = currentDay;
+      c.dayKey = currentDay;
+      return c;
+    });
+
+    memos.push(...clones);
+    persistMemos();
+    renderList();
+    alert("COPIED");
+  }
+
+  function exportBackup(){
+    const payload = {
+      version: "6.1",
+      exportedAt: new Date().toISOString(),
+      memos,
+      equipment: JSON.parse(localStorage.getItem(EQUIP_KEY) || "{}"),
+      photo: localStorage.getItem(PHOTO_KEY) || ""
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `jas-memo-backup-${todayStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importBackup(){
+    importInput.value = "";
+    importInput.click();
+  }
+
+  importInput.onchange = async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+
+    try{
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if(!data || !Array.isArray(data.memos)){
+        alert("INVALID BACKUP FILE");
+        return;
+      }
+
+      if(!confirm("IMPORT BACKUP AND REPLACE CURRENT MEMOS?")) return;
+
+      memos = data.memos;
+      persistMemos();
+
+      if(data.equipment){
+        localStorage.setItem(EQUIP_KEY, JSON.stringify(data.equipment));
+      }
+      if(typeof data.photo === "string"){
+        localStorage.setItem(PHOTO_KEY, data.photo);
+        syncPhotoFromStorage(false);
+      }
+
+      updateEquipBadge();
+      renderList();
+      alert("IMPORT DONE");
+    }catch(err){
+      console.error(err);
+      alert("IMPORT FAIL");
+    }
+  };
+
+  function scheduleMidnightCheck(){
+    if(midnightTimer) clearTimeout(midnightTimer);
+    const now = new Date();
+    const next = new Date();
+    next.setHours(24,0,5,0);
+    const ms = next - now;
+    midnightTimer = setTimeout(()=>{
+      checkDayRollover(true);
+      scheduleMidnightCheck();
+    }, ms);
+  }
+
+  function checkDayRollover(forceToday=false){
+    const currentShown = getViewingDayKey();
+    const realToday = todayStr();
+    if(forceToday || currentShown !== realToday){
+      dayOffset = 0;
+      updateDayLabel();
+      renderList();
+      if(modal.style.display === "flex" && !editId){
+        memoDate.value = todayStr();
+      }
+    }
+  }
+
+  searchInput.addEventListener("input", renderList);
+  sortSelect.addEventListener("change", renderList);
+
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
@@ -1629,6 +2038,7 @@
   renderList();
   updateEquipBadge();
   syncPhotoFromStorage(false);
+  scheduleMidnightCheck();
 </script>
 
 </body>
