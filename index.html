@@ -679,23 +679,105 @@
     padding:0;
   }
 
-  .calcPanel{
-    display:none;
-    margin-top:calc(10px * var(--ui));
-    background:#fff;
-    border:2px solid #e2e2e2;
-    border-radius:calc(18px * var(--ui));
-    padding:calc(12px * var(--ui));
-    box-shadow:0 8px 18px rgba(0,0,0,.08);
+  .calcIconBtn{
+    position:relative;
   }
 
-  .calcPanel.show{
+  .calcIcon{
+    position:relative;
     display:block;
+    width:calc(22px * var(--ui));
+    height:calc(26px * var(--ui));
+    border:2px solid var(--blue);
+    border-radius:calc(6px * var(--ui));
+  }
+
+  .calcIcon::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    top:calc(3px * var(--ui));
+    width:calc(12px * var(--ui));
+    height:calc(4px * var(--ui));
+    background:var(--blue);
+    border-radius:calc(2px * var(--ui));
+  }
+
+  .calcIcon::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:calc(4px * var(--ui));
+    width:calc(12px * var(--ui));
+    height:calc(10px * var(--ui));
+    background:
+      radial-gradient(circle, var(--blue) 58%, transparent 60%) 0 0 / calc(4px * var(--ui)) calc(4px * var(--ui)) repeat;
+    opacity:.95;
+  }
+
+  .calcFloatingWrap{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.22);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:120;
+    padding:calc(18px * var(--ui));
+  }
+
+  .calcFloatingWrap.show{
+    display:flex;
+  }
+
+  .calcFloating{
+    width:min(420px, 100%);
+    background:#fff;
+    border-radius:calc(24px * var(--ui));
+    box-shadow:0 22px 46px rgba(0,0,0,.28);
+    padding:calc(12px * var(--ui));
+    animation:calcUp .16s ease;
+  }
+
+  @keyframes calcUp{
+    from{transform:translateY(18px); opacity:.75}
+    to{transform:translateY(0); opacity:1}
+  }
+
+  .calcTopBar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:calc(10px * var(--ui));
+    margin-bottom:calc(10px * var(--ui));
+  }
+
+  .calcTitle{
+    font-size:calc(15px * var(--ui));
+    font-weight:1000;
+    color:#111;
+    text-transform:uppercase;
+    letter-spacing:.4px;
+  }
+
+  .calcCloseBtn{
+    border:none;
+    background:#eef1f7;
+    color:var(--blue);
+    width:calc(42px * var(--ui));
+    height:calc(42px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    box-shadow:none;
+    padding:0;
+    font-size:calc(18px * var(--ui));
+    font-weight:1000;
   }
 
   .calcDisplay{
     width:100%;
-    height:calc(54px * var(--ui));
+    height:calc(60px * var(--ui));
     border:2px solid var(--line);
     border-radius:calc(16px * var(--ui));
     background:#f9f9f9;
@@ -703,11 +785,12 @@
     display:flex;
     align-items:center;
     justify-content:flex-end;
-    font-size:calc(22px * var(--ui));
+    font-size:calc(24px * var(--ui));
     font-weight:1000;
     color:#111;
     overflow:hidden;
     white-space:nowrap;
+    font-variant-numeric:tabular-nums;
   }
 
   .calcGrid{
@@ -718,7 +801,7 @@
   }
 
   .calcKey{
-    height:calc(48px * var(--ui));
+    height:calc(52px * var(--ui));
     border:none;
     border-radius:calc(14px * var(--ui));
     background:#f3f3f3;
@@ -917,6 +1000,41 @@
   </div>
 </div>
 
+<div id="calcWrap" class="calcFloatingWrap" aria-hidden="true">
+  <div class="calcFloating" onclick="event.stopPropagation()">
+    <div class="calcTopBar">
+      <div class="calcTitle">CALCULATOR</div>
+      <button type="button" class="calcCloseBtn" onclick="closeCalc()">✕</button>
+    </div>
+    <div class="calcDisplay" id="globalCalcDisplay">0</div>
+    <div class="calcGrid">
+      <button type="button" class="calcKey op" data-global-calc="C">C</button>
+      <button type="button" class="calcKey op" data-global-calc="⌫">⌫</button>
+      <button type="button" class="calcKey op" data-global-calc="%">%</button>
+      <button type="button" class="calcKey op" data-global-calc="/">÷</button>
+
+      <button type="button" class="calcKey" data-global-calc="7">7</button>
+      <button type="button" class="calcKey" data-global-calc="8">8</button>
+      <button type="button" class="calcKey" data-global-calc="9">9</button>
+      <button type="button" class="calcKey op" data-global-calc="*">×</button>
+
+      <button type="button" class="calcKey" data-global-calc="4">4</button>
+      <button type="button" class="calcKey" data-global-calc="5">5</button>
+      <button type="button" class="calcKey" data-global-calc="6">6</button>
+      <button type="button" class="calcKey op" data-global-calc="-">−</button>
+
+      <button type="button" class="calcKey" data-global-calc="1">1</button>
+      <button type="button" class="calcKey" data-global-calc="2">2</button>
+      <button type="button" class="calcKey" data-global-calc="3">3</button>
+      <button type="button" class="calcKey op" data-global-calc="+">+</button>
+
+      <button type="button" class="calcKey wide" data-global-calc="0">0</button>
+      <button type="button" class="calcKey" data-global-calc=".">.</button>
+      <button type="button" class="calcKey eq" data-global-calc="=">=</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const MEMO_KEY = "jas_memos_v5";
   const PHOTO_KEY = "jas_photo_v5";
@@ -942,12 +1060,16 @@
   const tug2 = document.getElementById("tug2");
   const belt = document.getElementById("belt");
 
+  const calcWrap = document.getElementById("calcWrap");
+  const globalCalcDisplay = document.getElementById("globalCalcDisplay");
+
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
   let editId = null;
   let dayOffset = 0;
   let activeLirType = null;
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
+  let globalCalcExpr = "";
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
@@ -1099,8 +1221,8 @@
   }
 
   function addExtraRow(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
+    const box = root ? root.querySelector(\`#\${type}-EXTRAS\`) : null;
     if(!box) return;
     box.appendChild(makeExtraRow(type, "CREW", ""));
   }
@@ -1127,6 +1249,35 @@
     }
     photoImg.src = src;
     photoLayer.style.display = "flex";
+  }
+
+  function openCalc(){
+    calcWrap.classList.add("show");
+    calcWrap.setAttribute("aria-hidden","false");
+  }
+
+  function closeCalc(){
+    calcWrap.classList.remove("show");
+    calcWrap.setAttribute("aria-hidden","true");
+  }
+
+  function updateGlobalCalcDisplay(val){
+    globalCalcDisplay.textContent = val || "0";
+  }
+
+  function safeEval(expr){
+    if(!expr) return "0";
+    const cleaned = expr.replace(/[^0-9+\-*/%.()]/g, "");
+    if(!cleaned) return "0";
+    try{
+      const result = Function("return (" + cleaned + ")")();
+      if(result === undefined || result === null || Number.isNaN(result) || !Number.isFinite(result)){
+        return "ERROR";
+      }
+      return String(result);
+    }catch(e){
+      return "ERROR";
+    }
   }
 
   function makeSection(type, memoData){
@@ -1213,36 +1364,9 @@
           <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
           <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
         </div>
-        <button type="button" class="calcCircleBtn" data-calc-toggle="${type}">+</button>
-      </div>
-
-      <div class="calcPanel" id="${type}-CALCPANEL">
-        <div class="calcDisplay" id="${type}-CALCDISPLAY">0</div>
-        <div class="calcGrid">
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="C">C</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="⌫">⌫</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="%">%</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="/">÷</button>
-
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="7">7</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="8">8</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="9">9</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="*">×</button>
-
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="4">4</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="5">5</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="6">6</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="-">−</button>
-
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="1">1</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="2">2</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val="3">3</button>
-          <button type="button" class="calcKey op" data-calc-key="${type}" data-val="+">+</button>
-
-          <button type="button" class="calcKey wide" data-calc-key="${type}" data-val="0">0</button>
-          <button type="button" class="calcKey" data-calc-key="${type}" data-val=".">.</button>
-          <button type="button" class="calcKey eq" data-calc-key="${type}" data-val="=">=</button>
-        </div>
+        <button type="button" class="calcCircleBtn calcIconBtn" data-calc-toggle="${type}">
+          <span class="calcIcon"></span>
+        </button>
       </div>
       ` : ""}
 
@@ -1273,28 +1397,6 @@
     const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
     const lirViewBtn = d.querySelector(`[data-lir-view="${type}"]`);
     const calcToggleBtn = d.querySelector(`[data-calc-toggle="${type}"]`);
-    const calcPanel = d.querySelector(`#${type}-CALCPANEL`);
-    const calcDisplay = d.querySelector(`#${type}-CALCDISPLAY`);
-    let calcExpr = "";
-
-    function updateCalcDisplay(val){
-      if(calcDisplay) calcDisplay.textContent = val || "0";
-    }
-
-    function safeEval(expr){
-      if(!expr) return "0";
-      const cleaned = expr.replace(/[^0-9+\-*/%.()]/g, "");
-      if(!cleaned) return "0";
-      try{
-        const result = Function("return (" + cleaned + ")")();
-        if(result === undefined || result === null || Number.isNaN(result) || !Number.isFinite(result)){
-          return "ERROR";
-        }
-        return String(result);
-      }catch(e){
-        return "ERROR";
-      }
-    }
 
     if(lirAddBtn){
       lirAddBtn.addEventListener("click", ()=>{
@@ -1308,40 +1410,11 @@
       });
     }
 
-    if(calcToggleBtn && calcPanel){
+    if(calcToggleBtn){
       calcToggleBtn.addEventListener("click", ()=>{
-        calcPanel.classList.toggle("show");
+        openCalc();
       });
     }
-
-    d.querySelectorAll(`[data-calc-key="${type}"]`).forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const val = btn.dataset.val || "";
-
-        if(val === "C"){
-          calcExpr = "";
-          updateCalcDisplay("0");
-          return;
-        }
-
-        if(val === "⌫"){
-          calcExpr = calcExpr.slice(0, -1);
-          updateCalcDisplay(calcExpr || "0");
-          return;
-        }
-
-        if(val === "="){
-          calcExpr = safeEval(calcExpr);
-          updateCalcDisplay(calcExpr);
-          if(calcExpr === "ERROR") calcExpr = "";
-          return;
-        }
-
-        if(calcExpr === "ERROR") calcExpr = "";
-        calcExpr += val;
-        updateCalcDisplay(calcExpr);
-      });
-    });
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
@@ -1384,6 +1457,7 @@
     modal.setAttribute("aria-hidden","true");
     editId = null;
     activeLirType = null;
+    closeCalc();
     updateEquipBadge();
   }
 
@@ -1430,7 +1504,7 @@
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
-      const root = sections.querySelector(`.section[data-type="${type}"]`);
+      const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
 
       if(!root){
         data[type+"-7C"] = "";
@@ -1452,9 +1526,9 @@
         return;
       }
 
-      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
-      const note = root.querySelector(`textarea[data-k="${type}-note"]`);
+      const gi = (k)=> root.querySelector(\`input[data-k="\${type}-\${k}"]\`);
+      const cm = (n)=> root.querySelector(\`input[data-k="\${type}-cmpt\${n}"]\`);
+      const note = root.querySelector(\`textarea[data-k="\${type}-note"]\`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
       data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
@@ -1475,7 +1549,7 @@
       data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
 
       const extras = [];
-      const box = root.querySelector(`#${type}-EXTRAS`);
+      const box = root.querySelector(\`#\${type}-EXTRAS\`);
       if(box){
         [...box.querySelectorAll(".extraRow")].forEach(r=>{
           const key = (r.querySelector("select")?.value || "").toUpperCase();
@@ -1507,7 +1581,7 @@
     const v7c = v7cIn || v7cOut || "";
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
-    return `7C[${v7c}] HL[${vhl}] #[${hash}]`;
+    return \`7C[\${v7c}] HL[\${vhl}] #[\${hash}]\`;
   }
 
   function formatSplitLine(m, type){
@@ -1516,9 +1590,9 @@
     const hash = (m.sharedHASH || "").trim();
 
     if(type === "INBOUND"){
-      return `7C[${v7c}] HL[${vhl}]`;
+      return \`7C[\${v7c}] HL[\${vhl}]\`;
     }
-    return `7C[${v7c}] #[${hash}]`;
+    return \`7C[\${v7c}] #[\${hash}]\`;
   }
 
   function renderList(flashId){
@@ -1530,7 +1604,7 @@
       .sort((a,b)=> Number(a.id) - Number(b.id));
 
     if(!dayMemos.length){
-      memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`;
+      memoList.innerHTML = \`<div class="emptyDay">NO MEMO IN THIS DAY</div>\`;
       return;
     }
 
@@ -1774,6 +1848,39 @@
     if(e.target === equipModal) closeEquip();
   });
 
+  calcWrap.addEventListener("click", (e)=>{
+    if(e.target === calcWrap) closeCalc();
+  });
+
+  document.querySelectorAll("[data-global-calc]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const val = btn.dataset.globalCalc || "";
+
+      if(val === "C"){
+        globalCalcExpr = "";
+        updateGlobalCalcDisplay("0");
+        return;
+      }
+
+      if(val === "⌫"){
+        globalCalcExpr = globalCalcExpr.slice(0, -1);
+        updateGlobalCalcDisplay(globalCalcExpr || "0");
+        return;
+      }
+
+      if(val === "="){
+        globalCalcExpr = safeEval(globalCalcExpr);
+        updateGlobalCalcDisplay(globalCalcExpr);
+        if(globalCalcExpr === "ERROR") globalCalcExpr = "";
+        return;
+      }
+
+      if(globalCalcExpr === "ERROR") globalCalcExpr = "";
+      globalCalcExpr += val;
+      updateGlobalCalcDisplay(globalCalcExpr);
+    });
+  });
+
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
@@ -1816,6 +1923,7 @@
   renderList();
   updateEquipBadge();
   syncPhotoFromStorage(false);
+  updateGlobalCalcDisplay("0");
 </script>
 
 </body>
