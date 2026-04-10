@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 5.2</title>
+<title>JAS MEMO VER 6.1</title>
 
 <style>
   :root{
@@ -20,8 +20,12 @@
 
   *{box-sizing:border-box}
 
-  body{
+  html, body{
     margin:0;
+    padding:0;
+  }
+
+  body{
     font-family:-apple-system, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
     font-weight:700;
     background:
@@ -631,14 +635,6 @@
     text-transform:uppercase;
   }
 
-  .lirRow{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    margin:calc(12px * var(--ui)) 0 calc(4px * var(--ui));
-    flex-wrap:wrap;
-  }
-
   .lirBtn{
     padding:calc(10px * var(--ui)) calc(16px * var(--ui));
     font-size:calc(14px * var(--ui));
@@ -671,8 +667,6 @@
     background:#fff;
     box-shadow:0 8px 18px rgba(0,0,0,.10);
     color:var(--blue);
-    font-size:calc(22px * var(--ui));
-    font-weight:1000;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -720,12 +714,12 @@
   .calcFloatingWrap{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.22);
+    background:rgba(0,0,0,.24);
     display:none;
     align-items:flex-end;
     justify-content:center;
     z-index:120;
-    padding:calc(18px * var(--ui));
+    padding:calc(16px * var(--ui));
   }
 
   .calcFloatingWrap.show{
@@ -733,7 +727,7 @@
   }
 
   .calcFloating{
-    width:min(420px, 100%);
+    width:min(430px, 100%);
     background:#fff;
     border-radius:calc(24px * var(--ui));
     box-shadow:0 22px 46px rgba(0,0,0,.28);
@@ -826,6 +820,11 @@
     grid-column:span 2;
   }
 
+  .focusedCalcTarget{
+    border-color:#2f7df6 !important;
+    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(47,125,246,.14) !important;
+  }
+
   #photoLayer{
     position:fixed;
     inset:0;
@@ -905,11 +904,11 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 5.2</div>
+    <div class="titleVer">VER 6.1</div>
   </div>
 </header>
 
-<div class="controls">
+<div class="controls" id="topControls">
   <button type="button" onclick="newMemo()">ADD</button>
   <button type="button" onclick="deleteSelected()">DELETE</button>
   <button type="button" onclick="addPhoto()">PHOTO</button>
@@ -1036,9 +1035,9 @@
 </div>
 
 <script>
-  const MEMO_KEY = "jas_memos_v5";
-  const PHOTO_KEY = "jas_photo_v5";
-  const EQUIP_KEY = "jas_equipment_v5";
+  const MEMO_KEY = "jas_memos_v61";
+  const PHOTO_KEY = "jas_photo_v61";
+  const EQUIP_KEY = "jas_equipment_v61";
 
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
@@ -1053,6 +1052,7 @@
   const dayLabel = document.getElementById("dayLabel");
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
+  const topControls = document.getElementById("topControls");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -1070,6 +1070,7 @@
   let activeLirType = null;
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
+  let activeCalcInput = null;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
@@ -1173,6 +1174,46 @@
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
   }
+
+  function isCalcEligibleInput(el){
+    if(!(el instanceof HTMLInputElement)) return false;
+    const k = el.dataset.k || "";
+    if(!k) return false;
+    return (
+      k.endsWith("-7C") ||
+      k.endsWith("-STA") ||
+      k.endsWith("-STD") ||
+      k.endsWith("-t") ||
+      k.endsWith("-d") ||
+      k.endsWith("-bb") ||
+      k.endsWith("-tt") ||
+      k.endsWith("-tb") ||
+      k === "SHARED-HL" ||
+      k === "SHARED-HASH" ||
+      k.startsWith("extraVal-")
+    );
+  }
+
+  document.addEventListener("focusin", (e)=>{
+    const t = e.target;
+    if(isCalcEligibleInput(t)){
+      if(activeCalcInput && activeCalcInput !== t){
+        activeCalcInput.classList.remove("focusedCalcTarget");
+      }
+      activeCalcInput = t;
+      activeCalcInput.classList.add("focusedCalcTarget");
+    }
+  });
+
+  document.addEventListener("click", (e)=>{
+    const t = e.target;
+    if(!(t instanceof HTMLElement)) return;
+    if(!t.closest(".section") && !t.closest(".calcFloating")){
+      if(activeCalcInput){
+        activeCalcInput.classList.remove("focusedCalcTarget");
+      }
+    }
+  });
 
   document.addEventListener("input", (e)=>{
     const t = e.target;
@@ -1278,6 +1319,28 @@
     }catch(e){
       return "ERROR";
     }
+  }
+
+  function applyCalcToInput(result){
+    if(!activeCalcInput) return;
+    const k = activeCalcInput.dataset.k || "";
+    const digits = String(result || "").replace(/[^0-9]/g, "");
+
+    if(k === "SHARED-HL"){
+      activeCalcInput.value = digits.slice(0,4);
+    }else if(k === "SHARED-HASH"){
+      activeCalcInput.value = digits.slice(0,3);
+    }else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD") || k.endsWith("-tt") || k.endsWith("-tb")){
+      activeCalcInput.value = digits.slice(0,4);
+    }else if(k.endsWith("-t") || k.startsWith("extraVal-")){
+      activeCalcInput.value = digits.slice(0,3);
+    }else if(k.endsWith("-d") || k.endsWith("-bb")){
+      activeCalcInput.value = digits.slice(0,2);
+    }else{
+      activeCalcInput.value = digits;
+    }
+
+    activeCalcInput.dispatchEvent(new Event("input", { bubbles:true }));
   }
 
   function makeSection(type, memoData){
@@ -1450,6 +1513,7 @@
     modal.setAttribute("aria-hidden","false");
     sheet.style.transform = "translateY(0)";
     currentTranslate = 0;
+    topControls.style.display = "none";
   }
 
   function closeModal(){
@@ -1458,6 +1522,8 @@
     editId = null;
     activeLirType = null;
     closeCalc();
+    if(activeCalcInput) activeCalcInput.classList.remove("focusedCalcTarget");
+    topControls.style.display = "flex";
     updateEquipBadge();
   }
 
@@ -1871,7 +1937,11 @@
       if(val === "="){
         globalCalcExpr = safeEval(globalCalcExpr);
         updateGlobalCalcDisplay(globalCalcExpr);
-        if(globalCalcExpr === "ERROR") globalCalcExpr = "";
+        if(globalCalcExpr !== "ERROR"){
+          applyCalcToInput(globalCalcExpr);
+        }else{
+          globalCalcExpr = "";
+        }
         return;
       }
 
