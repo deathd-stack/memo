@@ -21,7 +21,6 @@
     --muted:#b4b4bc;
     --shadow:0 20px 44px rgba(0,0,0,.34);
     --shadow-soft:0 10px 24px rgba(0,0,0,.26);
-
     --ui:0.715;
     --dayUi:0.65;
   }
@@ -57,7 +56,6 @@
     flex-wrap:wrap;
   }
 
-  /* 10% 확대, 비율 유지 */
   .titleMain{
     font-size:calc(46.2px * var(--ui));
     font-weight:1000;
@@ -291,7 +289,6 @@
     50%{transform:scale(1.01); filter:brightness(1.06)}
   }
 
-  /* 하단 배치 */
   .bottomLeftButtons{
     position:fixed;
     left:calc(14px * var(--ui));
@@ -349,9 +346,6 @@
 
   #equipBadge{
     position:relative;
-    right:auto;
-    bottom:auto;
-    z-index:auto;
     min-width:calc(148px * var(--ui));
     background:rgba(18,18,20,.92);
     color:#fff;
@@ -370,14 +364,8 @@
     -webkit-backdrop-filter:blur(8px);
   }
 
-  #equipBadge .b1{
-    font-size:calc(18px * var(--ui));
-  }
-
-  #equipBadge .b2{
-    font-size:calc(18px * var(--ui));
-    opacity:.95;
-  }
+  #equipBadge .b1{font-size:calc(18px * var(--ui));}
+  #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
 
   .modal{
     position:fixed;
@@ -439,103 +427,22 @@
     color:var(--orange1);
   }
 
-  .stickyPhotoWrap{
+  /* 네가 원하는 고정 영역 */
+  .modalTitleTap{
     position:sticky;
     top:calc(72px * var(--ui));
-    z-index:35;
-    margin:0 calc(-4px * var(--ui)) calc(14px * var(--ui));
-    padding:0 0 calc(8px * var(--ui));
-    background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.96) 76%, rgba(23,23,26,0) 100%);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  .stickyPhotoCard{
-    position:relative;
-    width:100%;
-    height:calc(150px * var(--ui));
-    border-radius:calc(26px * var(--ui));
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,.06);
-    background:#0f0f12;
-    box-shadow:0 12px 28px rgba(0,0,0,.26);
-    cursor:pointer;
-  }
-
-  .stickyPhotoCard img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-    pointer-events:auto;
-    transform:scale(1.02);
-    filter:saturate(1.02) contrast(1.03);
-  }
-
-  .stickyPhotoCard::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,.30) 100%);
-    pointer-events:none;
-  }
-
-  .stickyPhotoText{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    z-index:2;
-    text-align:center;
-    color:#fff;
-    text-transform:uppercase;
-    pointer-events:none;
-  }
-
-  .stickyPhotoText .t1{
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.4px;
-  }
-
-  .stickyPhotoText .t2{
-    margin-top:calc(4px * var(--ui));
-    font-size:calc(11px * var(--ui));
-    opacity:.78;
-    letter-spacing:.6px;
-  }
-
-  .stickyPhotoBadge{
-    position:absolute;
-    right:calc(12px * var(--ui));
-    bottom:calc(12px * var(--ui));
-    z-index:2;
-    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
-    border-radius:999px;
-    font-size:calc(11px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    background:rgba(0,0,0,.40);
-    border:1px solid rgba(255,255,255,.10);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-    text-transform:uppercase;
-  }
-
-  .stickyPhotoEmpty{
-    background:
-      radial-gradient(circle at 50% 20%, rgba(255,122,0,.18), transparent 46%),
-      linear-gradient(180deg,#19191d,#111114);
-  }
-
-  .modalTitleTap{
+    z-index:34;
     text-align:center;
     font-weight:1000;
     color:#fff;
-    padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
+    padding:calc(10px * var(--ui)) 0 calc(12px * var(--ui));
     cursor:pointer;
     user-select:none;
     text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.98) 78%, rgba(23,23,26,.90) 100%);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    margin:0 calc(-14px * var(--ui));
   }
 
   .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
@@ -547,6 +454,7 @@
     align-items:center;
     gap:calc(8px * var(--ui));
     margin-bottom:calc(8px * var(--ui));
+    margin-top:calc(6px * var(--ui));
   }
 
   .dateLine .dateLab{
@@ -1156,17 +1064,6 @@
       </div>
     </div>
 
-    <div class="stickyPhotoWrap">
-      <div class="stickyPhotoCard stickyPhotoEmpty" id="stickyPhotoCard" onclick="openPhoto()">
-        <img id="stickyPhotoImg" alt="sticky preview" style="display:none;">
-        <div class="stickyPhotoText" id="stickyPhotoText">
-          <div class="t1">JAS MEMO</div>
-          <div class="t2">TAP TO OPEN PHOTO</div>
-        </div>
-        <div class="stickyPhotoBadge">PHOTO</div>
-      </div>
-    </div>
-
     <div class="modalTitleTap" onclick="openPhoto()">
       <div class="m1">JAS MEMO</div>
       <div class="m2">TAP TO OPEN PHOTO</div>
@@ -1275,9 +1172,6 @@
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
   const topControls = document.getElementById("topControls");
-  const stickyPhotoCard = document.getElementById("stickyPhotoCard");
-  const stickyPhotoImg = document.getElementById("stickyPhotoImg");
-  const stickyPhotoText = document.getElementById("stickyPhotoText");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -1398,26 +1292,6 @@
     memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
-  }
-
-  function updateStickyPhoto(){
-    if(photo){
-      stickyPhotoImg.src = photo;
-      stickyPhotoImg.style.display = "block";
-      stickyPhotoCard.classList.remove("stickyPhotoEmpty");
-      stickyPhotoText.innerHTML = `
-        <div class="t1">JAS MEMO</div>
-        <div class="t2">TAP TO OPEN PHOTO</div>
-      `;
-    }else{
-      stickyPhotoImg.removeAttribute("src");
-      stickyPhotoImg.style.display = "none";
-      stickyPhotoCard.classList.add("stickyPhotoEmpty");
-      stickyPhotoText.innerHTML = `
-        <div class="t1">JAS MEMO</div>
-        <div class="t2">NO PHOTO / TAP HEADER PHOTO BUTTON</div>
-      `;
-    }
   }
 
   function isCalcEligibleInput(el){
@@ -1759,7 +1633,6 @@
     sheet.style.transform = "translateY(0)";
     currentTranslate = 0;
     topControls.style.display = "none";
-    updateStickyPhoto();
   }
 
   function closeModal(){
@@ -2057,7 +1930,6 @@
         photoImg.removeAttribute("src");
       }
     }
-    updateStickyPhoto();
   }
 
   async function savePhotoFile(file){
@@ -2066,7 +1938,6 @@
       localStorage.setItem(PHOTO_KEY, stableDataUrl);
       photo = stableDataUrl;
       photoImg.src = stableDataUrl;
-      updateStickyPhoto();
       alert("PHOTO SAVED");
     }catch(err){
       console.error(err);
