@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.3 BLACK PREMIUM</title>
+<title>JAS MEMO VER 6.4</title>
 
 <style>
   :root{
@@ -22,8 +22,8 @@
     --shadow:0 20px 44px rgba(0,0,0,.34);
     --shadow-soft:0 10px 24px rgba(0,0,0,.26);
 
-    --ui:0.715;     /* 기존 0.65에서 약 10% 확대 */
-    --dayUi:0.65;   /* DAY 부분만 기존 크기 유지 */
+    --ui:0.715;
+    --dayUi:0.65;
   }
 
   *{box-sizing:border-box}
@@ -57,8 +57,9 @@
     flex-wrap:wrap;
   }
 
+  /* 10% 확대, 비율 유지 */
   .titleMain{
-    font-size:calc(42px * var(--ui));
+    font-size:calc(46.2px * var(--ui));
     font-weight:1000;
     letter-spacing:-1.2px;
     text-transform:uppercase;
@@ -68,7 +69,7 @@
   }
 
   .titleVer{
-    font-size:calc(17px * var(--ui));
+    font-size:calc(18.7px * var(--ui));
     font-weight:1000;
     opacity:.92;
     text-transform:uppercase;
@@ -111,7 +112,6 @@
     transform:scale(.985);
   }
 
-  /* DAY BAR만 기존 크기 유지 */
   .dayBar{
     width:min(calc(780px * var(--dayUi) / .65), calc(100% - 24px));
     margin:calc(2px * var(--dayUi)) auto calc(10px * var(--dayUi));
@@ -291,67 +291,93 @@
     50%{transform:scale(1.01); filter:brightness(1.06)}
   }
 
-  .bottomAppButtons{
+  /* 하단 배치 */
+  .bottomLeftButtons{
     position:fixed;
     left:calc(14px * var(--ui));
     bottom:calc(18px * var(--ui));
     z-index:30;
     display:flex;
     flex-direction:column;
-    gap:calc(10px * var(--ui));
+    gap:calc(12px * var(--ui));
+  }
+
+  .bottomRightButtons{
+    position:fixed;
+    right:calc(14px * var(--ui));
+    bottom:calc(18px * var(--ui));
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    gap:calc(12px * var(--ui));
+    align-items:flex-end;
   }
 
   .itMemoBtn,
   .akMemoBtn,
   .equipBtn{
-    width:calc(146px * var(--ui));
-    height:calc(48px * var(--ui));
+    width:calc(148px * var(--ui));
+    height:calc(50px * var(--ui));
     border-radius:999px;
-    font-size:calc(15px * var(--ui));
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
     padding:0;
     display:flex;
     align-items:center;
     justify-content:center;
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:
+      0 12px 24px rgba(0,0,0,.22),
+      inset 0 1px 0 rgba(255,255,255,.06);
+    letter-spacing:.2px;
   }
 
   .itMemoBtn{
-    background:linear-gradient(180deg,#ffd052,#ff9b16);
+    background:linear-gradient(180deg,#ffe063,#ffc61a);
     color:#111;
   }
 
   .akMemoBtn{
-    background:linear-gradient(180deg,#ff4b5f,#d80024);
+    background:linear-gradient(180deg,#ff3953,#d80024);
     color:#fff;
   }
 
   .equipBtn{
-    background:linear-gradient(180deg,#2a2a2f,#1c1c20);
+    background:linear-gradient(180deg,#2d2d33,#1c1c20);
     color:var(--orange1);
   }
 
   #equipBadge{
-    position:fixed;
-    right:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
-    z-index:20;
+    position:relative;
+    right:auto;
+    bottom:auto;
+    z-index:auto;
+    min-width:calc(148px * var(--ui));
     background:rgba(18,18,20,.92);
     color:#fff;
-    border-radius:calc(26px * var(--ui));
-    padding:calc(13px * var(--ui)) calc(16px * var(--ui));
+    border-radius:calc(24px * var(--ui));
+    padding:calc(12px * var(--ui)) calc(14px * var(--ui));
     font-weight:1000;
     line-height:1.15;
     text-align:right;
-    box-shadow:0 16px 30px rgba(0,0,0,.28);
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.24),
+      inset 0 1px 0 rgba(255,255,255,.05);
     display:none;
     text-transform:uppercase;
-    border:1px solid rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.06);
     backdrop-filter:blur(8px);
     -webkit-backdrop-filter:blur(8px);
   }
 
-  #equipBadge .b1{font-size:calc(18px * var(--ui));}
-  #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
+  #equipBadge .b1{
+    font-size:calc(18px * var(--ui));
+  }
+
+  #equipBadge .b2{
+    font-size:calc(18px * var(--ui));
+    opacity:.95;
+  }
 
   .modal{
     position:fixed;
@@ -386,7 +412,7 @@
     position:sticky;
     top:0;
     background:#17171a;
-    z-index:5;
+    z-index:40;
   }
 
   .drag-handle{
@@ -411,6 +437,95 @@
     box-shadow:none;
     background:#242429;
     color:var(--orange1);
+  }
+
+  .stickyPhotoWrap{
+    position:sticky;
+    top:calc(72px * var(--ui));
+    z-index:35;
+    margin:0 calc(-4px * var(--ui)) calc(14px * var(--ui));
+    padding:0 0 calc(8px * var(--ui));
+    background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.96) 76%, rgba(23,23,26,0) 100%);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  .stickyPhotoCard{
+    position:relative;
+    width:100%;
+    height:calc(150px * var(--ui));
+    border-radius:calc(26px * var(--ui));
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.06);
+    background:#0f0f12;
+    box-shadow:0 12px 28px rgba(0,0,0,.26);
+    cursor:pointer;
+  }
+
+  .stickyPhotoCard img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    pointer-events:auto;
+    transform:scale(1.02);
+    filter:saturate(1.02) contrast(1.03);
+  }
+
+  .stickyPhotoCard::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg, rgba(0,0,0,.16) 0%, rgba(0,0,0,.30) 100%);
+    pointer-events:none;
+  }
+
+  .stickyPhotoText{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    z-index:2;
+    text-align:center;
+    color:#fff;
+    text-transform:uppercase;
+    pointer-events:none;
+  }
+
+  .stickyPhotoText .t1{
+    font-size:calc(18px * var(--ui));
+    font-weight:1000;
+    letter-spacing:.4px;
+  }
+
+  .stickyPhotoText .t2{
+    margin-top:calc(4px * var(--ui));
+    font-size:calc(11px * var(--ui));
+    opacity:.78;
+    letter-spacing:.6px;
+  }
+
+  .stickyPhotoBadge{
+    position:absolute;
+    right:calc(12px * var(--ui));
+    bottom:calc(12px * var(--ui));
+    z-index:2;
+    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
+    border-radius:999px;
+    font-size:calc(11px * var(--ui));
+    font-weight:1000;
+    color:#fff;
+    background:rgba(0,0,0,.40);
+    border:1px solid rgba(255,255,255,.10);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    text-transform:uppercase;
+  }
+
+  .stickyPhotoEmpty{
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255,122,0,.18), transparent 46%),
+      linear-gradient(180deg,#19191d,#111114);
   }
 
   .modalTitleTap{
@@ -955,8 +1070,14 @@
   }
 
   @media (max-width:520px){
-    .bottomAppButtons{
+    .bottomLeftButtons{
       left:12px;
+      bottom:14px;
+      gap:10px;
+    }
+
+    .bottomRightButtons{
+      right:12px;
       bottom:14px;
       gap:10px;
     }
@@ -965,8 +1086,17 @@
     .akMemoBtn,
     .equipBtn{
       width:122px;
-      max-width:122px;
       height:42px;
+      font-size:14px;
+    }
+
+    #equipBadge{
+      min-width:122px;
+      padding:10px 12px;
+    }
+
+    #equipBadge .b1,
+    #equipBadge .b2{
       font-size:14px;
     }
 
@@ -983,7 +1113,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.3 BLACK PREMIUM</div>
+    <div class="titleVer">VER 6.4</div>
   </div>
 </header>
 
@@ -1003,13 +1133,15 @@
 
 <div id="memoList"></div>
 
-<div class="bottomAppButtons">
-  <button class="itMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS2/'">IT MEMO</button>
-  <button class="akMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS1/'">AK MEMO</button>
+<div class="bottomLeftButtons">
   <button class="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
+  <button class="itMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS2/'">IT MEMO</button>
 </div>
 
-<div id="equipBadge"></div>
+<div class="bottomRightButtons">
+  <div id="equipBadge"></div>
+  <button class="akMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS1/'">AK MEMO</button>
+</div>
 
 <input type="file" id="photoInput" accept="image/*" hidden />
 <input type="file" id="lirPhotoInput" accept="image/*" hidden />
@@ -1021,6 +1153,17 @@
       <div class="topActionBar">
         <button type="button" class="topMiniBtn" onclick="saveMemo()">SAVE</button>
         <button type="button" class="topMiniBtn" onclick="closeModal()">CLOSE</button>
+      </div>
+    </div>
+
+    <div class="stickyPhotoWrap">
+      <div class="stickyPhotoCard stickyPhotoEmpty" id="stickyPhotoCard" onclick="openPhoto()">
+        <img id="stickyPhotoImg" alt="sticky preview" style="display:none;">
+        <div class="stickyPhotoText" id="stickyPhotoText">
+          <div class="t1">JAS MEMO</div>
+          <div class="t2">TAP TO OPEN PHOTO</div>
+        </div>
+        <div class="stickyPhotoBadge">PHOTO</div>
       </div>
     </div>
 
@@ -1114,9 +1257,9 @@
 </div>
 
 <script>
-  const MEMO_KEY = "jas_memos_v63_black_premium";
-  const PHOTO_KEY = "jas_photo_v63_black_premium";
-  const EQUIP_KEY = "jas_equipment_v63_black_premium";
+  const MEMO_KEY = "jas_memos_v64";
+  const PHOTO_KEY = "jas_photo_v64";
+  const EQUIP_KEY = "jas_equipment_v64";
 
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
@@ -1132,6 +1275,9 @@
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
   const topControls = document.getElementById("topControls");
+  const stickyPhotoCard = document.getElementById("stickyPhotoCard");
+  const stickyPhotoImg = document.getElementById("stickyPhotoImg");
+  const stickyPhotoText = document.getElementById("stickyPhotoText");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -1252,6 +1398,26 @@
     memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
+  }
+
+  function updateStickyPhoto(){
+    if(photo){
+      stickyPhotoImg.src = photo;
+      stickyPhotoImg.style.display = "block";
+      stickyPhotoCard.classList.remove("stickyPhotoEmpty");
+      stickyPhotoText.innerHTML = `
+        <div class="t1">JAS MEMO</div>
+        <div class="t2">TAP TO OPEN PHOTO</div>
+      `;
+    }else{
+      stickyPhotoImg.removeAttribute("src");
+      stickyPhotoImg.style.display = "none";
+      stickyPhotoCard.classList.add("stickyPhotoEmpty");
+      stickyPhotoText.innerHTML = `
+        <div class="t1">JAS MEMO</div>
+        <div class="t2">NO PHOTO / TAP HEADER PHOTO BUTTON</div>
+      `;
+    }
   }
 
   function isCalcEligibleInput(el){
@@ -1593,6 +1759,7 @@
     sheet.style.transform = "translateY(0)";
     currentTranslate = 0;
     topControls.style.display = "none";
+    updateStickyPhoto();
   }
 
   function closeModal(){
@@ -1890,6 +2057,7 @@
         photoImg.removeAttribute("src");
       }
     }
+    updateStickyPhoto();
   }
 
   async function savePhotoFile(file){
@@ -1898,6 +2066,7 @@
       localStorage.setItem(PHOTO_KEY, stableDataUrl);
       photo = stableDataUrl;
       photoImg.src = stableDataUrl;
+      updateStickyPhoto();
       alert("PHOTO SAVED");
     }catch(err){
       console.error(err);
