@@ -6,8 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4</title>
-
+<title>JAS MEMO VER 6.4 SHARE COMPLETE</title>
 <style>
   :root{
     --bgSolid:#ff6a00;
@@ -26,12 +25,7 @@
   }
 
   *{box-sizing:border-box}
-
-  html, body{
-    margin:0;
-    padding:0;
-  }
-
+  html, body{margin:0;padding:0}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
     font-weight:800;
@@ -47,40 +41,41 @@
     user-select:none;
     cursor:pointer;
   }
+  .titleWrap{display:flex;justify-content:center;align-items:baseline;gap:calc(10px * var(--ui));flex-wrap:wrap}
+  .titleMain{font-size:calc(46.2px * var(--ui));font-weight:1000;letter-spacing:-1.2px;line-height:1;color:#fff;text-shadow:0 0 18px rgba(0,0,0,.14)}
+  .titleVer{font-size:calc(18.7px * var(--ui));font-weight:1000;opacity:.92;color:#fff2d8;letter-spacing:.4px}
 
-  .titleWrap{
+  .shareTopWrap{
+    width:min(calc(820px * var(--ui) / .65), calc(100% - 24px));
+    margin:0 auto calc(10px * var(--ui));
+    display:flex;
+    flex-direction:column;
+    gap:calc(8px * var(--ui));
+  }
+
+  .shareCard{
+    background:rgba(24,24,27,.88);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:calc(24px * var(--ui));
+    padding:calc(12px * var(--ui));
+    box-shadow:0 12px 24px rgba(0,0,0,.16);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+  }
+
+  .shareRow{display:flex;gap:calc(8px * var(--ui));flex-wrap:wrap;align-items:center}
+  .shareStat{font-size:calc(13px * var(--ui));color:#fff;background:rgba(255,255,255,.04);padding:calc(9px * var(--ui)) calc(12px * var(--ui));border-radius:999px;border:1px solid rgba(255,255,255,.05)}
+  .groupPillBtn{padding:calc(10px * var(--ui)) calc(14px * var(--ui));font-size:calc(13px * var(--ui));border-radius:999px;box-shadow:none}
+  .groupPillBtn.active{background:#fff;color:#111}
+
+  .controls,.authControls,.groupControls,.dayBar{
+    width:min(calc(820px * var(--ui) / .65), calc(100% - 24px));
+    margin:0 auto calc(10px * var(--ui));
     display:flex;
     justify-content:center;
-    align-items:baseline;
-    gap:calc(10px * var(--ui));
+    gap:calc(8px * var(--ui));
     flex-wrap:wrap;
-  }
-
-  .titleMain{
-    font-size:calc(46.2px * var(--ui));
-    font-weight:1000;
-    letter-spacing:-1.2px;
-    text-transform:uppercase;
-    line-height:1;
-    color:#fff;
-    text-shadow:0 0 18px rgba(0,0,0,.14);
-  }
-
-  .titleVer{
-    font-size:calc(18.7px * var(--ui));
-    font-weight:1000;
-    opacity:.92;
-    text-transform:uppercase;
-    color:#fff2d8;
-    letter-spacing:.4px;
-  }
-
-  .controls{
-    display:flex;
-    justify-content:center;
-    gap:calc(10px * var(--ui));
-    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(8px * var(--ui));
-    flex-wrap:wrap;
+    align-items:center;
   }
 
   button{
@@ -94,516 +89,16 @@
     box-shadow:var(--shadow-soft);
     text-transform:uppercase;
     cursor:pointer;
-    transition:transform .14s ease, box-shadow .14s ease, filter .14s ease, opacity .14s ease;
+    transition:transform .14s ease, box-shadow .14s ease, filter .14s ease;
     border:1px solid rgba(255,255,255,.06);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
   }
-
-  button:hover{
-    transform:translateY(-1px);
-    box-shadow:0 16px 30px rgba(0,0,0,.30);
-    filter:brightness(1.04);
-  }
-
-  button:active{
-    transform:scale(.985);
-  }
-
-  .dayBar{
-    width:min(calc(780px * var(--dayUi) / .65), calc(100% - 24px));
-    margin:calc(2px * var(--dayUi)) auto calc(10px * var(--dayUi));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:calc(8px * var(--dayUi));
-    flex-wrap:wrap;
-  }
-
-  .dayBtn{
-    padding:calc(10px * var(--dayUi)) calc(14px * var(--dayUi));
-    font-size:calc(13px * var(--dayUi));
-    border-radius:999px;
-    box-shadow:none;
-    background:rgba(34,34,38,.92);
-    color:var(--orange1);
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  .dayLabel{
-    background:rgba(34,34,38,.96);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(10px * var(--dayUi)) calc(16px * var(--dayUi));
-    font-size:calc(13px * var(--dayUi));
-    font-weight:1000;
-    color:#fff;
-    box-shadow:0 8px 18px rgba(0,0,0,.20);
-    text-transform:uppercase;
-    letter-spacing:.3px;
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  #memoList{
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
-    max-width:calc(780px * var(--ui) / .65);
-    margin:0 auto;
-  }
-
-  .emptyDay{
-    background:rgba(28,28,31,.70);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:calc(30px * var(--ui));
-    padding:calc(22px * var(--ui));
-    color:#fff;
-    text-align:center;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    margin-bottom:calc(42px * var(--ui));
-    box-shadow:0 14px 28px rgba(0,0,0,.22);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  .memoCard{
-    background:linear-gradient(180deg, rgba(34,34,38,.96), rgba(24,24,27,.96));
-    border-radius:calc(32px * var(--ui));
-    padding:calc(16px * var(--ui)) calc(14px * var(--ui));
-    margin:calc(12px * var(--ui)) 0;
-    box-shadow:var(--shadow);
-    border:1px solid rgba(255,255,255,.06);
-    overflow:hidden;
-    position:relative;
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-  }
-
-  .memoCard::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:calc(6px * var(--ui));
-    background:linear-gradient(180deg,var(--orange1),var(--orange2),var(--orange3));
-    box-shadow:0 0 20px rgba(255,122,0,.25);
-  }
-
-  .memoRow{
-    display:flex;
-    gap:calc(10px * var(--ui));
-    align-items:flex-start;
-    padding-left:calc(4px * var(--ui));
-  }
-
-  .selBox{
-    width:calc(30px * var(--ui));
-    height:calc(30px * var(--ui));
-    border-radius:calc(12px * var(--ui));
-    border:2px solid rgba(255,255,255,.18);
-    background:#131316;
-    appearance:none;
-    margin-top:calc(8px * var(--ui));
-    flex:0 0 auto;
-    position:relative;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-  }
-
-  .selBox:checked{
-    background:#1a1a1d;
-    border-color:var(--orange2);
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12);
-  }
-
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:calc(10px * var(--ui));
-    height:calc(16px * var(--ui));
-    border-right:calc(3px * var(--ui)) solid var(--orange2);
-    border-bottom:calc(3px * var(--ui)) solid var(--orange2);
-    transform:translate(-50%,-60%) rotate(45deg);
-  }
-
-  .lines{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    gap:calc(10px * var(--ui));
-    cursor:pointer;
-    min-width:0;
-  }
-
-  .line{
-    display:flex;
-    align-items:flex-start;
-    gap:calc(10px * var(--ui));
-    min-width:0;
-  }
-
-  .tagPill{
-    background:linear-gradient(180deg,#ff9a2f,#ff6a00);
-    color:#fff;
-    border-radius:999px;
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-    font-weight:1000;
-    font-size:calc(15px * var(--ui));
-    min-width:calc(70px * var(--ui));
-    text-align:center;
-    flex:0 0 auto;
-    text-transform:uppercase;
-    box-shadow:0 8px 16px rgba(255,122,0,.20);
-  }
-
-  .textPill{
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.05);
-    border-radius:999px;
-    padding:calc(11px * var(--ui)) calc(16px * var(--ui));
-    font-weight:1000;
-    font-size:calc(18px * var(--ui));
-    color:#fff;
-    flex:1;
-    min-width:0;
-    white-space:normal;
-    overflow:visible;
-    word-break:break-word;
-    text-transform:uppercase;
-  }
-
-  .datePill{
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-    font-size:calc(12px * var(--ui));
-    color:var(--muted);
-    font-weight:1000;
-    text-transform:uppercase;
-    letter-spacing:.2px;
-  }
-
-  .flash{animation:flash .55s;}
-  @keyframes flash{
-    50%{transform:scale(1.01); filter:brightness(1.06)}
-  }
-
-  .bottomLeftButtons{
-    position:fixed;
-    left:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
-    z-index:30;
-    display:flex;
-    flex-direction:column;
-    gap:calc(12px * var(--ui));
-  }
-
-  .bottomRightButtons{
-    position:fixed;
-    right:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
-    z-index:30;
-    display:flex;
-    flex-direction:column;
-    gap:calc(12px * var(--ui));
-    align-items:flex-end;
-  }
-
-  .itMemoBtn,
-  .akMemoBtn,
-  .equipBtn{
-    width:calc(148px * var(--ui));
-    height:calc(50px * var(--ui));
-    border-radius:999px;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    padding:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:
-      0 12px 24px rgba(0,0,0,.22),
-      inset 0 1px 0 rgba(255,255,255,.06);
-    letter-spacing:.2px;
-  }
-
-  .itMemoBtn{
-    background:linear-gradient(180deg,#ffe063,#ffc61a);
-    color:#111;
-  }
-
-  .akMemoBtn{
-    background:linear-gradient(180deg,#ff3953,#d80024);
-    color:#fff;
-  }
-
-  .equipBtn{
-    background:linear-gradient(180deg,#2d2d33,#1c1c20);
-    color:var(--orange1);
-  }
-
-  #equipBadge{
-    position:relative;
-    min-width:calc(148px * var(--ui));
-    background:rgba(18,18,20,.92);
-    color:#fff;
-    border-radius:calc(24px * var(--ui));
-    padding:calc(12px * var(--ui)) calc(14px * var(--ui));
-    font-weight:1000;
-    line-height:1.15;
-    text-align:right;
-    box-shadow:
-      0 14px 28px rgba(0,0,0,.24),
-      inset 0 1px 0 rgba(255,255,255,.05);
-    display:none;
-    text-transform:uppercase;
-    border:1px solid rgba(255,255,255,.06);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-  }
-
-  #equipBadge .b1{font-size:calc(18px * var(--ui));}
-  #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
-
-  .modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.58);
-    display:none;
-    justify-content:center;
-    align-items:flex-end;
-    z-index:50;
-    overscroll-behavior:contain;
-    pointer-events:none;
-  }
-
-  .box{
-    width:100%;
-    max-width:calc(820px * var(--ui) / .65);
-    background:#17171a;
-    border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;
-    padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));
-    max-height:92vh;
-    overflow:auto;
-    transform:translateY(0);
-    will-change:transform;
-    -webkit-overflow-scrolling:touch;
-    pointer-events:auto;
-    box-shadow:0 -10px 30px rgba(0,0,0,.28);
-    border-top:1px solid rgba(255,255,255,.05);
-  }
-
-  .dragArea{
-    padding:calc(7px * var(--ui)) 0 calc(8px * var(--ui));
-    position:sticky;
-    top:0;
-    background:#17171a;
-    z-index:40;
-  }
-
-  .drag-handle{
-    width:calc(62px * var(--ui));
-    height:calc(8px * var(--ui));
-    background:#494952;
-    border-radius:999px;
-    margin:0 auto calc(8px * var(--ui));
-  }
-
-  .topActionBar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-  }
-
-  .topMiniBtn{
-    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(14px * var(--ui));
-    border-radius:999px;
-    box-shadow:none;
-    background:#242429;
-    color:var(--orange1);
-  }
-
-  /* 네가 원하는 고정 영역 */
-  .modalTitleTap{
-    position:sticky;
-    top:calc(72px * var(--ui));
-    z-index:34;
-    text-align:center;
-    font-weight:1000;
-    color:#fff;
-    padding:calc(10px * var(--ui)) 0 calc(12px * var(--ui));
-    cursor:pointer;
-    user-select:none;
-    text-transform:uppercase;
-    background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.98) 78%, rgba(23,23,26,.90) 100%);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    margin:0 calc(-14px * var(--ui));
-  }
-
-  .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
-  .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.58; margin-top:2px;}
-
-  .dateLine{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    margin-bottom:calc(8px * var(--ui));
-    margin-top:calc(6px * var(--ui));
-  }
-
-  .dateLine .dateLab{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
-  .dateInput{
-    width:auto !important;
-    min-width:calc(180px * var(--ui));
-    text-align:center;
-    padding:0 calc(12px * var(--ui));
-  }
-
-  .pickRow{
-    display:flex;
-    justify-content:center;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-    margin:calc(6px * var(--ui)) 0 calc(12px * var(--ui));
-  }
-
-  .pickPill{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    background:#222226;
-    border:2px solid #2d2d32;
-    border-radius:999px;
-    padding:calc(11px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-    user-select:none;
-    color:#fff;
-  }
-
-  .pickPill input{
-    width:calc(20px * var(--ui));
-    height:calc(20px * var(--ui));
-    margin:0;
-    accent-color:var(--orange2);
-  }
-
-  .section{
-    background:#1f1f23;
-    border-radius:calc(28px * var(--ui));
-    padding:calc(14px * var(--ui));
-    margin:calc(12px * var(--ui)) 0;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  .sectionHead{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    margin-bottom:calc(10px * var(--ui));
-    gap:calc(10px * var(--ui));
-  }
-
-  .sectionTitle{
-    font-size:calc(24px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.3px;
-    text-transform:uppercase;
-    color:#fff;
-  }
-
-  .headRight{
-    display:flex;
-    align-items:flex-start;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-
-  .staStdWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    white-space:nowrap;
-  }
-
-  .staStdLab{
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
-  .staStdInput{
-    width:calc(92px * var(--ui)) !important;
-    min-width:calc(92px * var(--ui));
-    text-align:center;
-  }
-
-  .timeWrap{
-    display:flex;
-    align-items:baseline;
-    gap:calc(10px * var(--ui));
-    white-space:nowrap;
-    text-transform:uppercase;
-  }
-
-  .timeBtn{
-    border:none;
-    background:transparent;
-    box-shadow:none;
-    padding:calc(4px * var(--ui)) calc(8px * var(--ui));
-    margin:0;
-    font-weight:1000;
-    font-size:calc(16px * var(--ui));
-    color:#fff;
-    border-radius:999px;
-    text-transform:uppercase;
-  }
-
-  .timeBtn:active{background:rgba(255,122,0,.08);}
-
-  .timeVal{
-    font-weight:1000;
-    font-size:calc(22px * var(--ui));
-    color:var(--orange1);
-    min-width:calc(64px * var(--ui));
-    text-align:right;
-    font-variant-numeric:tabular-nums;
-    cursor:pointer;
-  }
-
-  .row{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    margin:calc(10px * var(--ui)) 0;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
-
-  .lab{
-    font-size:calc(20px * var(--ui));
-    font-weight:1000;
-    min-width:calc(46px * var(--ui));
-    color:#fff;
-    white-space:nowrap;
-    text-transform:uppercase;
-  }
+  button:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(0,0,0,.30);filter:brightness(1.04)}
+  button:active{transform:scale(.985)}
+  button.whiteBtn{background:#fff;color:#111}
+  button.redBtn{background:linear-gradient(180deg,#ff4b5f,#d80024);color:#fff}
+  button.slimBtn{padding:calc(10px * var(--ui)) calc(14px * var(--ui));font-size:calc(13px * var(--ui));box-shadow:none}
 
   input, textarea, select{
     font-family:inherit;
@@ -619,411 +114,155 @@
     text-transform:uppercase;
     transition:border-color .14s ease, box-shadow .14s ease;
   }
+  input::placeholder, textarea::placeholder{color:#8e8e96}
+  input:focus, textarea:focus, select:focus{border-color:rgba(255,122,0,.7);box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12)}
+  input{height:calc(50px * var(--ui));line-height:calc(50px * var(--ui));padding:0 calc(12px * var(--ui));text-align:center}
+  textarea{width:100%;height:calc(82px * var(--ui));resize:none;font-weight:800;padding:calc(12px * var(--ui));text-transform:none;border-radius:calc(24px * var(--ui))}
+  select{height:calc(54px * var(--ui));padding:0 calc(12px * var(--ui))}
+  .shareInput{width:min(calc(220px * var(--ui) / .65), 100%)}
 
-  input::placeholder, textarea::placeholder{
-    color:#8e8e96;
+  .dayBar{
+    width:min(calc(780px * var(--dayUi) / .65), calc(100% - 24px));
+    margin:calc(2px * var(--dayUi)) auto calc(10px * var(--dayUi));
   }
+  .dayBtn{padding:calc(10px * var(--dayUi)) calc(14px * var(--dayUi));font-size:calc(13px * var(--dayUi));border-radius:999px;box-shadow:none;background:rgba(34,34,38,.92);color:var(--orange1);border:1px solid rgba(255,255,255,.05)}
+  .dayLabel{background:rgba(34,34,38,.96);border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:calc(10px * var(--dayUi)) calc(16px * var(--dayUi));font-size:calc(13px * var(--dayUi));font-weight:1000;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.20)}
 
-  input:focus, textarea:focus, select:focus{
-    border-color:rgba(255,122,0,.7);
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12);
+  #memoList{
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
+    max-width:calc(780px * var(--ui) / .65);
+    margin:0 auto;
   }
+  .emptyDay{background:rgba(28,28,31,.70);border:1px solid rgba(255,255,255,.06);border-radius:calc(30px * var(--ui));padding:calc(22px * var(--ui));color:#fff;text-align:center;font-size:calc(16px * var(--ui));margin-bottom:calc(42px * var(--ui))}
+  .memoCard{background:linear-gradient(180deg, rgba(34,34,38,.96), rgba(24,24,27,.96));border-radius:calc(32px * var(--ui));padding:calc(16px * var(--ui)) calc(14px * var(--ui));margin:calc(12px * var(--ui)) 0;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06);overflow:hidden;position:relative}
+  .memoCard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(6px * var(--ui));background:linear-gradient(180deg,var(--orange1),var(--orange2),var(--orange3))}
+  .memoRow{display:flex;gap:calc(10px * var(--ui));align-items:flex-start;padding-left:calc(4px * var(--ui))}
+  .selBox{width:calc(30px * var(--ui));height:calc(30px * var(--ui));border-radius:calc(12px * var(--ui));border:2px solid rgba(255,255,255,.18);background:#131316;appearance:none;margin-top:calc(8px * var(--ui));position:relative}
+  .selBox:checked{border-color:var(--orange2);box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12)}
+  .selBox:checked::after{content:"";position:absolute;left:50%;top:50%;width:calc(10px * var(--ui));height:calc(16px * var(--ui));border-right:calc(3px * var(--ui)) solid var(--orange2);border-bottom:calc(3px * var(--ui)) solid var(--orange2);transform:translate(-50%,-60%) rotate(45deg)}
+  .lines{flex:1;display:flex;flex-direction:column;gap:calc(10px * var(--ui));cursor:pointer;min-width:0}
+  .line{display:flex;align-items:flex-start;gap:calc(10px * var(--ui));min-width:0}
+  .tagPill{background:linear-gradient(180deg,#ff9a2f,#ff6a00);color:#fff;border-radius:999px;padding:calc(10px * var(--ui)) calc(14px * var(--ui));font-size:calc(15px * var(--ui));min-width:calc(70px * var(--ui));text-align:center}
+  .textPill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);border-radius:999px;padding:calc(11px * var(--ui)) calc(16px * var(--ui));font-size:calc(18px * var(--ui));color:#fff;flex:1;word-break:break-word}
+  .datePill{margin-top:calc(8px * var(--ui));margin-left:calc(42px * var(--ui));font-size:calc(12px * var(--ui));color:var(--muted)}
 
-  input{
-    width:100%;
-    height:calc(54px * var(--ui));
-    line-height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    text-align:center;
-  }
+  .bottomLeftButtons{position:fixed;left:calc(14px * var(--ui));bottom:calc(18px * var(--ui));z-index:30;display:flex;flex-direction:column;gap:calc(12px * var(--ui))}
+  .bottomRightButtons{position:fixed;right:calc(14px * var(--ui));bottom:calc(18px * var(--ui));z-index:30;display:flex;flex-direction:column;gap:calc(12px * var(--ui));align-items:flex-end}
+  .itMemoBtn,.akMemoBtn,.equipBtn{width:calc(148px * var(--ui));height:calc(50px * var(--ui));border-radius:999px;font-size:calc(16px * var(--ui));font-weight:1000;padding:0;display:flex;align-items:center;justify-content:center}
+  .itMemoBtn{background:linear-gradient(180deg,#ffe063,#ffc61a);color:#111}
+  .akMemoBtn{background:linear-gradient(180deg,#ff3953,#d80024);color:#fff}
+  .equipBtn{background:linear-gradient(180deg,#2d2d33,#1c1c20);color:var(--orange1)}
+  #equipBadge{min-width:calc(148px * var(--ui));background:rgba(18,18,20,.92);color:#fff;border-radius:calc(24px * var(--ui));padding:calc(12px * var(--ui)) calc(14px * var(--ui));line-height:1.15;text-align:right;box-shadow:0 14px 28px rgba(0,0,0,.24);display:none;border:1px solid rgba(255,255,255,.06)}
+  #equipBadge .b1{font-size:calc(18px * var(--ui))}
+  #equipBadge .b2{font-size:calc(18px * var(--ui));opacity:.95}
 
-  textarea{
-    width:100%;
-    height:calc(82px * var(--ui));
-    resize:none;
-    font-weight:800;
-    padding:calc(12px * var(--ui));
-    text-transform:none;
-    border-radius:calc(24px * var(--ui));
-  }
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;justify-content:center;align-items:flex-end;z-index:50;pointer-events:none}
+  .modal.show{display:flex}
+  .box{width:100%;max-width:calc(820px * var(--ui) / .65);background:#17171a;border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));max-height:92vh;overflow:auto;pointer-events:auto}
+  .dragArea{padding:calc(7px * var(--ui)) 0 calc(8px * var(--ui));position:sticky;top:0;background:#17171a;z-index:40}
+  .dragHandle{width:calc(62px * var(--ui));height:calc(8px * var(--ui));background:#494952;border-radius:999px;margin:0 auto calc(8px * var(--ui))}
+  .topActionBar{display:flex;align-items:center;justify-content:space-between;gap:calc(10px * var(--ui))}
+  .topMiniBtn{padding:calc(10px * var(--ui)) calc(16px * var(--ui));font-size:calc(14px * var(--ui));border-radius:999px;box-shadow:none;background:#242429;color:var(--orange1)}
+  .modalTitleTap{position:sticky;top:calc(72px * var(--ui));z-index:34;text-align:center;font-weight:1000;color:#fff;padding:calc(10px * var(--ui)) 0 calc(12px * var(--ui));cursor:pointer;background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.98) 78%, rgba(23,23,26,.90) 100%);margin:0 calc(-14px * var(--ui))}
+  .modalTitleTap .m1{font-size:calc(18px * var(--ui))}
+  .modalTitleTap .m2{font-size:calc(12px * var(--ui));opacity:.58;margin-top:2px}
 
-  select{
-    height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-  }
+  .dateLine{display:flex;justify-content:center;align-items:center;gap:calc(8px * var(--ui));margin-bottom:calc(8px * var(--ui));margin-top:calc(6px * var(--ui))}
+  .dateLine .dateLab{font-size:calc(15px * var(--ui));font-weight:1000;color:#fff}
+  .dateInput{width:auto !important;min-width:calc(180px * var(--ui));text-align:center;padding:0 calc(12px * var(--ui))}
+  .pickRow{display:flex;justify-content:center;gap:calc(10px * var(--ui));flex-wrap:wrap;margin:calc(6px * var(--ui)) 0 calc(12px * var(--ui))}
+  .pickPill{display:flex;align-items:center;gap:calc(8px * var(--ui));background:#222226;border:2px solid #2d2d32;border-radius:999px;padding:calc(11px * var(--ui)) calc(16px * var(--ui));color:#fff}
+  .pickPill input{width:calc(20px * var(--ui));height:calc(20px * var(--ui));margin:0;accent-color:var(--orange2)}
 
-  .numBox{
-    font-size:calc(18px * var(--ui));
-    letter-spacing:.6px;
-  }
+  .section{background:#1f1f23;border-radius:calc(28px * var(--ui));padding:calc(14px * var(--ui));margin:calc(12px * var(--ui)) 0;border:1px solid rgba(255,255,255,.05)}
+  .sectionHead{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:calc(10px * var(--ui));gap:calc(10px * var(--ui));flex-wrap:wrap}
+  .sectionTitle{font-size:calc(24px * var(--ui));font-weight:1000;color:#fff}
+  .headRight{display:flex;align-items:flex-start;gap:calc(10px * var(--ui));flex-wrap:wrap;justify-content:flex-end}
+  .staStdWrap,.timeWrap{display:flex;align-items:center;gap:calc(8px * var(--ui));white-space:nowrap}
+  .timeVal{font-weight:1000;font-size:calc(22px * var(--ui));color:var(--orange1);min-width:calc(64px * var(--ui));text-align:right;cursor:pointer}
+  .row{display:flex;align-items:center;gap:calc(10px * var(--ui));margin:calc(10px * var(--ui)) 0;min-width:0}
+  .lab{font-size:calc(20px * var(--ui));font-weight:1000;min-width:calc(46px * var(--ui));color:#fff;white-space:nowrap}
+  .numBox{font-size:calc(18px * var(--ui));letter-spacing:.6px;text-align:center}
+  .long{flex:1;min-width:0;font-size:calc(16px * var(--ui));font-weight:1000;padding-left:calc(16px * var(--ui));text-align:left}
+  .extraBox{background:#18181b;border:2px solid #27272c;border-radius:calc(26px * var(--ui));padding:calc(14px * var(--ui));margin-top:calc(10px * var(--ui))}
+  .extraHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:calc(10px * var(--ui))}
+  .extraTitle{font-size:calc(20px * var(--ui));font-weight:1000;color:#fff}
+  .iconBtn{width:calc(48px * var(--ui));height:calc(48px * var(--ui));border-radius:calc(18px * var(--ui));border:none;background:#242429;box-shadow:0 8px 18px rgba(0,0,0,.16);color:var(--orange1);font-size:calc(28px * var(--ui));font-weight:1000;padding:0}
+  .extraRow{display:flex;gap:calc(10px * var(--ui));align-items:center;margin-top:calc(10px * var(--ui))}
+  .extraRow select{width:calc(130px * var(--ui));font-size:calc(16px * var(--ui));font-weight:1000}
+  .extraRow input{width:calc(130px * var(--ui));font-size:calc(18px * var(--ui))}
+  .minusBtn{width:calc(60px * var(--ui));height:calc(54px * var(--ui));border-radius:calc(20px * var(--ui));border:none;background:#242429;color:var(--orange1);font-weight:1000;font-size:calc(22px * var(--ui));box-shadow:none;padding:0}
+  .lirBtn{padding:calc(10px * var(--ui)) calc(16px * var(--ui));font-size:calc(14px * var(--ui));border-radius:999px;box-shadow:none;background:#242429;color:var(--orange1)}
+  .lirCalcRow{display:flex;align-items:center;justify-content:space-between;gap:calc(10px * var(--ui));margin:calc(12px * var(--ui)) 0 calc(4px * var(--ui));flex-wrap:nowrap}
+  .lirBtns{display:flex;align-items:center;gap:calc(10px * var(--ui));flex-wrap:wrap}
+  .calcCircleBtn{width:calc(48px * var(--ui));height:calc(48px * var(--ui));min-width:calc(48px * var(--ui));border-radius:999px;border:none;background:#242429;box-shadow:0 8px 18px rgba(0,0,0,.16);color:var(--orange1);display:flex;align-items:center;justify-content:center;padding:0}
+  .calcIcon{position:relative;display:block;width:calc(22px * var(--ui));height:calc(26px * var(--ui));border:2px solid var(--orange2);border-radius:calc(8px * var(--ui))}
+  .calcIcon::before{content:"";position:absolute;left:50%;transform:translateX(-50%);top:calc(3px * var(--ui));width:calc(12px * var(--ui));height:calc(4px * var(--ui));background:var(--orange2);border-radius:calc(3px * var(--ui))}
+  .calcIcon::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:calc(4px * var(--ui));width:calc(12px * var(--ui));height:calc(10px * var(--ui));background:radial-gradient(circle, var(--orange2) 58%, transparent 60%) 0 0 / calc(4px * var(--ui)) calc(4px * var(--ui)) repeat;opacity:.95}
 
-  .long{
-    flex:1;
-    min-width:0;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    padding-left:calc(16px * var(--ui));
-    text-align:left;
-  }
+  .calcFloatingWrap{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:flex-end;justify-content:center;z-index:120;padding:calc(16px * var(--ui))}
+  .calcFloatingWrap.show{display:flex}
+  .calcFloating{width:min(calc(430px * var(--ui) / .65), 100%);background:#18181b;border-radius:calc(30px * var(--ui));box-shadow:0 22px 46px rgba(0,0,0,.34);padding:calc(14px * var(--ui));border:1px solid rgba(255,255,255,.05)}
+  .calcTopBar{display:flex;justify-content:space-between;align-items:center;gap:calc(10px * var(--ui));margin-bottom:calc(10px * var(--ui))}
+  .calcTitle{font-size:calc(15px * var(--ui));font-weight:1000;color:#fff}
+  .calcCloseBtn{background:#242429;color:var(--orange1);width:calc(42px * var(--ui));height:calc(42px * var(--ui));border-radius:calc(16px * var(--ui));box-shadow:none;padding:0;font-size:calc(18px * var(--ui))}
+  .calcDisplay{width:100%;height:calc(60px * var(--ui));border:2px solid #2b2b31;border-radius:calc(24px * var(--ui));background:#101012;padding:0 calc(14px * var(--ui));display:flex;align-items:center;justify-content:flex-end;font-size:calc(24px * var(--ui));font-weight:1000;color:#fff;overflow:hidden;white-space:nowrap}
+  .calcGrid{margin-top:calc(10px * var(--ui));display:grid;grid-template-columns:repeat(4, 1fr);gap:calc(8px * var(--ui))}
+  .calcKey{height:calc(54px * var(--ui));border:none;border-radius:calc(20px * var(--ui));background:#242429;color:#fff;font-size:calc(18px * var(--ui));font-weight:1000;box-shadow:none;padding:0}
+  .calcKey.op{background:#2b2b31;color:var(--orange1)}
+  .calcKey.eq{background:linear-gradient(180deg,var(--orange2),var(--orange3));color:#fff}
+  .calcKey.wide{grid-column:span 2}
+  .focusedCalcTarget{border-color:rgba(255,122,0,.7) !important;box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12) !important}
 
-  .extraBox{
-    background:#18181b;
-    border:2px solid #27272c;
-    border-radius:calc(26px * var(--ui));
-    padding:calc(14px * var(--ui));
-    margin-top:calc(10px * var(--ui));
-  }
+  #photoLayer{position:fixed;inset:0;background:#000;display:none;justify-content:center;align-items:center;z-index:90}
+  #photoLayer img{max-width:100%;max-height:100%;object-fit:contain}
 
-  .extraHead{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:calc(10px * var(--ui));
-    text-transform:uppercase;
-  }
-
-  .extraTitle{
-    font-size:calc(20px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.4px;
-    color:#fff;
-  }
-
-  .iconBtn{
-    width:calc(48px * var(--ui));
-    height:calc(48px * var(--ui));
-    border-radius:calc(18px * var(--ui));
-    border:none;
-    background:#242429;
-    box-shadow:0 8px 18px rgba(0,0,0,.16);
-    color:var(--orange1);
-    font-size:calc(28px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .extraRow{
-    display:flex;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin-top:calc(10px * var(--ui));
-  }
-
-  .extraRow select{
-    width:calc(130px * var(--ui));
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-  }
-
-  .extraRow input{
-    width:calc(130px * var(--ui));
-    font-size:calc(18px * var(--ui));
-  }
-
-  .minusBtn{
-    width:calc(60px * var(--ui));
-    height:calc(54px * var(--ui));
-    border-radius:calc(20px * var(--ui));
-    border:none;
-    background:#242429;
-    color:var(--orange1);
-    font-weight:1000;
-    font-size:calc(22px * var(--ui));
-    box-shadow:none;
-    text-transform:uppercase;
-  }
-
-  .lirBtn{
-    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(14px * var(--ui));
-    border-radius:999px;
-    box-shadow:none;
-    background:#242429;
-    color:var(--orange1);
-  }
-
-  .lirCalcRow{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-    margin:calc(12px * var(--ui)) 0 calc(4px * var(--ui));
-    flex-wrap:nowrap;
-  }
-
-  .lirBtns{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-  }
-
-  .calcCircleBtn{
-    width:calc(48px * var(--ui));
-    height:calc(48px * var(--ui));
-    min-width:calc(48px * var(--ui));
-    border-radius:999px;
-    border:none;
-    background:#242429;
-    box-shadow:0 8px 18px rgba(0,0,0,.16);
-    color:var(--orange1);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-  }
-
-  .calcIconBtn{
-    position:relative;
-  }
-
-  .calcIcon{
-    position:relative;
-    display:block;
-    width:calc(22px * var(--ui));
-    height:calc(26px * var(--ui));
-    border:2px solid var(--orange2);
-    border-radius:calc(8px * var(--ui));
-  }
-
-  .calcIcon::before{
-    content:"";
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    top:calc(3px * var(--ui));
-    width:calc(12px * var(--ui));
-    height:calc(4px * var(--ui));
-    background:var(--orange2);
-    border-radius:calc(3px * var(--ui));
-  }
-
-  .calcIcon::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    bottom:calc(4px * var(--ui));
-    width:calc(12px * var(--ui));
-    height:calc(10px * var(--ui));
-    background:
-      radial-gradient(circle, var(--orange2) 58%, transparent 60%) 0 0 / calc(4px * var(--ui)) calc(4px * var(--ui)) repeat;
-    opacity:.95;
-  }
-
-  .calcFloatingWrap{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.42);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:120;
-    padding:calc(16px * var(--ui));
-  }
-
-  .calcFloatingWrap.show{
-    display:flex;
-  }
-
-  .calcFloating{
-    width:min(calc(430px * var(--ui) / .65), 100%);
-    background:#18181b;
-    border-radius:calc(30px * var(--ui));
-    box-shadow:0 22px 46px rgba(0,0,0,.34);
-    padding:calc(14px * var(--ui));
-    animation:calcUp .16s ease;
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  @keyframes calcUp{
-    from{transform:translateY(18px); opacity:.75}
-    to{transform:translateY(0); opacity:1}
-  }
-
-  .calcTopBar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    margin-bottom:calc(10px * var(--ui));
-  }
-
-  .calcTitle{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-  }
-
-  .calcCloseBtn{
-    border:none;
-    background:#242429;
-    color:var(--orange1);
-    width:calc(42px * var(--ui));
-    height:calc(42px * var(--ui));
-    border-radius:calc(16px * var(--ui));
-    box-shadow:none;
-    padding:0;
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-  }
-
-  .calcDisplay{
-    width:100%;
-    height:calc(60px * var(--ui));
-    border:2px solid #2b2b31;
-    border-radius:calc(24px * var(--ui));
-    background:#101012;
-    padding:0 calc(14px * var(--ui));
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    font-size:calc(24px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    overflow:hidden;
-    white-space:nowrap;
-    font-variant-numeric:tabular-nums;
-  }
-
-  .calcGrid{
-    margin-top:calc(10px * var(--ui));
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:calc(8px * var(--ui));
-  }
-
-  .calcKey{
-    height:calc(54px * var(--ui));
-    border:none;
-    border-radius:calc(20px * var(--ui));
-    background:#242429;
-    color:#fff;
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-    box-shadow:none;
-    padding:0;
-  }
-
-  .calcKey.op{
-    background:#2b2b31;
-    color:var(--orange1);
-  }
-
-  .calcKey.eq{
-    background:linear-gradient(180deg,var(--orange2),var(--orange3));
-    color:#fff;
-  }
-
-  .calcKey.wide{
-    grid-column:span 2;
-  }
-
-  .focusedCalcTarget{
-    border-color:rgba(255,122,0,.7) !important;
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12) !important;
-  }
-
-  #photoLayer{
-    position:fixed;
-    inset:0;
-    background:#000;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:90;
-  }
-
-  #photoLayer img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-  }
-
-  .rowGrid3{
-    display:grid;
-    grid-template-columns:
-      calc(26px * var(--ui)) .9fr
-      calc(26px * var(--ui)) .9fr
-      calc(14px * var(--ui)) .9fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
-
-  .rowGridTDBB{
-    display:grid;
-    grid-template-columns:
-      calc(18px * var(--ui)) 1fr
-      calc(18px * var(--ui)) .9fr
-      calc(26px * var(--ui)) .9fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
-
-  .rowGridTTTB{
-    display:grid;
-    grid-template-columns:
-      calc(26px * var(--ui)) 1fr
-      calc(26px * var(--ui)) 1fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
+  .rowGrid3{display:grid;grid-template-columns:calc(26px * var(--ui)) .9fr calc(26px * var(--ui)) .9fr calc(14px * var(--ui)) .9fr;gap:calc(10px * var(--ui));align-items:center;margin:calc(10px * var(--ui)) 0;min-width:0}
+  .rowGridTDBB{display:grid;grid-template-columns:calc(18px * var(--ui)) 1fr calc(18px * var(--ui)) .9fr calc(26px * var(--ui)) .9fr;gap:calc(10px * var(--ui));align-items:center;margin:calc(10px * var(--ui)) 0;min-width:0}
+  .rowGridTTTB{display:grid;grid-template-columns:calc(26px * var(--ui)) 1fr calc(26px * var(--ui)) 1fr;gap:calc(10px * var(--ui));align-items:center;margin:calc(10px * var(--ui)) 0;min-width:0}
 
   @media (max-width:520px){
-    .bottomLeftButtons{
-      left:12px;
-      bottom:14px;
-      gap:10px;
-    }
-
-    .bottomRightButtons{
-      right:12px;
-      bottom:14px;
-      gap:10px;
-    }
-
-    .itMemoBtn,
-    .akMemoBtn,
-    .equipBtn{
-      width:122px;
-      height:42px;
-      font-size:14px;
-    }
-
-    #equipBadge{
-      min-width:122px;
-      padding:10px 12px;
-    }
-
-    #equipBadge .b1,
-    #equipBadge .b2{
-      font-size:14px;
-    }
-
-    .topMiniBtn{
-      padding:8px 12px;
-      font-size:14px;
-    }
+    .bottomLeftButtons{left:12px;bottom:14px;gap:10px}
+    .bottomRightButtons{right:12px;bottom:14px;gap:10px}
+    .itMemoBtn,.akMemoBtn,.equipBtn{width:122px;height:42px;font-size:14px}
+    #equipBadge{min-width:122px;padding:10px 12px}
+    #equipBadge .b1,#equipBadge .b2{font-size:14px}
+    .topMiniBtn{padding:8px 12px;font-size:14px}
+    .shareInput{width:100%}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
     <div class="titleVer">VER 6.4</div>
   </div>
 </header>
+
+<div class="shareTopWrap">
+  <div class="shareCard">
+    <div class="shareRow">
+      <div class="shareStat" id="authStatus">LOGIN: OFF</div>
+      <div class="shareStat" id="groupStatus">GROUP: NONE</div>
+      <button type="button" class="slimBtn whiteBtn" onclick="signInWithGoogle()">GOOGLE LOGIN</button>
+      <button type="button" class="slimBtn" onclick="signOutUser()">LOGOUT</button>
+      <button type="button" class="slimBtn" onclick="refreshMemos()">SYNC</button>
+    </div>
+  </div>
+  <div class="shareCard">
+    <div class="shareRow">
+      <input id="groupNameInput" class="shareInput" placeholder="NEW GROUP NAME" />
+      <button type="button" class="slimBtn" onclick="createGroup()">CREATE GROUP</button>
+      <input id="groupCodeInput" class="shareInput" placeholder="JOIN CODE" />
+      <button type="button" class="slimBtn" onclick="joinGroupByCode()">JOIN GROUP</button>
+    </div>
+  </div>
+  <div class="shareCard">
+    <div class="shareRow" id="groupList"></div>
+  </div>
+</div>
 
 <div class="controls" id="topControls">
   <button type="button" onclick="newMemo()">ADD</button>
@@ -1057,7 +296,7 @@
 <div class="modal" id="modal" aria-hidden="true">
   <div class="box" id="sheet" role="dialog" aria-modal="true">
     <div class="dragArea" id="dragArea">
-      <div class="drag-handle"></div>
+      <div class="dragHandle"></div>
       <div class="topActionBar">
         <button type="button" class="topMiniBtn" onclick="saveMemo()">SAVE</button>
         <button type="button" class="topMiniBtn" onclick="closeModal()">CLOSE</button>
@@ -1075,14 +314,8 @@
     </div>
 
     <div class="pickRow">
-      <label class="pickPill">
-        <input type="checkbox" id="pickInbound" checked>
-        <span>INBOUND</span>
-      </label>
-      <label class="pickPill">
-        <input type="checkbox" id="pickOutbound" checked>
-        <span>OUTBOUND</span>
-      </label>
+      <label class="pickPill"><input type="checkbox" id="pickInbound" checked><span>INBOUND</span></label>
+      <label class="pickPill"><input type="checkbox" id="pickOutbound" checked><span>OUTBOUND</span></label>
     </div>
 
     <div id="sections"></div>
@@ -1096,7 +329,7 @@
 <div class="modal" id="equipModal" aria-hidden="true">
   <div class="box" style="max-height:70vh" onclick="event.stopPropagation()">
     <div class="dragArea">
-      <div class="drag-handle"></div>
+      <div class="dragHandle"></div>
       <div class="topActionBar">
         <button type="button" class="topMiniBtn" onclick="saveEquip()">SAVE</button>
         <button type="button" class="topMiniBtn" onclick="closeEquip()">CLOSE</button>
@@ -1154,9 +387,19 @@
 </div>
 
 <script>
-  const MEMO_KEY = "jas_memos_v64";
-  const PHOTO_KEY = "jas_photo_v64";
-  const EQUIP_KEY = "jas_equipment_v64";
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  let supabase = null;
+  if (SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY") {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+
+  const MEMO_TABLE = "memos";
+  const GROUP_TABLE = "groups";
+  const MEMBER_TABLE = "group_members";
+  const PHOTO_KEY = "jas_photo_v64_share_complete";
+  const EQUIP_KEY = "jas_equipment_v64_share_complete";
 
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
@@ -1173,6 +416,12 @@
   const pickOutbound = document.getElementById("pickOutbound");
   const topControls = document.getElementById("topControls");
 
+  const authStatus = document.getElementById("authStatus");
+  const groupStatus = document.getElementById("groupStatus");
+  const groupList = document.getElementById("groupList");
+  const groupNameInput = document.getElementById("groupNameInput");
+  const groupCodeInput = document.getElementById("groupCodeInput");
+
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
   const tug1 = document.getElementById("tug1");
@@ -1182,7 +431,7 @@
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
 
-  let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
+  let memos = [];
   let photo = localStorage.getItem(PHOTO_KEY) || "";
   let editId = null;
   let dayOffset = 0;
@@ -1190,147 +439,192 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
+  let currentUser = null;
+  let currentGroupId = null;
+  let currentGroups = [];
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
-  function onlyNum(val, len){
-    return (val || "").replace(/[^0-9]/g, "").slice(0, len);
+  function ensureSupabase(){
+    if(!supabase){
+      alert("SUPABASE URL / ANON KEY 먼저 넣어줘");
+      return false;
+    }
+    return true;
   }
 
-  function pad(val, len){
-    const v = onlyNum(val, len);
-    return v ? v.padStart(len, "0") : "";
+  function onlyNum(val, len){ return (val || "").replace(/[^0-9]/g, "").slice(0, len); }
+  function pad(val, len){ const v = onlyNum(val, len); return v ? v.padStart(len, "0") : ""; }
+  function cleanTextUpper(val){ return (val || "").toUpperCase().trim(); }
+  function defaultF(val){ const v = cleanTextUpper(val); return v ? v : "F"; }
+  function nowTime(){ const d = new Date(); return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); }
+  function normalizeTimeText(val){ const raw = (val || "").trim(); if(!raw) return ""; const digits = raw.replace(/[^0-9]/g, ""); if(digits.length === 3) return digits.slice(0,1) + ":" + digits.slice(1,3); if(digits.length >= 4) return digits.slice(0,2) + ":" + digits.slice(2,4); return raw.slice(0,5); }
+  function askTime(currentValue=""){ const t = prompt("TIME (HH:MM 24H)", currentValue || nowTime()); if(t === null) return null; return normalizeTimeText(t); }
+  function todayStr(){ const d = new Date(); return dateToStr(d); }
+  function dateToStr(d){ const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,"0"); const day=String(d.getDate()).padStart(2,"0"); return `${y}-${m}-${day}`; }
+  function getViewingDate(){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+dayOffset); return d; }
+  function getViewingDayKey(){ return dateToStr(getViewingDate()); }
+  function updateDayLabel(){ dayLabel.textContent = getViewingDayKey(); }
+  function calcDayOffsetFromDate(dateStr){ const base=new Date(todayStr()); const target=new Date(dateStr); base.setHours(0,0,0,0); target.setHours(0,0,0,0); return Math.round((target-base)/86400000); }
+  function moveDay(n){ dayOffset += n; updateDayLabel(); renderList(); }
+  function goToday(){ dayOffset = 0; updateDayLabel(); renderList(); }
+
+  function randomCode(){
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let out = "";
+    for(let i=0;i<6;i++) out += chars[Math.floor(Math.random()*chars.length)];
+    return out;
   }
 
-  function cleanTextUpper(val){
-    return (val || "").toUpperCase().trim();
+  function updateAuthUI(){
+    authStatus.textContent = currentUser ? `LOGIN: ${currentUser.email || currentUser.id}` : "LOGIN: OFF";
+    const g = currentGroups.find(x => x.id === currentGroupId);
+    groupStatus.textContent = g ? `GROUP: ${g.name} / ${g.code}` : "GROUP: NONE";
   }
 
-  function defaultF(val){
-    const v = cleanTextUpper(val);
-    return v ? v : "F";
+  async function signInWithGoogle(){
+    if(!ensureSupabase()) return;
+    const redirectTo = window.location.href;
+    const { error } = await supabase.auth.signInWithOAuth({ provider:"google", options:{ redirectTo } });
+    if(error) alert(error.message);
   }
 
-  function nowTime(){
-    const d = new Date();
-    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
-  }
-
-  function normalizeTimeText(val){
-    const raw = (val || "").trim();
-    if(!raw) return "";
-    const digits = raw.replace(/[^0-9]/g, "");
-    if(digits.length === 3) return digits.slice(0,1) + ":" + digits.slice(1,3);
-    if(digits.length >= 4) return digits.slice(0,2) + ":" + digits.slice(2,4);
-    return raw.slice(0,5);
-  }
-
-  function askTime(currentValue=""){
-    const t = prompt("TIME (HH:MM 24H)", currentValue || nowTime());
-    if(t === null) return null;
-    return normalizeTimeText(t);
-  }
-
-  function todayStr(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function dateToStr(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function getViewingDate(){
-    const d = new Date();
-    d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + dayOffset);
-    return d;
-  }
-
-  function getViewingDayKey(){
-    return dateToStr(getViewingDate());
-  }
-
-  function updateDayLabel(){
-    dayLabel.textContent = getViewingDayKey();
-  }
-
-  function calcDayOffsetFromDate(dateStr){
-    const base = new Date(todayStr());
-    const target = new Date(dateStr);
-    base.setHours(0,0,0,0);
-    target.setHours(0,0,0,0);
-    return Math.round((target - base) / 86400000);
-  }
-
-  function moveDay(n){
-    dayOffset += n;
-    updateDayLabel();
+  async function signOutUser(){
+    if(!ensureSupabase()) return;
+    await supabase.auth.signOut();
+    currentUser = null;
+    currentGroupId = null;
+    currentGroups = [];
+    memos = [];
+    updateAuthUI();
+    renderGroupList();
     renderList();
   }
 
-  function goToday(){
-    dayOffset = 0;
-    updateDayLabel();
-    renderList();
+  async function loadSession(){
+    if(!ensureSupabase()) return;
+    const { data } = await supabase.auth.getUser();
+    currentUser = data.user || null;
+    updateAuthUI();
+    if(currentUser){
+      await loadGroups();
+      await refreshMemos();
+    }
   }
 
-  function deleteCurrentDay(){
-    const dk = getViewingDayKey();
-    const target = memos.filter(m => (m.dayKey || m.memoDate) === dk);
-    if(!target.length){
-      alert("NO MEMO IN THIS DAY");
+  async function createGroup(){
+    if(!ensureSupabase()) return;
+    if(!currentUser){ alert("먼저 로그인해줘"); return; }
+    const name = cleanTextUpper(groupNameInput.value || "");
+    if(!name){ alert("GROUP NAME 입력해줘"); return; }
+
+    let inserted = null;
+    for(let i=0;i<4;i++){
+      const code = randomCode();
+      const { data, error } = await supabase.from(GROUP_TABLE).insert({ name, code, owner_user_id: currentUser.id }).select().single();
+      if(!error){ inserted = data; break; }
+    }
+    if(!inserted){ alert("GROUP CREATE FAIL"); return; }
+
+    const memberRes = await supabase.from(MEMBER_TABLE).insert({ group_id: inserted.id, user_id: currentUser.id, role: "admin" });
+    if(memberRes.error){ alert(memberRes.error.message); return; }
+
+    groupNameInput.value = "";
+    await loadGroups();
+    currentGroupId = inserted.id;
+    updateAuthUI();
+    await refreshMemos();
+  }
+
+  async function joinGroupByCode(){
+    if(!ensureSupabase()) return;
+    if(!currentUser){ alert("먼저 로그인해줘"); return; }
+    const code = cleanTextUpper(groupCodeInput.value || "");
+    if(!code){ alert("JOIN CODE 입력해줘"); return; }
+
+    const { data: group, error } = await supabase.from(GROUP_TABLE).select("*").eq("code", code).maybeSingle();
+    if(error){ alert(error.message); return; }
+    if(!group){ alert("조 코드 없음"); return; }
+
+    const { data: exists } = await supabase.from(MEMBER_TABLE).select("id").eq("group_id", group.id).eq("user_id", currentUser.id).maybeSingle();
+    if(!exists){
+      const joinRes = await supabase.from(MEMBER_TABLE).insert({ group_id: group.id, user_id: currentUser.id, role: "member" });
+      if(joinRes.error){ alert(joinRes.error.message); return; }
+    }
+    groupCodeInput.value = "";
+    await loadGroups();
+    currentGroupId = group.id;
+    updateAuthUI();
+    await refreshMemos();
+  }
+
+  async function loadGroups(){
+    if(!ensureSupabase() || !currentUser) return;
+    const { data, error } = await supabase
+      .from(MEMBER_TABLE)
+      .select(`role, ${GROUP_TABLE}(id,name,code,owner_user_id)`)
+      .eq("user_id", currentUser.id);
+    if(error){ alert(error.message); return; }
+
+    currentGroups = (data || []).map(row => ({ ...row.groups, role: row.role })).filter(Boolean);
+    if(!currentGroupId && currentGroups.length) currentGroupId = currentGroups[0].id;
+    if(currentGroupId && !currentGroups.some(g => g.id === currentGroupId)) currentGroupId = currentGroups[0]?.id || null;
+    renderGroupList();
+    updateAuthUI();
+  }
+
+  function renderGroupList(){
+    if(!currentGroups.length){
+      groupList.innerHTML = '<div class="shareStat">NO GROUP</div>';
       return;
     }
-    if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
-    memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    groupList.innerHTML = currentGroups.map(g => `
+      <button type="button" class="groupPillBtn ${g.id===currentGroupId ? 'active' : ''}" onclick="selectGroup('${g.id}')">${g.name} / ${g.code} / ${g.role}</button>
+    `).join("");
+  }
+
+  async function selectGroup(groupId){
+    currentGroupId = groupId;
+    renderGroupList();
+    updateAuthUI();
+    await refreshMemos();
+  }
+
+  async function refreshMemos(){
+    if(!ensureSupabase() || !currentUser || !currentGroupId){ memos = []; renderList(); return; }
+    const { data, error } = await supabase.from(MEMO_TABLE).select("*").eq("group_id", currentGroupId).order("created_at", { ascending: true });
+    if(error){ alert(error.message); return; }
+    memos = data || [];
     renderList();
   }
 
-  function isCalcEligibleInput(el){
-    if(!(el instanceof HTMLInputElement)) return false;
-    const k = el.dataset.k || "";
-    if(!k) return false;
-    return (
-      k.endsWith("-7C") ||
-      k.endsWith("-STA") ||
-      k.endsWith("-STD") ||
-      k.endsWith("-t") ||
-      k.endsWith("-d") ||
-      k.endsWith("-bb") ||
-      k.endsWith("-tt") ||
-      k.endsWith("-tb") ||
-      k === "SHARED-HL" ||
-      k === "SHARED-HASH" ||
-      k.startsWith("extraVal-")
-    );
+  async function deleteCurrentDay(){
+    if(!ensureSupabase()) return;
+    const dk = getViewingDayKey();
+    const target = memos.filter(m => (m.dayKey || m.memoDate) === dk);
+    if(!target.length){ alert("NO MEMO IN THIS DAY"); return; }
+    if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
+    const ids = target.map(m => m.id);
+    const { error } = await supabase.from(MEMO_TABLE).delete().in("id", ids);
+    if(error){ alert(error.message); return; }
+    await refreshMemos();
   }
 
   document.addEventListener("focusin", (e)=>{
     const t = e.target;
-    if(isCalcEligibleInput(t)){
-      if(activeCalcInput && activeCalcInput !== t){
-        activeCalcInput.classList.remove("focusedCalcTarget");
-      }
-      activeCalcInput = t;
-      activeCalcInput.classList.add("focusedCalcTarget");
-    }
+    if(!(t instanceof HTMLInputElement)) return;
+    const k = t.dataset.k || "";
+    if(!k) return;
+    if(activeCalcInput && activeCalcInput !== t) activeCalcInput.classList.remove("focusedCalcTarget");
+    activeCalcInput = t;
+    activeCalcInput.classList.add("focusedCalcTarget");
   });
 
   document.addEventListener("click", (e)=>{
     const t = e.target;
     if(!(t instanceof HTMLElement)) return;
     if(!t.closest(".section") && !t.closest(".calcFloating")){
-      if(activeCalcInput){
-        activeCalcInput.classList.remove("focusedCalcTarget");
-      }
+      if(activeCalcInput) activeCalcInput.classList.remove("focusedCalcTarget");
     }
   });
 
@@ -1339,23 +633,16 @@
     if(!(t instanceof HTMLInputElement)) return;
     const k = t.dataset.k || "";
     if(!k) return;
-
     if(k === "SHARED-HL"){
       t.value = onlyNum(t.value, 4);
-      document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=>{
-        if(el !== t) el.value = t.value;
-      });
+      document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=>{ if(el !== t) el.value = t.value; });
       return;
     }
-
     if(k === "SHARED-HASH"){
       t.value = onlyNum(t.value, 3);
-      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
-        if(el !== t) el.value = t.value;
-      });
+      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{ if(el !== t) el.value = t.value; });
       return;
     }
-
     if(k.endsWith("-7C")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
     if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
@@ -1371,9 +658,7 @@
     const row = document.createElement("div");
     row.className = "extraRow";
     row.innerHTML = `
-      <select>
-        ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
-      </select>
+      <select>${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}</select>
       <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
       <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
     `;
@@ -1389,78 +674,11 @@
 
   function bindEditableTime(el, initialValue){
     el.textContent = initialValue || "";
-    el.addEventListener("click", ()=>{
-      const t = askTime(el.textContent || "");
-      if(t !== null) el.textContent = t;
-    });
+    el.addEventListener("click", ()=>{ const t = askTime(el.textContent || ""); if(t !== null) el.textContent = t; });
   }
 
-  function openLirPicker(type){
-    activeLirType = type;
-    lirPhotoInput.value = "";
-    lirPhotoInput.click();
-  }
-
-  function viewLirPhoto(type){
-    const src = currentLirPhotos[type] || "";
-    if(!src){
-      alert("NO LIR PHOTO");
-      return;
-    }
-    photoImg.src = src;
-    photoLayer.style.display = "flex";
-  }
-
-  function openCalc(){
-    calcWrap.classList.add("show");
-    calcWrap.setAttribute("aria-hidden","false");
-  }
-
-  function closeCalc(){
-    calcWrap.classList.remove("show");
-    calcWrap.setAttribute("aria-hidden","true");
-  }
-
-  function updateGlobalCalcDisplay(val){
-    globalCalcDisplay.textContent = val || "0";
-  }
-
-  function safeEval(expr){
-    if(!expr) return "0";
-    const cleaned = expr.replace(/[^0-9+\-*/%.()]/g, "");
-    if(!cleaned) return "0";
-    try{
-      const result = Function("return (" + cleaned + ")")();
-      if(result === undefined || result === null || Number.isNaN(result) || !Number.isFinite(result)){
-        return "ERROR";
-      }
-      return String(result);
-    }catch(e){
-      return "ERROR";
-    }
-  }
-
-  function applyCalcToInput(result){
-    if(!activeCalcInput) return;
-    const k = activeCalcInput.dataset.k || "";
-    const digits = String(result || "").replace(/[^0-9]/g, "");
-
-    if(k === "SHARED-HL"){
-      activeCalcInput.value = digits.slice(0,4);
-    }else if(k === "SHARED-HASH"){
-      activeCalcInput.value = digits.slice(0,3);
-    }else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD") || k.endsWith("-tt") || k.endsWith("-tb")){
-      activeCalcInput.value = digits.slice(0,4);
-    }else if(k.endsWith("-t") || k.startsWith("extraVal-")){
-      activeCalcInput.value = digits.slice(0,3);
-    }else if(k.endsWith("-d") || k.endsWith("-bb")){
-      activeCalcInput.value = digits.slice(0,2);
-    }else{
-      activeCalcInput.value = digits;
-    }
-
-    activeCalcInput.dispatchEvent(new Event("input", { bubbles:true }));
-  }
+  function openLirPicker(type){ activeLirType = type; lirPhotoInput.value = ""; lirPhotoInput.click(); }
+  function viewLirPhoto(type){ const src = currentLirPhotos[type] || ""; if(!src){ alert("NO LIR PHOTO"); return; } photoImg.src = src; photoLayer.style.display = "flex"; }
 
   function makeSection(type, memoData){
     const d = document.createElement("div");
@@ -1473,10 +691,8 @@
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
-
     const cmpt1Val = memoData ? defaultF(memoData[type+"-cmpt1"]) : "F";
     const cmpt2Val = memoData ? defaultF(memoData[type+"-cmpt2"]) : "F";
-
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
 
@@ -1504,25 +720,10 @@
         <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
       </div>
 
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
-      </div>
+      <div class="row"><div class="lab" style="min-width:96px;">CMPT 1</div><input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT"></div>
+      <div class="row"><div class="lab" style="min-width:96px;">CMPT 2</div><input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT"></div>
+      <div class="row"><div class="lab" style="min-width:96px;">CMPT 3</div><input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}"></div>
+      <div class="row"><div class="lab" style="min-width:96px;">CMPT 4</div><input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}"></div>
 
       <div class="rowGridTDBB">
         <div class="lab">T</div>
@@ -1546,9 +747,7 @@
           <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
           <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
         </div>
-        <button type="button" class="calcCircleBtn calcIconBtn" data-calc-toggle="${type}">
-          <span class="calcIcon"></span>
-        </button>
+        <button type="button" class="calcCircleBtn calcIconBtn" data-calc-toggle="${type}"><span class="calcIcon"></span></button>
       </div>
       ` : ""}
 
@@ -1566,37 +765,15 @@
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
     const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
     bindEditableTime(timeShown, savedTime);
-
-    timeBtn.addEventListener("click", ()=>{
-      timeShown.textContent = nowTime();
-    });
-
-    timeBtn.addEventListener("dblclick", ()=>{
-      const t = askTime(timeShown.textContent || "");
-      if(t !== null) timeShown.textContent = t;
-    });
+    timeBtn.addEventListener("click", ()=>{ timeShown.textContent = nowTime(); });
+    timeBtn.addEventListener("dblclick", ()=>{ const t = askTime(timeShown.textContent || ""); if(t !== null) timeShown.textContent = t; });
 
     const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
     const lirViewBtn = d.querySelector(`[data-lir-view="${type}"]`);
     const calcToggleBtn = d.querySelector(`[data-calc-toggle="${type}"]`);
-
-    if(lirAddBtn){
-      lirAddBtn.addEventListener("click", ()=>{
-        openLirPicker(type);
-      });
-    }
-
-    if(lirViewBtn){
-      lirViewBtn.addEventListener("click", ()=>{
-        viewLirPhoto(type);
-      });
-    }
-
-    if(calcToggleBtn){
-      calcToggleBtn.addEventListener("click", ()=>{
-        openCalc();
-      });
-    }
+    if(lirAddBtn) lirAddBtn.addEventListener("click", ()=> openLirPicker(type));
+    if(lirViewBtn) lirViewBtn.addEventListener("click", ()=> viewLirPhoto(type));
+    if(calcToggleBtn) calcToggleBtn.addEventListener("click", ()=> openCalc());
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
@@ -1618,6 +795,7 @@
   }
 
   function newMemo(){
+    if(!currentGroupId){ alert("조를 먼저 선택해줘"); return; }
     editId = null;
     memoDate.value = getViewingDayKey();
     pickInbound.checked = true;
@@ -1628,7 +806,7 @@
   }
 
   function openModal(){
-    modal.style.display = "flex";
+    modal.classList.add("show");
     modal.setAttribute("aria-hidden","false");
     sheet.style.transform = "translateY(0)";
     currentTranslate = 0;
@@ -1636,7 +814,7 @@
   }
 
   function closeModal(){
-    modal.style.display = "none";
+    modal.classList.remove("show");
     modal.setAttribute("aria-hidden","true");
     editId = null;
     activeLirType = null;
@@ -1657,40 +835,34 @@
 
   pickInbound.addEventListener("change", ()=>{
     if(!ensureAtLeastOnePick(pickInbound)) return;
-    if(editId){
-      const m = memos.find(x=>x.id===editId);
-      rebuildSectionsFromMemo(m || null);
-    }else{
-      buildSectionsBlank();
-    }
+    if(editId){ const m = memos.find(x=>String(x.id)===String(editId)); rebuildSectionsFromMemo(m || null); }
+    else buildSectionsBlank();
   });
 
   pickOutbound.addEventListener("change", ()=>{
     if(!ensureAtLeastOnePick(pickOutbound)) return;
-    if(editId){
-      const m = memos.find(x=>x.id===editId);
-      rebuildSectionsFromMemo(m || null);
-    }else{
-      buildSectionsBlank();
-    }
+    if(editId){ const m = memos.find(x=>String(x.id)===String(editId)); rebuildSectionsFromMemo(m || null); }
+    else buildSectionsBlank();
   });
 
-  function saveMemo(){
-    if(!pickInbound.checked && !pickOutbound.checked){
-      alert("INBOUND OR OUTBOUND SELECT");
-      return;
-    }
+  async function saveMemo(){
+    if(!ensureSupabase()) return;
+    if(!currentUser || !currentGroupId){ alert("로그인하고 조를 선택해줘"); return; }
+    if(!pickInbound.checked && !pickOutbound.checked){ alert("INBOUND OR OUTBOUND SELECT"); return; }
 
-    const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
-    data.memoDate = memoDate.value || getViewingDayKey();
-    data.dayKey = data.memoDate;
-
-    data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
-    data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
+    const data = {
+      group_id: currentGroupId,
+      user_id: currentUser.id,
+      hasIn: pickInbound.checked,
+      hasOut: pickOutbound.checked,
+      memoDate: memoDate.value || getViewingDayKey(),
+      dayKey: memoDate.value || getViewingDayKey(),
+      sharedHL: pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4),
+      sharedHASH: pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3)
+    };
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const root = sections.querySelector(`.section[data-type="${type}"]`);
-
       if(!root){
         data[type+"-7C"] = "";
         data[type+"-STA"] = "";
@@ -1716,20 +888,18 @@
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
-      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
-      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
+      data[type+"-STA"] = type === "INBOUND" ? pad(gi("STA")?.value, 4) : "";
+      data[type+"-STD"] = type === "OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
       data[type+"-t"] = pad(gi("t")?.value, 3);
       data[type+"-d"] = pad(gi("d")?.value, 2);
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
-      data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
-      data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
-
+      data[type+"-tt"] = type === "OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
+      data[type+"-tb"] = type === "OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
       data[type+"-cmpt1"] = defaultF(cm(1)?.value || "");
       data[type+"-cmpt2"] = defaultF(cm(2)?.value || "");
       data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
       data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
       data[type+"-note"] = note ? (note.value || "") : "";
-
       const shown = document.getElementById(type+"-TIMESHOWN");
       data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
 
@@ -1746,18 +916,18 @@
       data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
     });
 
+    let res;
     if(editId){
-      const idx = memos.findIndex(m=>m.id===editId);
-      if(idx >= 0) memos[idx] = data;
+      res = await supabase.from(MEMO_TABLE).update(data).eq("id", editId).select().single();
     }else{
-      memos.push(data);
+      res = await supabase.from(MEMO_TABLE).insert(data).select().single();
     }
+    if(res.error){ alert(res.error.message); return; }
 
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     dayOffset = calcDayOffsetFromDate(data.memoDate);
     updateDayLabel();
     closeModal();
-    renderList(data.id);
+    await refreshMemos();
   }
 
   function formatCombinedLine(m){
@@ -1773,20 +943,14 @@
     const v7c = (m[type+"-7C"] || "").trim();
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
-
-    if(type === "INBOUND"){
-      return `7C[${v7c}] HL[${vhl}]`;
-    }
+    if(type === "INBOUND") return `7C[${v7c}] HL[${vhl}]`;
     return `7C[${v7c}] #[${hash}]`;
   }
 
-  function renderList(flashId){
+  function renderList(){
     memoList.innerHTML = "";
-
     const viewingDay = getViewingDayKey();
-    const dayMemos = memos
-      .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .sort((a,b)=> Number(a.id) - Number(b.id));
+    const dayMemos = memos.filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay);
 
     if(!dayMemos.length){
       memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`;
@@ -1796,7 +960,6 @@
     dayMemos.forEach(m=>{
       const hasIn = m.hasIn !== false;
       const hasOut = m.hasOut !== false;
-
       let linesHtml = "";
 
       if(hasIn && hasOut){
@@ -1806,19 +969,15 @@
         `;
       }else{
         const singleTag = hasIn ? "IN" : "OUT";
-        linesHtml = `
-          <div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLine(m)}</div></div>
-        `;
+        linesHtml = `<div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLine(m)}</div></div>`;
       }
 
       const card = document.createElement("div");
-      card.className = "memoCard" + (m.id===flashId ? " flash" : "");
+      card.className = "memoCard";
       card.innerHTML = `
         <div class="memoRow">
           <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" data-open="${m.id}">
-            ${linesHtml}
-          </div>
+          <div class="lines" data-open="${m.id}">${linesHtml}</div>
         </div>
         <div class="datePill">${m.memoDate || ""}</div>
       `;
@@ -1826,49 +985,35 @@
     });
 
     memoList.querySelectorAll("[data-open]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        const id = Number(el.getAttribute("data-open"));
-        editMemo(id);
-      });
+      el.addEventListener("click", ()=> editMemo(el.getAttribute("data-open")));
     });
   }
 
   function editMemo(id){
-    const m = memos.find(x=>x.id===id);
+    const m = memos.find(x=>String(x.id)===String(id));
     if(!m) return;
-
-    editId = id;
+    editId = m.id;
     memoDate.value = m.memoDate || getViewingDayKey();
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
-    currentLirPhotos = {
-      INBOUND: m["INBOUND-LIRPHOTO"] || "",
-      OUTBOUND: m["OUTBOUND-LIRPHOTO"] || ""
-    };
+    currentLirPhotos = { INBOUND: m["INBOUND-LIRPHOTO"] || "", OUTBOUND: m["OUTBOUND-LIRPHOTO"] || "" };
     rebuildSectionsFromMemo(m);
-
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
-
     openModal();
   }
 
-  function deleteSelected(){
+  async function deleteSelected(){
+    if(!ensureSupabase()) return;
     const checks = document.querySelectorAll('.selBox:checked');
-    const ids = [...checks].map(c=>Number(c.dataset.id));
-    if(!ids.length){
-      alert("SELECT MEMO");
-      return;
-    }
-    memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    renderList();
+    const ids = [...checks].map(c=>c.dataset.id);
+    if(!ids.length){ alert("SELECT MEMO"); return; }
+    const { error } = await supabase.from(MEMO_TABLE).delete().in("id", ids);
+    if(error){ alert(error.message); return; }
+    await refreshMemos();
   }
 
-  function addPhoto(){
-    photoInput.value = "";
-    photoInput.click();
-  }
+  function addPhoto(){ photoInput.value = ""; photoInput.click(); }
 
   function loadImageFromFile(file){
     return new Promise((resolve, reject)=>{
@@ -1888,21 +1033,17 @@
     const ratio = Math.min(maxW / img.width, maxH / img.height, 1);
     const w = Math.max(1, Math.round(img.width * ratio));
     const h = Math.max(1, Math.round(img.height * ratio));
-
     const canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
-
     const ctx = canvas.getContext("2d");
     if(!ctx) throw new Error("CANVAS FAIL");
     ctx.drawImage(img, 0, 0, w, h);
-
     return canvas.toDataURL("image/jpeg", quality);
   }
 
   async function makeStablePhotoData(file){
     const img = await loadImageFromFile(file);
-
     const tries = [
       { maxW:1600, maxH:1600, quality:0.82 },
       { maxW:1600, maxH:1600, quality:0.70 },
@@ -1910,26 +1051,11 @@
       { maxW:1280, maxH:1280, quality:0.52 },
       { maxW:1080, maxH:1080, quality:0.48 }
     ];
-
     for(const t of tries){
       const dataUrl = compressImageToDataUrl(img, t.maxW, t.maxH, t.quality);
       if(dataUrl.length < 3500000) return dataUrl;
     }
-
     return compressImageToDataUrl(img, 960, 960, 0.42);
-  }
-
-  function syncPhotoFromStorage(forceDraw = false){
-    const savedPhoto = localStorage.getItem(PHOTO_KEY) || "";
-    photo = savedPhoto;
-
-    if(forceDraw || photoLayer.style.display === "flex"){
-      if(photo){
-        photoImg.src = photo;
-      }else{
-        photoImg.removeAttribute("src");
-      }
-    }
   }
 
   async function savePhotoFile(file){
@@ -1939,10 +1065,7 @@
       photo = stableDataUrl;
       photoImg.src = stableDataUrl;
       alert("PHOTO SAVED");
-    }catch(err){
-      console.error(err);
-      alert("PHOTO SAVE FAIL");
-    }
+    }catch(err){ console.error(err); alert("PHOTO SAVE FAIL"); }
   }
 
   async function saveLirPhotoFile(file, type){
@@ -1950,10 +1073,7 @@
       const stableDataUrl = await makeStablePhotoData(file);
       currentLirPhotos[type] = stableDataUrl;
       alert("LIR PHOTO SAVED");
-    }catch(err){
-      console.error(err);
-      alert("LIR PHOTO SAVE FAIL");
-    }
+    }catch(err){ console.error(err); alert("LIR PHOTO SAVE FAIL"); }
   }
 
   photoInput.onchange = async (e)=>{
@@ -1968,46 +1088,33 @@
     await saveLirPhotoFile(f, activeLirType);
   };
 
-  function openPhoto(){
-    syncPhotoFromStorage(true);
-    if(!photo) return;
-    photoLayer.style.display = "flex";
-  }
-
-  function closePhoto(){
-    photoLayer.style.display = "none";
-  }
-
-  window.addEventListener("pageshow", ()=>{
-    syncPhotoFromStorage(true);
-  });
-
-  document.addEventListener("visibilitychange", ()=>{
-    if(document.visibilityState === "visible"){
-      syncPhotoFromStorage(true);
+  function syncPhotoFromStorage(forceDraw = false){
+    const savedPhoto = localStorage.getItem(PHOTO_KEY) || "";
+    photo = savedPhoto;
+    if(forceDraw || photoLayer.style.display === "flex"){
+      if(photo) photoImg.src = photo;
+      else photoImg.removeAttribute("src");
     }
-  });
+  }
+
+  function openPhoto(){ syncPhotoFromStorage(true); if(!photo) return; photoLayer.style.display = "flex"; }
+  function closePhoto(){ photoLayer.style.display = "none"; }
+
+  window.addEventListener("pageshow", ()=> syncPhotoFromStorage(true));
+  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "visible") syncPhotoFromStorage(true); });
 
   function openEquip(){
     const eq = JSON.parse(localStorage.getItem(EQUIP_KEY) || "{}");
     tug1.value = pad(eq.tug1,2);
     tug2.value = pad(eq.tug2,2);
     belt.value = pad(eq.belt,2);
-    equipModal.style.display = "flex";
-    equipModal.setAttribute("aria-hidden","false");
+    equipModal.classList.add("show");
   }
 
-  function closeEquip(){
-    equipModal.style.display = "none";
-    equipModal.setAttribute("aria-hidden","true");
-  }
+  function closeEquip(){ equipModal.classList.remove("show"); }
 
   function saveEquip(){
-    const eq = {
-      tug1: pad(tug1.value,2),
-      tug2: pad(tug2.value,2),
-      belt: pad(belt.value,2)
-    };
+    const eq = { tug1: pad(tug1.value,2), tug2: pad(tug2.value,2), belt: pad(belt.value,2) };
     localStorage.setItem(EQUIP_KEY, JSON.stringify(eq));
     updateEquipBadge();
     closeEquip();
@@ -2015,55 +1122,53 @@
 
   function updateEquipBadge(){
     const eq = JSON.parse(localStorage.getItem(EQUIP_KEY) || "{}");
-    if(!eq.tug1 && !eq.tug2 && !eq.belt){
-      equipBadge.style.display = "none";
-      return;
-    }
+    if(!eq.tug1 && !eq.tug2 && !eq.belt){ equipBadge.style.display = "none"; return; }
     const t1 = eq.tug1 || "00";
     const t2 = eq.tug2 || "00";
     const b = eq.belt || "00";
-    equipBadge.innerHTML = `
-      <div class="b1">TUG ${t1}/${t2}</div>
-      <div class="b2">BELT ${b}</div>
-    `;
+    equipBadge.innerHTML = `<div class="b1">TUG ${t1}/${t2}</div><div class="b2">BELT ${b}</div>`;
     equipBadge.style.display = "block";
   }
 
-  equipModal.addEventListener("click",(e)=>{
-    if(e.target === equipModal) closeEquip();
-  });
+  function openCalc(){ calcWrap.classList.add("show"); calcWrap.setAttribute("aria-hidden","false"); }
+  function closeCalc(){ calcWrap.classList.remove("show"); calcWrap.setAttribute("aria-hidden","true"); }
+  function updateGlobalCalcDisplay(val){ globalCalcDisplay.textContent = val || "0"; }
+  function safeEval(expr){
+    if(!expr) return "0";
+    const cleaned = expr.replace(/[^0-9+\-*/%.()]/g, "");
+    if(!cleaned) return "0";
+    try{
+      const result = Function("return (" + cleaned + ")")();
+      if(result === undefined || result === null || Number.isNaN(result) || !Number.isFinite(result)) return "ERROR";
+      return String(result);
+    }catch(e){ return "ERROR"; }
+  }
 
-  calcWrap.addEventListener("click", (e)=>{
-    if(e.target === calcWrap) closeCalc();
-  });
+  function applyCalcToInput(result){
+    if(!activeCalcInput) return;
+    const k = activeCalcInput.dataset.k || "";
+    const digits = String(result || "").replace(/[^0-9]/g, "");
+    if(k === "SHARED-HL") activeCalcInput.value = digits.slice(0,4);
+    else if(k === "SHARED-HASH") activeCalcInput.value = digits.slice(0,3);
+    else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD") || k.endsWith("-tt") || k.endsWith("-tb")) activeCalcInput.value = digits.slice(0,4);
+    else if(k.endsWith("-t") || k.startsWith("extraVal-")) activeCalcInput.value = digits.slice(0,3);
+    else if(k.endsWith("-d") || k.endsWith("-bb")) activeCalcInput.value = digits.slice(0,2);
+    else activeCalcInput.value = digits;
+    activeCalcInput.dispatchEvent(new Event("input", { bubbles:true }));
+  }
 
+  calcWrap.addEventListener("click", (e)=>{ if(e.target === calcWrap) closeCalc(); });
   document.querySelectorAll("[data-global-calc]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const val = btn.dataset.globalCalc || "";
-
-      if(val === "C"){
-        globalCalcExpr = "";
-        updateGlobalCalcDisplay("0");
-        return;
-      }
-
-      if(val === "⌫"){
-        globalCalcExpr = globalCalcExpr.slice(0, -1);
-        updateGlobalCalcDisplay(globalCalcExpr || "0");
-        return;
-      }
-
+      if(val === "C"){ globalCalcExpr = ""; updateGlobalCalcDisplay("0"); return; }
+      if(val === "⌫"){ globalCalcExpr = globalCalcExpr.slice(0,-1); updateGlobalCalcDisplay(globalCalcExpr || "0"); return; }
       if(val === "="){
         globalCalcExpr = safeEval(globalCalcExpr);
         updateGlobalCalcDisplay(globalCalcExpr);
-        if(globalCalcExpr !== "ERROR"){
-          applyCalcToInput(globalCalcExpr);
-        }else{
-          globalCalcExpr = "";
-        }
+        if(globalCalcExpr !== "ERROR") applyCalcToInput(globalCalcExpr); else globalCalcExpr = "";
         return;
       }
-
       if(globalCalcExpr === "ERROR") globalCalcExpr = "";
       globalCalcExpr += val;
       updateGlobalCalcDisplay(globalCalcExpr);
@@ -2073,36 +1178,12 @@
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
-
-  function onStart(y){
-    dragging = true;
-    startY = y;
-    sheet.style.transition = "none";
-  }
-
-  function onMove(y){
-    if(!dragging) return;
-    const dy = Math.max(0, y - startY);
-    currentTranslate = dy;
-    sheet.style.transform = `translateY(${dy}px)`;
-  }
-
-  function onEnd(){
-    if(!dragging) return;
-    dragging = false;
-    sheet.style.transition = "transform .18s ease";
-    if(currentTranslate > 140){
-      closeModal();
-    }else{
-      sheet.style.transform = "translateY(0)";
-      currentTranslate = 0;
-    }
-  }
-
+  function onStart(y){ dragging = true; startY = y; sheet.style.transition = "none"; }
+  function onMove(y){ if(!dragging) return; const dy = Math.max(0, y - startY); currentTranslate = dy; sheet.style.transform = `translateY(${dy}px)`; }
+  function onEnd(){ if(!dragging) return; dragging = false; sheet.style.transition = "transform .18s ease"; if(currentTranslate > 140) closeModal(); else { sheet.style.transform = "translateY(0)"; currentTranslate = 0; } }
   dragArea.addEventListener("touchstart", (e)=> onStart(e.touches[0].clientY), {passive:true});
-  dragArea.addEventListener("touchmove",  (e)=> onMove(e.touches[0].clientY),  {passive:true});
-  dragArea.addEventListener("touchend",   ()=> onEnd());
-
+  dragArea.addEventListener("touchmove", (e)=> onMove(e.touches[0].clientY), {passive:true});
+  dragArea.addEventListener("touchend", ()=> onEnd());
   dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
@@ -2113,7 +1194,151 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
+
+  if (supabase) {
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      currentUser = session?.user || null;
+      updateAuthUI();
+      if(currentUser){
+        await loadGroups();
+        await refreshMemos();
+      }else{
+        currentGroupId = null;
+        currentGroups = [];
+        memos = [];
+        renderGroupList();
+        renderList();
+      }
+    });
+    loadSession();
+  }
 </script>
 
+<!--
+SUPABASE SQL
+
+create extension if not exists pgcrypto;
+
+create table public.groups (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  code text unique not null,
+  owner_user_id uuid not null,
+  created_at timestamptz default now()
+);
+
+create table public.group_members (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  user_id uuid not null,
+  role text not null default 'member',
+  created_at timestamptz default now(),
+  unique(group_id, user_id)
+);
+
+create table public.memos (
+  id uuid primary key default gen_random_uuid(),
+  group_id uuid not null references public.groups(id) on delete cascade,
+  user_id uuid not null,
+  memoDate text,
+  dayKey text,
+  hasIn boolean default true,
+  hasOut boolean default true,
+  sharedHL text,
+  sharedHASH text,
+  "INBOUND-7C" text,
+  "INBOUND-STA" text,
+  "INBOUND-STD" text,
+  "INBOUND-t" text,
+  "INBOUND-d" text,
+  "INBOUND-bb" text,
+  "INBOUND-tt" text,
+  "INBOUND-tb" text,
+  "INBOUND-cmpt1" text,
+  "INBOUND-cmpt2" text,
+  "INBOUND-cmpt3" text,
+  "INBOUND-cmpt4" text,
+  "INBOUND-note" text,
+  "INBOUND-TIME" text,
+  "INBOUND-EXTRAS" jsonb default '[]'::jsonb,
+  "INBOUND-LIRPHOTO" text,
+  "OUTBOUND-7C" text,
+  "OUTBOUND-STA" text,
+  "OUTBOUND-STD" text,
+  "OUTBOUND-t" text,
+  "OUTBOUND-d" text,
+  "OUTBOUND-bb" text,
+  "OUTBOUND-tt" text,
+  "OUTBOUND-tb" text,
+  "OUTBOUND-cmpt1" text,
+  "OUTBOUND-cmpt2" text,
+  "OUTBOUND-cmpt3" text,
+  "OUTBOUND-cmpt4" text,
+  "OUTBOUND-note" text,
+  "OUTBOUND-TIME" text,
+  "OUTBOUND-EXTRAS" jsonb default '[]'::jsonb,
+  "OUTBOUND-LIRPHOTO" text,
+  created_at timestamptz default now()
+);
+
+alter table public.groups enable row level security;
+alter table public.group_members enable row level security;
+alter table public.memos enable row level security;
+
+create policy "groups select for members" on public.groups
+for select using (
+  exists (
+    select 1 from public.group_members gm
+    where gm.group_id = groups.id and gm.user_id = auth.uid()
+  )
+);
+
+create policy "groups insert owner" on public.groups
+for insert with check (owner_user_id = auth.uid());
+
+create policy "members select self" on public.group_members
+for select using (user_id = auth.uid());
+
+create policy "members insert self" on public.group_members
+for insert with check (user_id = auth.uid());
+
+create policy "memos select by group member" on public.memos
+for select using (
+  exists (
+    select 1 from public.group_members gm
+    where gm.group_id = memos.group_id and gm.user_id = auth.uid()
+  )
+);
+
+create policy "memos insert by group member" on public.memos
+for insert with check (
+  user_id = auth.uid()
+  and exists (
+    select 1 from public.group_members gm
+    where gm.group_id = memos.group_id and gm.user_id = auth.uid()
+  )
+);
+
+create policy "memos update by group member" on public.memos
+for update using (
+  exists (
+    select 1 from public.group_members gm
+    where gm.group_id = memos.group_id and gm.user_id = auth.uid()
+  )
+) with check (
+  exists (
+    select 1 from public.group_members gm
+    where gm.group_id = memos.group_id and gm.user_id = auth.uid()
+  )
+);
+
+create policy "memos delete by group member" on public.memos
+for delete using (
+  exists (
+    select 1 from public.group_members gm
+    where gm.group_id = memos.group_id and gm.user_id = auth.uid()
+  )
+);
+-->
 </body>
 </html>
