@@ -387,11 +387,11 @@
 </div>
 
 <script>
-  const SUPABASE_URL = "YOUR_SUPABASE_URL";
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://jkcunywjpucolkurjjg.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_X69vIwnJhf9Pm9FZV150Bw_tjFxyePw";
 
   let supabase = null;
-  if (SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY !== "YOUR_SUPABASE_ANON_KEY") {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 
