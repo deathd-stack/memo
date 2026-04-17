@@ -81,41 +81,6 @@
     gap:calc(10px * var(--ui));
     padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(8px * var(--ui));
     flex-wrap:wrap;
-    align-items:center;
-  }
-
-  .teamQuickWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    border-radius:999px;
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-    border:1px solid rgba(255,255,255,.06);
-    box-shadow:var(--shadow-soft);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-
-  .teamQuickLabel{
-    font-size:calc(14px * var(--ui));
-    color:#fff;
-    font-weight:1000;
-    text-transform:uppercase;
-    white-space:nowrap;
-  }
-
-  .teamQuickSelect{
-    min-width:calc(104px * var(--ui));
-    height:calc(42px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    font-size:calc(15px * var(--ui));
-    font-family:inherit;
-    font-weight:1000;
-    color:#fff;
-    background:#121214;
-    border:2px solid var(--line);
-    border-radius:calc(20px * var(--ui));
   }
 
   button{
@@ -143,6 +108,95 @@
 
   button:active{
     transform:scale(.985);
+  }
+
+
+  .teamQuickWrap{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
+    border-radius:999px;
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow:var(--shadow-soft);
+  }
+
+  .teamQuickLabel,
+  .teamLab{
+    font-size:calc(14px * var(--ui));
+    font-weight:1000;
+    color:#fff;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .teamQuickSelect,
+  .teamSelect{
+    height:calc(42px * var(--ui));
+    min-width:calc(104px * var(--ui));
+    padding:0 calc(12px * var(--ui));
+    border:2px solid var(--line);
+    border-radius:calc(18px * var(--ui));
+    background:#121214;
+    color:#fff;
+    font-size:calc(15px * var(--ui));
+    font-weight:1000;
+  }
+
+  .teamLine{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    margin-bottom:calc(8px * var(--ui));
+    margin-top:calc(6px * var(--ui));
+  }
+
+  .teamSelect{
+    height:calc(54px * var(--ui));
+    min-width:calc(150px * var(--ui));
+    border-radius:calc(22px * var(--ui));
+    font-size:calc(16px * var(--ui));
+  }
+
+  .teamGroup{
+    margin-bottom:calc(16px * var(--ui));
+  }
+
+  .teamHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:calc(10px * var(--ui));
+    background:rgba(34,34,38,.96);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:999px;
+    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
+    margin:calc(10px * var(--ui)) 0;
+    box-shadow:0 8px 18px rgba(0,0,0,.20);
+  }
+
+  .teamHeader .t1{font-size:calc(18px * var(--ui)); font-weight:1000; color:#fff;}
+  .teamHeader .t2{font-size:calc(12px * var(--ui)); font-weight:1000; color:var(--muted); text-transform:uppercase;}
+
+  .metaRow{
+    margin-top:calc(8px * var(--ui));
+    margin-left:calc(42px * var(--ui));
+    display:flex;
+    flex-wrap:wrap;
+    gap:calc(8px * var(--ui));
+  }
+
+  .miniPill{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:999px;
+    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
+    font-size:calc(12px * var(--ui));
+    font-weight:1000;
+    color:var(--muted);
+    text-transform:uppercase;
   }
 
   .dayBar{
@@ -184,56 +238,6 @@
     padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
     max-width:calc(780px * var(--ui) / .65);
     margin:0 auto;
-  }
-
-
-  .teamGroup{
-    margin-bottom:calc(18px * var(--ui));
-  }
-
-  .teamHeader{
-    margin:calc(8px * var(--ui)) 0 calc(10px * var(--ui));
-    padding:calc(12px * var(--ui)) calc(16px * var(--ui));
-    background:rgba(20,20,24,.9);
-    border:1px solid rgba(255,255,255,.07);
-    border-radius:999px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    box-shadow:0 8px 18px rgba(0,0,0,.18);
-  }
-
-  .teamHeader .t1{
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-  }
-
-  .teamHeader .t2{
-    font-size:calc(12px * var(--ui));
-    font-weight:1000;
-    color:var(--muted);
-    text-transform:uppercase;
-  }
-
-  .metaRow{
-    display:flex;
-    gap:calc(8px * var(--ui));
-    align-items:center;
-    flex-wrap:wrap;
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-  }
-
-  .miniPill{
-    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
-    border-radius:999px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.05);
-    font-size:calc(12px * var(--ui));
-    color:var(--muted);
-    text-transform:uppercase;
   }
 
   .emptyDay{
@@ -554,35 +558,6 @@
     min-width:calc(180px * var(--ui));
     text-align:center;
     padding:0 calc(12px * var(--ui));
-  }
-
-  .teamLine{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    margin-bottom:calc(8px * var(--ui));
-  }
-
-  .teamLine .teamLab{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
-  .teamSelect{
-    min-width:calc(150px * var(--ui));
-    height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    font-family:inherit;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    background:#121214;
-    border:2px solid var(--line);
-    border-radius:calc(22px * var(--ui));
-    text-transform:uppercase;
   }
 
   .pickRow{
@@ -1126,11 +1101,6 @@
       padding:8px 12px;
       font-size:14px;
     }
-
-    .teamQuickWrap{
-      width:100%;
-      justify-content:center;
-    }
   }
 </style>
 </head>
@@ -1326,14 +1296,182 @@
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
   function fillTeamSelects(){
-    const options = ['<option value="">TEAM</option>'].concat(
-      Array.from({length:24}, (_,i)=>`<option value="${i+1}">${i+1}조</option>`)
-    ).join("");
-    quickTeamSelect.innerHTML = options;
-    memoTeam.innerHTML = options;
+    const options = ['<option value="">TEAM</option>']
+      .concat(Array.from({length:24}, (_,i)=> `<option value="${i+1}">${i+1}조</option>`))
+      .join("");
+    if(quickTeamSelect) quickTeamSelect.innerHTML = options;
+    if(memoTeam) memoTeam.innerHTML = options;
   }
 
-  fillTeamSelects();
+  function teamLabelOf(v){
+    const s = String(v || "").trim();
+    return s ? `${Number(s)}조` : "TEAM NONE";
+  }
+
+  function persistMemos(){
+    persistMemos();
+  }
+
+  function normalizeOcrToken(token){
+    let s = String(token || "").toUpperCase().trim();
+    s = s.replace(/[|,;:_]/g, "");
+    s = s.replace(/[()\[\]{}]/g, "");
+    s = s.replace(/H1(?=\d{4})/g, "HL");
+    s = s.replace(/HL(?=[O0]\d{3})/g, "HL");
+    s = s.replace(/TC(?=\d{4})/g, "7C");
+    s = s.replace(/7G(?=\d{4})/g, "7C");
+    s = s.replace(/ZC(?=\d{4})/g, "7C");
+    s = s.replace(/([7H])L([O0])(\d{3})/g, "HL0$3");
+    s = s.replace(/([7C])([O0])(\d{3})/g, "$10$3");
+    s = s.replace(/^#$/, "");
+    s = s.replace(/O/g, (m, idx)=> /\d/.test(s[idx-1]||'') || /\d/.test(s[idx+1]||'') ? '0' : 'O');
+    return s;
+  }
+
+  function tokenizeLineText(line){
+    return String(line || "")
+      .replace(/\n/g, " ")
+      .split(/\s+/)
+      .map(normalizeOcrToken)
+      .filter(Boolean);
+  }
+
+  function wordsToRows(words){
+    const usable = (words || [])
+      .filter(w => w && w.text && w.bbox && typeof w.bbox.y0 === 'number')
+      .map(w => ({ text: normalizeOcrToken(w.text), x: w.bbox.x0, y: w.bbox.y0, h: Math.max(1, (w.bbox.y1 - w.bbox.y0) || 1) }))
+      .filter(w => w.text);
+    usable.sort((a,b)=> a.y - b.y || a.x - b.x);
+    const rows = [];
+    for(const w of usable){
+      let row = rows.find(r => Math.abs(r.cy - w.y) <= Math.max(12, w.h * 0.8));
+      if(!row){
+        row = { cy:w.y, words:[] };
+        rows.push(row);
+      }
+      row.words.push(w);
+      row.cy = (row.cy * (row.words.length - 1) + w.y) / row.words.length;
+    }
+    rows.sort((a,b)=> a.cy - b.cy);
+    return rows.map(r => r.words.sort((a,b)=> a.x - b.x).map(w => w.text));
+  }
+
+  function parseTeamToken(token){
+    const s = String(token || "").trim();
+    if(!s) return null;
+    const m = s.match(/^(\d{1,2})(?:\/(\d{1,2}))?$/);
+    if(!m) return null;
+    const a = String(Number(m[1]));
+    const b = m[2] ? String(Number(m[2])) : a;
+    return { inbound:a, outbound:b, raw:s };
+  }
+
+  function parseRowTokens(tokens){
+    const cleaned = (tokens || []).map(normalizeOcrToken).filter(Boolean);
+    const flightIdx = [];
+    cleaned.forEach((t, i)=> { if(/^7C\d{4}$/.test(t)) flightIdx.push(i); });
+    if(!flightIdx.length) return [];
+    const inboundFlight = cleaned[flightIdx[0]] || "";
+    const outboundFlight = cleaned[flightIdx[1]] || (flightIdx.length === 1 ? "" : cleaned[flightIdx[flightIdx.length - 1]] || "");
+    const hlToken = cleaned.find(t => /^HL\d{4}$/.test(t)) || "";
+    let teamToken = "";
+    for(let i = cleaned.length - 1; i >= 0; i--){
+      if(parseTeamToken(cleaned[i])){ teamToken = cleaned[i]; break; }
+    }
+    const team = parseTeamToken(teamToken);
+    if(!team) return [];
+    let hashToken = "";
+    const searchEnd = flightIdx[1] != null ? flightIdx[1] : cleaned.length;
+    for(let i = 0; i < searchEnd; i++){
+      if(/^\d{3}$/.test(cleaned[i])) hashToken = cleaned[i];
+    }
+    const rows = [];
+    const dayKey = getViewingDayKey();
+    if(team.inbound === team.outbound){
+      rows.push({
+        id: Date.now() + Math.floor(Math.random()*100000),
+        memoDate: dayKey, dayKey, team: team.inbound,
+        hasIn: !!(inboundFlight || hashToken), hasOut: !!(outboundFlight || hlToken),
+        sharedHL: hlToken.replace(/^HL/, ""),
+        sharedHASH: hashToken,
+        "INBOUND-7C": inboundFlight.replace(/^7C/, ""),
+        "OUTBOUND-7C": outboundFlight.replace(/^7C/, ""),
+        "INBOUND-STA":"","OUTBOUND-STD":"",
+        "INBOUND-t":"","INBOUND-d":"","INBOUND-bb":"",
+        "OUTBOUND-t":"","OUTBOUND-d":"","OUTBOUND-bb":"","OUTBOUND-tt":"","OUTBOUND-tb":"",
+        "INBOUND-cmpt1":"F","INBOUND-cmpt2":"F","INBOUND-cmpt3":"","INBOUND-cmpt4":"","INBOUND-note":"","INBOUND-TIME":"","INBOUND-EXTRAS":[],"INBOUND-LIRPHOTO":"",
+        "OUTBOUND-cmpt1":"F","OUTBOUND-cmpt2":"F","OUTBOUND-cmpt3":"","OUTBOUND-cmpt4":"","OUTBOUND-note":"","OUTBOUND-TIME":"","OUTBOUND-EXTRAS":[],"OUTBOUND-LIRPHOTO":""
+      });
+    }else{
+      rows.push({
+        id: Date.now() + Math.floor(Math.random()*100000),
+        memoDate: dayKey, dayKey, team: team.inbound,
+        hasIn: !!(inboundFlight || hashToken), hasOut:false,
+        sharedHL: "", sharedHASH: hashToken,
+        "INBOUND-7C": inboundFlight.replace(/^7C/, ""),
+        "OUTBOUND-7C": "",
+        "INBOUND-STA":"","OUTBOUND-STD":"",
+        "INBOUND-t":"","INBOUND-d":"","INBOUND-bb":"",
+        "OUTBOUND-t":"","OUTBOUND-d":"","OUTBOUND-bb":"","OUTBOUND-tt":"","OUTBOUND-tb":"",
+        "INBOUND-cmpt1":"F","INBOUND-cmpt2":"F","INBOUND-cmpt3":"","INBOUND-cmpt4":"","INBOUND-note":"","INBOUND-TIME":"","INBOUND-EXTRAS":[],"INBOUND-LIRPHOTO":"",
+        "OUTBOUND-cmpt1":"F","OUTBOUND-cmpt2":"F","OUTBOUND-cmpt3":"","OUTBOUND-cmpt4":"","OUTBOUND-note":"","OUTBOUND-TIME":"","OUTBOUND-EXTRAS":[],"OUTBOUND-LIRPHOTO":""
+      });
+      rows.push({
+        id: Date.now() + Math.floor(Math.random()*100000) + 1,
+        memoDate: dayKey, dayKey, team: team.outbound,
+        hasIn:false, hasOut: !!(outboundFlight || hlToken),
+        sharedHL: hlToken.replace(/^HL/, ""), sharedHASH: "",
+        "INBOUND-7C": "",
+        "OUTBOUND-7C": outboundFlight.replace(/^7C/, ""),
+        "INBOUND-STA":"","OUTBOUND-STD":"",
+        "INBOUND-t":"","INBOUND-d":"","INBOUND-bb":"",
+        "OUTBOUND-t":"","OUTBOUND-d":"","OUTBOUND-bb":"","OUTBOUND-tt":"","OUTBOUND-tb":"",
+        "INBOUND-cmpt1":"F","INBOUND-cmpt2":"F","INBOUND-cmpt3":"","INBOUND-cmpt4":"","INBOUND-note":"","INBOUND-TIME":"","INBOUND-EXTRAS":[],"INBOUND-LIRPHOTO":"",
+        "OUTBOUND-cmpt1":"F","OUTBOUND-cmpt2":"F","OUTBOUND-cmpt3":"","OUTBOUND-cmpt4":"","OUTBOUND-note":"","OUTBOUND-TIME":"","OUTBOUND-EXTRAS":[],"OUTBOUND-LIRPHOTO":""
+      });
+    }
+    return rows.filter(r => r.hasIn || r.hasOut);
+  }
+
+  async function autoGenerateMemosFromPhoto(){
+    if(ocrBusy || !photo || !window.Tesseract) return;
+    ocrBusy = true;
+    try{
+      const worker = await Tesseract.createWorker('eng');
+      const result = await worker.recognize(photo);
+      await worker.terminate();
+      const rowsFromWords = wordsToRows(result?.data?.words || []);
+      const rowsFromText = String(result?.data?.text || '').split(/\n+/).map(tokenizeLineText).filter(Boolean);
+      const allRows = [...rowsFromWords, ...rowsFromText];
+      const created = [];
+      const seen = new Set();
+      for(const row of allRows){
+        const parsed = parseRowTokens(row);
+        for(const item of parsed){
+          const sig = JSON.stringify([item.team, item.hasIn, item.hasOut, item['INBOUND-7C'], item.sharedHASH, item['OUTBOUND-7C'], item.sharedHL]);
+          if(seen.has(sig)) continue;
+          seen.add(sig);
+          created.push(item);
+        }
+      }
+      if(!created.length){
+        alert('AUTO SCAN FAIL');
+        return;
+      }
+      memos.push(...created);
+      persistMemos();
+      dayOffset = 0;
+      updateDayLabel();
+      renderList(created[created.length - 1].id);
+      alert(`${created.length} MEMO ADDED`);
+    }catch(err){
+      console.error(err);
+      alert('AUTO SCAN FAIL');
+    }finally{
+      ocrBusy = false;
+    }
+  }
+
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1432,7 +1570,7 @@
     }
     if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
     memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
     renderList();
   }
 
@@ -1761,11 +1899,12 @@
 
   function newMemo(){
     editId = null;
-    memoDate.value = getViewingDayKey();
-    memoTeam.value = quickTeamSelect.value || "";
+    fillTeamSelects();
+  memoDate.value = getViewingDayKey();
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
+    if(memoTeam) memoTeam.value = quickTeamSelect ? quickTeamSelect.value : "";
     buildSectionsBlank();
     openModal();
   }
@@ -1818,12 +1957,6 @@
     }
   });
 
-  quickTeamSelect.addEventListener("change", ()=>{
-    if(!editId && modal.style.display === "flex"){
-      memoTeam.value = quickTeamSelect.value;
-    }
-  });
-
   function saveMemo(){
     if(!pickInbound.checked && !pickOutbound.checked){
       alert("INBOUND OR OUTBOUND SELECT");
@@ -1833,8 +1966,8 @@
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
-    data.team = memoTeam.value || quickTeamSelect.value || "";
-    data.teamLabel = data.team ? `${Number(data.team)}조` : "TEAM NONE";
+    data.team = (memoTeam && memoTeam.value) || (quickTeamSelect && quickTeamSelect.value) || "";
+    data.teamLabel = teamLabelOf(data.team);
 
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
@@ -1904,8 +2037,7 @@
       memos.push(data);
     }
 
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    quickTeamSelect.value = data.team || quickTeamSelect.value;
+    persistMemos();
     dayOffset = calcDayOffsetFromDate(data.memoDate);
     updateDayLabel();
     closeModal();
@@ -1915,9 +2047,12 @@
   function formatCombinedLine(m){
     const v7cIn = (m["INBOUND-7C"] || "").trim();
     const v7cOut = (m["OUTBOUND-7C"] || "").trim();
-    const v7c = v7cIn || v7cOut || "";
     const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
+    if(v7cIn && hash && v7cOut && vhl){
+      return `IN 7C[${v7cIn}] #[${hash}] / OUT 7C[${v7cOut}] HL[${vhl}]`;
+    }
+    const v7c = v7cIn || v7cOut || "";
     return `7C[${v7c}] HL[${vhl}] #[${hash}]`;
   }
 
@@ -1960,23 +2095,24 @@
     groups.forEach((items, key)=>{
       const group = document.createElement("div");
       group.className = "teamGroup";
-      const title = key === "NONE" ? "TEAM NONE" : `${Number(key)}조`;
-      group.innerHTML = `<div class="teamHeader"><div class="t1">${title}</div><div class="t2">${items.length} MEMO</div></div>`;
+      group.innerHTML = `<div class="teamHeader"><div class="t1">${teamLabelOf(key)}</div><div class="t2">${items.length} MEMO</div></div>`;
 
       items.forEach(m=>{
         const hasIn = m.hasIn !== false;
         const hasOut = m.hasOut !== false;
-
         let linesHtml = "";
 
-        if(hasIn){
-          linesHtml += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>`;
-        }
-        if(hasOut){
-          linesHtml += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>`;
-        }
-        if(!hasIn && !hasOut){
-          linesHtml = `<div class="line"><div class="tagPill">MEMO</div><div class="textPill">${formatCombinedLine(m)}</div></div>`;
+        if(hasIn && hasOut){
+          linesHtml = `
+            <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>
+            <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>
+          `;
+        }else{
+          const singleTag = hasIn ? "IN" : "OUT";
+          const singleType = hasIn ? "INBOUND" : "OUTBOUND";
+          linesHtml = `
+            <div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatSplitLine(m, singleType)}</div></div>
+          `;
         }
 
         const card = document.createElement("div");
@@ -1990,7 +2126,7 @@
           </div>
           <div class="metaRow">
             <div class="miniPill">${m.memoDate || ""}</div>
-            <div class="miniPill">${m.teamLabel || "TEAM NONE"}</div>
+            <div class="miniPill">${teamLabelOf(m.team)}</div>
           </div>
         `;
         group.appendChild(card);
@@ -2013,8 +2149,8 @@
 
     editId = id;
     memoDate.value = m.memoDate || getViewingDayKey();
-    memoTeam.value = m.team || "";
-    quickTeamSelect.value = m.team || quickTeamSelect.value;
+    if(memoTeam) memoTeam.value = m.team || "";
+    if(quickTeamSelect && m.team) quickTeamSelect.value = m.team || "";
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
     currentLirPhotos = {
@@ -2037,7 +2173,7 @@
       return;
     }
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
     renderList();
   }
 
@@ -2132,295 +2268,11 @@
     }
   }
 
-  function normalizeOcrText(text){
-    return (text || "")
-      .replace(/[|]/g, " ")
-      .replace(/[()\[\]{}]/g, " ")
-      .replace(/[“”"']/g, "")
-      .replace(/\bTC(?=\d{3,4}\b)/g, "7C")
-      .replace(/\b7G(?=\d{3,4}\b)/g, "7C")
-      .replace(/\bHC(?=\d{3,4}\b)/g, "HL")
-      .replace(/\bH1(?=\d{3,4}\b)/g, "HL")
-      .replace(/\bHI(?=\d{3,4}\b)/g, "HL")
-      .replace(/[Oo](?=조\b)/g, "0");
-  }
-
-  function normalizeToken(token){
-    return (token || "")
-      .toUpperCase()
-      .replace(/[^A-Z0-9\/#:-]/g, "")
-      .replace(/^TC(?=\d{3,4}$)/, "7C")
-      .replace(/^7G(?=\d{3,4}$)/, "7C")
-      .replace(/^H1(?=\d{3,4}$)/, "HL")
-      .replace(/^HI(?=\d{3,4}$)/, "HL")
-      .replace(/^HC(?=\d{3,4}$)/, "HL");
-  }
-
-  function tokenToTeamNumber(token){
-    const t = normalizeToken(token).replace(/조$/,"");
-    if(/^\d{1,2}$/.test(t)){
-      const n = Number(t);
-      if(n >= 1 && n <= 24) return String(n);
-    }
-    return "";
-  }
-
-  function parseTeamCell(token){
-    const cleaned = normalizeToken(token).replace(/조/g, "");
-    if(!cleaned) return { in:"", out:"" };
-    if(cleaned.includes("/")){
-      const parts = cleaned.split("/").map(tokenToTeamNumber).filter(Boolean);
-      return { in: parts[0] || "", out: parts[1] || "" };
-    }
-    const one = tokenToTeamNumber(cleaned);
-    return { in: one, out: one };
-  }
-
-  function extractTeamInfo(tokens){
-    for(let i = tokens.length - 2; i >= Math.max(0, tokens.length - 5); i--){
-      const raw = tokens[i] || "";
-      const parsed = parseTeamCell(raw);
-      if(parsed.in || parsed.out){
-        return { ...parsed, idx:i };
-      }
-    }
-    return { in:"", out:"", idx:-1 };
-  }
-
-  function buildAutoMemoData(type, team, rowData, dateKey){
-    return {
-      id: Date.now() + Math.floor(Math.random() * 1000000),
-      memoDate: dateKey,
-      dayKey: dateKey,
-      team: team || "",
-      teamLabel: team ? `${Number(team)}조` : "TEAM NONE",
-      hasIn: type === "INBOUND",
-      hasOut: type === "OUTBOUND",
-      sharedHL: pad(rowData.hl || "", 4),
-      sharedHASH: pad(rowData.hash || "", 3),
-      "INBOUND-7C": type === "INBOUND" ? pad(rowData.in7c || "", 4) : "",
-      "INBOUND-STA": "",
-      "INBOUND-STD": "",
-      "INBOUND-t": "",
-      "INBOUND-d": "",
-      "INBOUND-bb": "",
-      "INBOUND-tt": "",
-      "INBOUND-tb": "",
-      "INBOUND-cmpt1": "F",
-      "INBOUND-cmpt2": "F",
-      "INBOUND-cmpt3": "",
-      "INBOUND-cmpt4": "",
-      "INBOUND-note": "",
-      "INBOUND-TIME": "",
-      "INBOUND-EXTRAS": [],
-      "INBOUND-LIRPHOTO": "",
-      "OUTBOUND-7C": type === "OUTBOUND" ? pad(rowData.out7c || "", 4) : "",
-      "OUTBOUND-STA": "",
-      "OUTBOUND-STD": "",
-      "OUTBOUND-t": "",
-      "OUTBOUND-d": "",
-      "OUTBOUND-bb": "",
-      "OUTBOUND-tt": "",
-      "OUTBOUND-tb": "",
-      "OUTBOUND-cmpt1": "F",
-      "OUTBOUND-cmpt2": "F",
-      "OUTBOUND-cmpt3": "",
-      "OUTBOUND-cmpt4": "",
-      "OUTBOUND-note": "",
-      "OUTBOUND-TIME": "",
-      "OUTBOUND-EXTRAS": [],
-      "OUTBOUND-LIRPHOTO": ""
-    };
-  }
-
-  function parseTokensToRows(rawTokens){
-    const tokens = (rawTokens || []).map(normalizeToken).filter(Boolean);
-    if(tokens.length < 4) return [];
-
-    const teamInfo = extractTeamInfo(tokens);
-    if(!teamInfo.in && !teamInfo.out) return [];
-
-    const flightMeta = [];
-    tokens.forEach((t, idx)=>{
-      if(/^7C\d{3,4}$/.test(t)){
-        flightMeta.push({ token:t, idx });
-      }
-    });
-    if(!flightMeta.length) return [];
-
-    const inboundFlight = flightMeta[0] || null;
-    const outboundFlight = flightMeta[1] || null;
-
-    let hashToken = "";
-    const hashStart = inboundFlight ? inboundFlight.idx + 1 : 0;
-    const hashEnd = outboundFlight ? outboundFlight.idx : Math.max(teamInfo.idx, tokens.length);
-    for(let i = hashStart; i < hashEnd; i++){
-      const t = tokens[i];
-      if(/^\d{1,3}$/.test(t)){
-        hashToken = t;
-        break;
-      }
-    }
-    if(!hashToken){
-      hashToken = tokens.find(t => /^\d{1,3}$/.test(t)) || "";
-    }
-
-    let hlToken = "";
-    const hlStart = outboundFlight ? outboundFlight.idx + 1 : 0;
-    const hlEnd = teamInfo.idx > -1 ? teamInfo.idx : tokens.length;
-    for(let i = hlStart; i < hlEnd; i++){
-      const t = tokens[i];
-      if(/^HL\d{3,4}$/.test(t)){
-        hlToken = t;
-        break;
-      }
-    }
-    if(!hlToken){
-      hlToken = tokens.find(t => /^HL\d{3,4}$/.test(t)) || "";
-    }
-
-    const rowData = {
-      in7c: inboundFlight ? inboundFlight.token.replace(/^7C/, "") : "",
-      out7c: outboundFlight ? outboundFlight.token.replace(/^7C/, "") : "",
-      hl: hlToken.replace(/^HL/, ""),
-      hash: hashToken
-    };
-
-    const rows = [];
-    if(teamInfo.in && rowData.in7c){
-      rows.push(buildAutoMemoData("INBOUND", teamInfo.in, rowData, getViewingDayKey()));
-    }
-    if(teamInfo.out && rowData.out7c){
-      rows.push(buildAutoMemoData("OUTBOUND", teamInfo.out, rowData, getViewingDayKey()));
-    }
-    if(rows.length === 2 && teamInfo.in && teamInfo.out && teamInfo.in === teamInfo.out){
-      rows[0].hasOut = true;
-      rows[0]["OUTBOUND-7C"] = rows[1]["OUTBOUND-7C"];
-      rows[0].teamLabel = `${Number(teamInfo.in)}조`;
-      rows.pop();
-    }
-    return rows;
-  }
-
-  function parseOcrLineToRows(line){
-    const normLine = normalizeOcrText(line);
-    const rawTokens = normLine.split(/\s+/).map(normalizeToken).filter(Boolean);
-    return parseTokensToRows(rawTokens);
-  }
-
-  function groupWordsToTokenLines(words){
-    const validWords = (words || [])
-      .map(w => {
-        const text = normalizeToken((w && w.text) || "");
-        const bbox = w && (w.bbox || w.boundingBox || w);
-        const x0 = bbox && Number.isFinite(bbox.x0) ? bbox.x0 : (bbox && Number.isFinite(bbox.left) ? bbox.left : 0);
-        const x1 = bbox && Number.isFinite(bbox.x1) ? bbox.x1 : (bbox && Number.isFinite(bbox.right) ? bbox.right : x0);
-        const y0 = bbox && Number.isFinite(bbox.y0) ? bbox.y0 : (bbox && Number.isFinite(bbox.top) ? bbox.top : 0);
-        const y1 = bbox && Number.isFinite(bbox.y1) ? bbox.y1 : (bbox && Number.isFinite(bbox.bottom) ? bbox.bottom : y0);
-        const cy = (y0 + y1) / 2;
-        return { text, x0, x1, y0, y1, cy };
-      })
-      .filter(w => w.text);
-
-    validWords.sort((a,b)=>{
-      if(Math.abs(a.cy - b.cy) > 12) return a.cy - b.cy;
-      return a.x0 - b.x0;
-    });
-
-    const lines = [];
-    validWords.forEach(word=>{
-      let target = null;
-      for(let i = lines.length - 1; i >= 0; i--){
-        const line = lines[i];
-        if(Math.abs(line.cy - word.cy) <= 14){
-          target = line;
-          break;
-        }
-      }
-      if(!target){
-        target = { cy: word.cy, words: [] };
-        lines.push(target);
-      }
-      target.words.push(word);
-      target.cy = (target.cy * (target.words.length - 1) + word.cy) / target.words.length;
-    });
-
-    return lines.map(line => line.words.sort((a,b)=>a.x0-b.x0).map(w=>w.text));
-  }
-
-  function dedupeAutoRows(rows){
-    const seen = new Set();
-    return rows.filter(row=>{
-      const key = [
-        row.memoDate || "",
-        row.team || "",
-        row.hasIn ? row["INBOUND-7C"] : "",
-        row.hasOut ? row["OUTBOUND-7C"] : "",
-        row.sharedHL || "",
-        row.sharedHASH || ""
-      ].join("|");
-      if(seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  }
-
-  function extractRowsFromOcrResult(result){
-    const created = [];
-    const words = result && result.data && Array.isArray(result.data.words) ? result.data.words : [];
-    const tokenLines = groupWordsToTokenLines(words);
-
-    tokenLines.forEach(tokens=>{
-      parseTokensToRows(tokens).forEach(row => created.push(row));
-    });
-
-    if(created.length) return dedupeAutoRows(created);
-
-    const text = (result && result.data && result.data.text) ? result.data.text : "";
-    const lines = text.split(/\n+/).map(v => v.trim()).filter(Boolean);
-    lines.forEach(line=>{
-      parseOcrLineToRows(line).forEach(row => created.push(row));
-    });
-    return dedupeAutoRows(created);
-  }
-
-  async function scanPhotoAndCreateMemos(file){
-    if(ocrBusy) return;
-    if(typeof Tesseract === "undefined"){
-      alert("OCR LOAD FAIL");
-      return;
-    }
-
-    ocrBusy = true;
-    try{
-      const worker = await Tesseract.createWorker("eng");
-      const result = await worker.recognize(file);
-      await worker.terminate();
-
-      const created = extractRowsFromOcrResult(result);
-
-      if(!created.length){
-        alert("AUTO MEMO NOT FOUND");
-        return;
-      }
-
-      memos.push(...created);
-      localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-      renderList(created[created.length - 1].id);
-      alert(`${created.length} MEMO CREATED`);
-    }catch(err){
-      console.error(err);
-      alert("AUTO SCAN FAIL");
-    }finally{
-      ocrBusy = false;
-    }
-  }
-
   photoInput.onchange = async (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     await savePhotoFile(f);
-    await scanPhotoAndCreateMemos(f);
+    await autoGenerateMemosFromPhoto();
   };
 
   lirPhotoInput.onchange = async (e)=>{
