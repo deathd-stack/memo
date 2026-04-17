@@ -310,6 +310,7 @@
   </div>
 </div>
 
+<script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
 <script>
 const MEMO_KEY = 'jas_memos_v65';
 const PHOTO_KEY = 'jas_photo_v65';
@@ -573,8 +574,167 @@ function compressImageToDataUrl(img,maxW=1600,maxH=1600,quality=0.82){const rati
 async function makeStablePhotoData(file){const img=await loadImageFromFile(file); const tries=[{maxW:1600,maxH:1600,quality:.82},{maxW:1600,maxH:1600,quality:.70},{maxW:1440,maxH:1440,quality:.60},{maxW:1280,maxH:1280,quality:.52},{maxW:1080,maxH:1080,quality:.48}]; for(const t of tries){const dataUrl=compressImageToDataUrl(img,t.maxW,t.maxH,t.quality); if(dataUrl.length<3500000) return dataUrl;} return compressImageToDataUrl(img,960,960,.42);}
 async function savePhotoFile(file){try{const stableDataUrl=await makeStablePhotoData(file); localStorage.setItem(PHOTO_KEY, stableDataUrl); photo=stableDataUrl; photoImg.src=stableDataUrl; alert('PHOTO SAVED');}catch(err){console.error(err); alert('PHOTO SAVE FAIL');}}
 async function saveLirPhotoFile(file,type){try{const stableDataUrl=await makeStablePhotoData(file); currentLirPhotos[type]=stableDataUrl; alert('LIR PHOTO SAVED');}catch(err){console.error(err); alert('LIR PHOTO SAVE FAIL');}}
-photoInput.onchange=async e=>{const file=e.target.files?.[0]; if(file) await savePhotoFile(file);};
+photoInput.onchange=async e=>{const file=e.target.files?.[0]; if(file){ await savePhotoFile(file); await autoCreateMemosFromPhoto(file); }};
 lirPhotoInput.onchange=async e=>{const file=e.target.files?.[0]; if(file && activeLirType) await saveLirPhotoFile(file, activeLirType);};
+
+function normalizeOcrToken(token){
+  let t = (token || '').toUpperCase().trim();
+  t = t.replace(/[|\\]/g,'/');
+  t = t.replace(/[ＯO]/g,'0');
+  t = t.replace(/^TC(\d{4})$/,'7C$1');
+  t = t.replace(/^7G(\d{4})$/,'7C$1');
+  t = t.replace(/^H1(\d{4})$/,'HL$1');
+  t = t.replace(/^HI(\d{4})$/,'HL$1');
+  t = t.replace(/^HL[- ]?(\d{4})$/,'HL$1');
+  t = t.replace(/^7C[- ]?(\d{4})$/,'7C$1');
+  return t;
+}
+function tokenizeOcrLine(line){
+  return (line || '')
+    .replace(/\t+/g,' ')
+    .replace(/[\u00A0]/g,' ')
+    .split(/\s+/)
+    .map(normalizeOcrToken)
+    .filter(Boolean);
+}
+function parseTeamCell(teamCell){
+  const raw = (teamCell || '').replace(/[^0-9/]/g,'');
+  if(!raw) return { inTeam:'', outTeam:'' };
+  if(raw.includes('/')){
+    const [a,b] = raw.split('/');
+    return { inTeam: onlyNum(a,2), outTeam: onlyNum(b,2) };
+  }
+  const one = onlyNum(raw,2);
+  return { inTeam: one, outTeam: one };
+}
+function extractRowDataFromTokens(tokens){
+  if(!tokens || tokens.length < 4) return null;
+  const teamCell = tokens.length >= 2 ? tokens[tokens.length - 2] : '';
+  if(!/^\d{1,2}(?:\/\d{1,2})?$/.test(teamCell)) return null;
+
+  const inboundIdx = tokens.findIndex(t => /^7C\d{4}$/.test(t));
+  if(inboundIdx < 0) return null;
+
+  const outboundIdx = tokens.findIndex((t,i) => i > inboundIdx + 1 && /^7C\d{4}$/.test(t));
+  const hlIdx = tokens.findIndex((t,i) => i > (outboundIdx >= 0 ? outboundIdx : inboundIdx) && /^HL\d{4}$/.test(t));
+
+  let hashToken = '';
+  const hashRangeStart = inboundIdx + 1;
+  const hashRangeEnd = outboundIdx > 0 ? outboundIdx : Math.min(tokens.length - 2, inboundIdx + 5);
+  for(let i=hashRangeStart; i<hashRangeEnd; i++){
+    if(/^\d{1,3}$/.test(tokens[i])){ hashToken = tokens[i]; break; }
+  }
+  if(!hashToken){
+    const direct = tokens[2] || '';
+    if(/^\d{1,3}$/.test(direct)) hashToken = direct;
+  }
+
+  const inboundFlight = tokens[inboundIdx].replace(/^7C/,'');
+  const outboundFlight = outboundIdx >= 0 ? tokens[outboundIdx].replace(/^7C/,'') : '';
+  const hl = hlIdx >= 0 ? tokens[hlIdx].replace(/^HL/,'') : '';
+  const teams = parseTeamCell(teamCell);
+
+  if(!inboundFlight && !outboundFlight) return null;
+  return {
+    inboundFlight,
+    outboundFlight,
+    hl,
+    hash: onlyNum(hashToken,3),
+    inTeam: teams.inTeam,
+    outTeam: teams.outTeam
+  };
+}
+function buildMemoRecordFromParsed(parsed, type){
+  const base = {
+    id: Date.now() + Math.floor(Math.random()*1000000),
+    memoDate: getViewingDayKey(),
+    dayKey: getViewingDayKey(),
+    team: '',
+    teamLabel: '미지정',
+    sharedHL: '',
+    sharedHASH: '',
+    hasIn: false,
+    hasOut: false,
+    'INBOUND-7C':'', 'INBOUND-STA':'', 'INBOUND-STD':'', 'INBOUND-t':'', 'INBOUND-d':'', 'INBOUND-bb':'', 'INBOUND-tt':'', 'INBOUND-tb':'',
+    'INBOUND-cmpt1':'F', 'INBOUND-cmpt2':'F', 'INBOUND-cmpt3':'', 'INBOUND-cmpt4':'', 'INBOUND-note':'', 'INBOUND-TIME':'', 'INBOUND-EXTRAS':[], 'INBOUND-LIRPHOTO':'',
+    'OUTBOUND-7C':'', 'OUTBOUND-STA':'', 'OUTBOUND-STD':'', 'OUTBOUND-t':'', 'OUTBOUND-d':'', 'OUTBOUND-bb':'', 'OUTBOUND-tt':'', 'OUTBOUND-tb':'',
+    'OUTBOUND-cmpt1':'F', 'OUTBOUND-cmpt2':'F', 'OUTBOUND-cmpt3':'', 'OUTBOUND-cmpt4':'', 'OUTBOUND-note':'', 'OUTBOUND-TIME':'', 'OUTBOUND-EXTRAS':[], 'OUTBOUND-LIRPHOTO':''
+  };
+  if(type === 'BOTH'){
+    base.team = parsed.inTeam || parsed.outTeam || '';
+    base.teamLabel = base.team ? `${Number(base.team)}조` : '미지정';
+    base.hasIn = true;
+    base.hasOut = true;
+    base['INBOUND-7C'] = pad(parsed.inboundFlight,4);
+    base['OUTBOUND-7C'] = pad(parsed.outboundFlight,4);
+    base.sharedHASH = pad(parsed.hash,3);
+    base.sharedHL = pad(parsed.hl,4);
+  } else if(type === 'INBOUND'){
+    base.team = parsed.inTeam || '';
+    base.teamLabel = base.team ? `${Number(base.team)}조` : '미지정';
+    base.hasIn = true;
+    base['INBOUND-7C'] = pad(parsed.inboundFlight,4);
+    base.sharedHASH = pad(parsed.hash,3);
+  } else if(type === 'OUTBOUND'){
+    base.team = parsed.outTeam || '';
+    base.teamLabel = base.team ? `${Number(base.team)}조` : '미지정';
+    base.hasOut = true;
+    base['OUTBOUND-7C'] = pad(parsed.outboundFlight,4);
+    base.sharedHL = pad(parsed.hl,4);
+  }
+  base.autoMemo = buildAutoMemoText(base);
+  return base;
+}
+function buildRecordsFromParsedRow(parsed){
+  if(!parsed) return [];
+  const sameTeam = parsed.inTeam && parsed.outTeam && parsed.inTeam === parsed.outTeam;
+  if(sameTeam){
+    return [buildMemoRecordFromParsed(parsed,'BOTH')];
+  }
+  const out = [];
+  if(parsed.inTeam && parsed.inboundFlight) out.push(buildMemoRecordFromParsed(parsed,'INBOUND'));
+  if(parsed.outTeam && parsed.outboundFlight) out.push(buildMemoRecordFromParsed(parsed,'OUTBOUND'));
+  return out;
+}
+async function recognizePhotoText(file){
+  if(typeof Tesseract === 'undefined') throw new Error('OCR LIBRARY NOT LOADED');
+  const result = await Tesseract.recognize(file, 'eng', {
+    logger: m => {
+      if(m && m.status === 'recognizing text') updateGlobalCalcDisplay(`SCAN ${Math.round((m.progress || 0) * 100)}%`);
+    }
+  });
+  return result?.data?.text || '';
+}
+async function autoCreateMemosFromPhoto(file){
+  try{
+    updateGlobalCalcDisplay('SCAN 0%');
+    const text = await recognizePhotoText(file);
+    const lines = text.split(/\r?\n/).map(v=>v.trim()).filter(Boolean);
+    const newRecords = [];
+    lines.forEach(line => {
+      const tokens = tokenizeOcrLine(line);
+      const parsed = extractRowDataFromTokens(tokens);
+      if(parsed){
+        buildRecordsFromParsedRow(parsed).forEach(record => newRecords.push(record));
+      }
+    });
+    if(!newRecords.length){
+      updateGlobalCalcDisplay('0');
+      alert('AUTO MEMO FAIL - ROW NOT FOUND');
+      return;
+    }
+    memos.push(...newRecords);
+    persistMemos();
+    updateDayLabel();
+    renderList(newRecords[newRecords.length - 1].id);
+    updateGlobalCalcDisplay('0');
+    alert(`AUTO MEMO ${newRecords.length} CREATED`);
+  }catch(err){
+    console.error(err);
+    updateGlobalCalcDisplay('0');
+    alert('AUTO MEMO FAIL');
+  }
+}
 function openPhoto(){if(!photo){alert('NO PHOTO'); return;} photoImg.src=photo; photoLayer.style.display='flex';}
 function closePhoto(){photoLayer.style.display='none';}
 function openEquip(){equipModal.style.display='flex'; equipModal.setAttribute('aria-hidden','false'); loadEquip();}
