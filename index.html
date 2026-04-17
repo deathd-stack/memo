@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER X</title>
+<title>JAS MEMO VER X.1</title>
 
 <style>
   :root{
@@ -108,95 +108,6 @@
 
   button:active{
     transform:scale(.985);
-  }
-
-
-  .teamQuickWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    border-radius:999px;
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-    border:1px solid rgba(255,255,255,.06);
-    box-shadow:var(--shadow-soft);
-  }
-
-  .teamQuickLabel,
-  .teamLab{
-    font-size:calc(14px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-    white-space:nowrap;
-  }
-
-  .teamQuickSelect,
-  .teamSelect{
-    height:calc(42px * var(--ui));
-    min-width:calc(104px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    border:2px solid var(--line);
-    border-radius:calc(18px * var(--ui));
-    background:#121214;
-    color:#fff;
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-  }
-
-  .teamLine{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    margin-bottom:calc(8px * var(--ui));
-    margin-top:calc(6px * var(--ui));
-  }
-
-  .teamSelect{
-    height:calc(54px * var(--ui));
-    min-width:calc(150px * var(--ui));
-    border-radius:calc(22px * var(--ui));
-    font-size:calc(16px * var(--ui));
-  }
-
-  .teamGroup{
-    margin-bottom:calc(16px * var(--ui));
-  }
-
-  .teamHeader{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-    background:rgba(34,34,38,.96);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
-    margin:calc(10px * var(--ui)) 0;
-    box-shadow:0 8px 18px rgba(0,0,0,.20);
-  }
-
-  .teamHeader .t1{font-size:calc(18px * var(--ui)); font-weight:1000; color:#fff;}
-  .teamHeader .t2{font-size:calc(12px * var(--ui)); font-weight:1000; color:var(--muted); text-transform:uppercase;}
-
-  .metaRow{
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-    display:flex;
-    flex-wrap:wrap;
-    gap:calc(8px * var(--ui));
-  }
-
-  .miniPill{
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.05);
-    border-radius:999px;
-    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
-    font-size:calc(12px * var(--ui));
-    font-weight:1000;
-    color:var(--muted);
-    text-transform:uppercase;
   }
 
   .dayBar{
@@ -1066,6 +977,126 @@
     min-width:0;
   }
 
+
+  .controls{
+    align-items:center;
+  }
+
+  .teamQuickWrap{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
+    border-radius:999px;
+    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow:var(--shadow-soft);
+  }
+
+  .teamQuickLabel{
+    font-size:calc(14px * var(--ui));
+    font-weight:1000;
+    color:#fff;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .teamQuickSelect,
+  .teamSelect{
+    font-family:inherit;
+    font-weight:1000;
+    border:2px solid var(--line);
+    border-radius:calc(20px * var(--ui));
+    outline:none;
+    background:#121214;
+    color:#fff;
+    text-transform:uppercase;
+  }
+
+  .teamQuickSelect{
+    height:calc(42px * var(--ui));
+    padding:0 calc(12px * var(--ui));
+    font-size:calc(15px * var(--ui));
+    min-width:calc(104px * var(--ui));
+  }
+
+  .teamLine{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    margin-bottom:calc(8px * var(--ui));
+  }
+
+  .teamLab{
+    font-size:calc(15px * var(--ui));
+    font-weight:1000;
+    color:#fff;
+    text-transform:uppercase;
+  }
+
+  .teamSelect{
+    width:auto !important;
+    min-width:calc(150px * var(--ui));
+    height:calc(54px * var(--ui));
+    padding:0 calc(12px * var(--ui));
+    font-size:calc(16px * var(--ui));
+  }
+
+  .teamGroup{
+    margin-bottom:calc(18px * var(--ui));
+  }
+
+  .teamHeader{
+    margin:calc(8px * var(--ui)) 0 calc(10px * var(--ui));
+    padding:calc(12px * var(--ui)) calc(16px * var(--ui));
+    background:rgba(20,20,24,.9);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:999px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
+  }
+
+  .teamHeader .t1{
+    font-size:calc(18px * var(--ui));
+    font-weight:1000;
+    color:#fff;
+  }
+
+  .teamHeader .t2{
+    font-size:calc(12px * var(--ui));
+    font-weight:1000;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+
+  .metaRow{
+    display:flex;
+    gap:calc(8px * var(--ui));
+    align-items:center;
+    flex-wrap:wrap;
+    margin-top:calc(8px * var(--ui));
+    margin-left:calc(42px * var(--ui));
+  }
+
+  .miniPill{
+    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.05);
+    font-size:calc(12px * var(--ui));
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+
+  .scanBusy{
+    opacity:.55;
+    pointer-events:none;
+  }
+
   @media (max-width:520px){
     .bottomLeftButtons{
       left:12px;
@@ -1110,7 +1141,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER X</div>
+    <div class="titleVer">VER X.1</div>
   </div>
 </header>
 
@@ -1291,301 +1322,262 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
-  let ocrBusy = false;
+  let scanBusy = false;
+  let ocrWorker = null;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
   function fillTeamSelects(){
     const options = ['<option value="">TEAM</option>']
-      .concat(Array.from({length:24}, (_,i)=> `<option value="${i+1}">${i+1}조</option>`))
+      .concat(Array.from({length:24}, (_,i)=>`<option value="${i+1}">${i+1}조</option>`))
       .join("");
-    if(quickTeamSelect) quickTeamSelect.innerHTML = options;
-    if(memoTeam) memoTeam.innerHTML = options;
+    quickTeamSelect.innerHTML = options;
+    memoTeam.innerHTML = options;
   }
 
-  function teamLabelOf(v){
-    const s = String(v || "").trim();
-    return s ? `${Number(s)}조` : "TEAM NONE";
+  fillTeamSelects();
+
+  function teamLabelOf(team){
+    return team ? `${Number(team)}조` : "TEAM NONE";
   }
 
   function persistMemos(){
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    persistMemos();
   }
 
-
-  function normalizeOcrToken(token){
-    let s = String(token || "").toUpperCase().trim();
-    s = s.replace(/[\u200B\u200C\u200D]/g, "");
-    s = s.replace(/[，,;:_]/g, " ");
-    s = s.replace(/[\[\]{}()]/g, "");
-    s = s.replace(/H1(?=\d{4})/g, "HL");
-    s = s.replace(/HI(?=\d{4})/g, "HL");
-    s = s.replace(/HL([O0])(\d{3})/g, "HL0$2");
-    s = s.replace(/TC(?=\d{4})/g, "7C");
-    s = s.replace(/7G(?=\d{4})/g, "7C");
-    s = s.replace(/ZC(?=\d{4})/g, "7C");
-    s = s.replace(/7C([O0])(\d{3})/g, "7C0$2");
-    s = s.replace(/L\\?O/g, "L/O");
-    s = s.replace(/\s+/g, " ").trim();
-    return s;
+  function normalizeFlightCode(raw){
+    let s = (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    s = s.replace(/^70/, "7C").replace(/^7O/, "7C").replace(/^7D/, "7C");
+    const m = s.match(/(\d{4})$/);
+    if(/^7C\d{4}$/.test(s)) return s;
+    if(m) return "7C" + m[1];
+    return "";
   }
 
-  function clusterPositions(values, gap){
-    const arr = (values || []).slice().sort((a,b)=> a-b);
-    if(!arr.length) return [];
-    const out = [];
-    let bucket = [arr[0]];
-    for(let i=1;i<arr.length;i++){
-      if(arr[i] - bucket[bucket.length - 1] <= gap){
-        bucket.push(arr[i]);
-      }else{
-        out.push(Math.round(bucket.reduce((a,b)=> a+b, 0) / bucket.length));
-        bucket = [arr[i]];
+  function normalizeHLCode(raw){
+    let s = (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    s = s.replace(/^HI/, "HL").replace(/^H1/, "HL").replace(/^HL/, "HL");
+    const m = s.match(/(\d{4})$/);
+    if(/^HL\d{4}$/.test(s)) return s;
+    if(m) return "HL" + m[1];
+    return "";
+  }
+
+  function normalizeHash(raw){
+    const digits = (raw || "").replace(/[^0-9]/g, "");
+    return digits.slice(-3);
+  }
+
+  function parseTeamValue(raw){
+    const nums = ((raw || "").match(/\d{1,2}/g) || [])
+      .map(v=>Number(v))
+      .filter(v=>v>=1 && v<=24);
+
+    if(nums.length >= 2){
+      return { in:String(nums[0]), out:String(nums[1]), same:false };
+    }
+    if(nums.length === 1){
+      return { in:String(nums[0]), out:String(nums[0]), same:true };
+    }
+    return null;
+  }
+
+  function setScanBusy(flag){
+    scanBusy = flag;
+    if(flag){
+      topControls.classList.add("scanBusy");
+    }else{
+      topControls.classList.remove("scanBusy");
+    }
+  }
+
+  async function getOcrWorker(){
+    if(ocrWorker) return ocrWorker;
+    if(!window.Tesseract) throw new Error("TESSERACT LOAD FAIL");
+    ocrWorker = await Tesseract.createWorker("eng");
+    return ocrWorker;
+  }
+
+  function detectGridLinesFromImage(imgEl){
+    const cvs = document.createElement("canvas");
+    cvs.width = imgEl.naturalWidth || imgEl.width;
+    cvs.height = imgEl.naturalHeight || imgEl.height;
+    const ctx = cvs.getContext("2d", { willReadFrequently:true });
+    ctx.drawImage(imgEl, 0, 0, cvs.width, cvs.height);
+    const { data, width, height } = ctx.getImageData(0,0,cvs.width,cvs.height);
+
+    const xDark = new Array(width).fill(0);
+    const yDark = new Array(height).fill(0);
+
+    for(let y=0; y<height; y++){
+      for(let x=0; x<width; x++){
+        const i = (y*width + x) * 4;
+        const gray = (data[i] + data[i+1] + data[i+2]) / 3;
+        const dark = 255 - gray;
+        xDark[x] += dark;
+        yDark[y] += dark;
       }
     }
-    out.push(Math.round(bucket.reduce((a,b)=> a+b, 0) / bucket.length));
+
+    for(let x=0; x<width; x++) xDark[x] /= height;
+    for(let y=0; y<height; y++) yDark[y] /= width;
+
+    function pickLines(arr, threshold, minGap){
+      const raw = [];
+      for(let i=0;i<arr.length;i++){
+        if(arr[i] > threshold) raw.push(i);
+      }
+      const groups = [];
+      raw.forEach(v=>{
+        if(!groups.length || v - groups[groups.length-1][groups[groups.length-1].length-1] > minGap){
+          groups.push([v]);
+        }else{
+          groups[groups.length-1].push(v);
+        }
+      });
+      return groups.map(g=>Math.round(g.reduce((a,b)=>a+b,0)/g.length));
+    }
+
+    const xLines = pickLines(xDark, 200, 5);
+    const yLines = pickLines(yDark, 200, 5);
+
+    if(xLines.length < 10 || yLines.length < 10){
+      throw new Error("GRID DETECT FAIL");
+    }
+
+    return { xLines, yLines };
+  }
+
+  function makeCropCanvas(imgEl, x0, y0, x1, y1, scale=3){
+    const w = Math.max(1, Math.round(x1 - x0));
+    const h = Math.max(1, Math.round(y1 - y0));
+    const src = document.createElement("canvas");
+    src.width = w;
+    src.height = h;
+    const sctx = src.getContext("2d", { willReadFrequently:true });
+    sctx.drawImage(imgEl, x0, y0, w, h, 0, 0, w, h);
+
+    const imgData = sctx.getImageData(0,0,w,h);
+    const d = imgData.data;
+    for(let i=0;i<d.length;i+=4){
+      const gray = (d[i] + d[i+1] + d[i+2]) / 3;
+      const boosted = gray > 170 ? 255 : gray < 95 ? 0 : gray;
+      d[i] = boosted;
+      d[i+1] = boosted;
+      d[i+2] = boosted;
+    }
+    sctx.putImageData(imgData,0,0);
+
+    const out = document.createElement("canvas");
+    out.width = w * scale;
+    out.height = h * scale;
+    const octx = out.getContext("2d");
+    octx.imageSmoothingEnabled = false;
+    octx.drawImage(src, 0, 0, out.width, out.height);
     return out;
   }
 
-  async function loadPhotoImage(){
-    return new Promise((resolve, reject)=>{
-      const img = new Image();
-      img.onload = ()=> resolve(img);
-      img.onerror = ()=> reject(new Error("PHOTO LOAD FAIL"));
-      img.src = photo;
+  async function recognizeCell(imgEl, worker, x0, y0, x1, y1, whitelist){
+    const canvas = makeCropCanvas(imgEl, x0, y0, x1, y1, 3);
+    await worker.setParameters({
+      tessedit_pageseg_mode: "7",
+      preserve_interword_spaces: "1",
+      tessedit_char_whitelist: whitelist || ""
     });
+    const { data } = await worker.recognize(canvas);
+    return (data.text || "").trim();
   }
 
-  function detectGridBounds(img){
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth || img.width;
-    canvas.height = img.naturalHeight || img.height;
-    const ctx = canvas.getContext('2d', { willReadFrequently:true });
-    if(!ctx) throw new Error('CANVAS FAIL');
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-    const darkAt = (x, y)=>{
-      const idx = (y * width + x) * 4;
-      const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
-      if(a < 30) return false;
-      const lum = 0.299*r + 0.587*g + 0.114*b;
-      return lum < 150;
-    };
-
-    const vHits = [];
-    for(let x=0; x<width; x++){
-      let c = 0;
-      for(let y=0; y<height; y++) if(darkAt(x,y)) c++;
-      if(c > height * 0.62) vHits.push(x);
-    }
-
-    const hHits = [];
-    for(let y=0; y<height; y++){
-      let c = 0;
-      for(let x=0; x<width; x++) if(darkAt(x,y)) c++;
-      if(c > width * 0.52) hHits.push(y);
-    }
-
-    let vBounds = clusterPositions(vHits, 5);
-    let hBounds = clusterPositions(hHits, 4);
-
-    if(!vBounds.length || vBounds[0] > 3) vBounds.unshift(0);
-    if(vBounds[vBounds.length - 1] < width - 3) vBounds.push(width - 1);
-    if(!hBounds.length || hBounds[0] > 3) hBounds.unshift(0);
-    if(hBounds[hBounds.length - 1] < height - 3) hBounds.push(height - 1);
-
-    vBounds = vBounds.filter((v, i)=> i === 0 || v - vBounds[i-1] >= 12);
-    hBounds = hBounds.filter((v, i)=> i === 0 || v - hBounds[i-1] >= 12);
-
-    return { width, height, vBounds, hBounds };
-  }
-
-  function findBandIndex(center, bounds){
-    for(let i=0; i<bounds.length-1; i++){
-      if(center >= bounds[i] && center < bounds[i+1]) return i;
-    }
-    return -1;
-  }
-
-  function buildCellMatrixFromWords(words, bounds){
-    const rowCount = Math.max(0, bounds.hBounds.length - 1);
-    const colCount = Math.max(0, bounds.vBounds.length - 1);
-    const matrix = Array.from({ length: rowCount }, ()=> Array.from({ length: colCount }, ()=> []));
-
-    (words || []).forEach(w=>{
-      if(!w || !w.text || !w.bbox) return;
-      const text = normalizeOcrToken(w.text);
-      if(!text) return;
-      const cx = ((w.bbox.x0 || 0) + (w.bbox.x1 || 0)) / 2;
-      const cy = ((w.bbox.y0 || 0) + (w.bbox.y1 || 0)) / 2;
-      const r = findBandIndex(cy, bounds.hBounds);
-      const c = findBandIndex(cx, bounds.vBounds);
-      if(r < 0 || c < 0 || !matrix[r] || !matrix[r][c]) return;
-      matrix[r][c].push({ text, x: w.bbox.x0 || 0 });
-    });
-
-    return matrix.map(row=> row.map(cell=> cell.sort((a,b)=> a.x - b.x).map(v=> v.text).join(' ').replace(/\s+/g,' ').trim()));
-  }
-
-  function extractNumbers(text){
-    return String(text || '').match(/\d{1,2}/g) || [];
-  }
-
-  function parseTeamCell(teamCell, noteCell){
-    const nums = extractNumbers(`${teamCell || ''} ${String(noteCell || '').split(/\s+/).slice(0,2).join(' ')}`)
-      .map(v => String(Number(v)))
-      .filter(v => Number(v) >= 1 && Number(v) <= 24);
-    if(!nums.length) return null;
-    if(nums.length === 1) return { inbound: nums[0], outbound: nums[0] };
-    return { inbound: nums[0], outbound: nums[1] };
-  }
-
-  function cleanFlight(text, prefix){
-    const s = normalizeOcrToken(text).replace(/\s+/g, '');
-    const m = s.match(new RegExp(`${prefix}(\\d{4})`));
-    return m ? m[1] : '';
-  }
-
-  function cleanHash(text){
-    const s = normalizeOcrToken(text);
-    if(/L\/O/.test(s)) return '';
-    const m = s.match(/(?:^|\s)(\d{1,3})(?:\s|$)/g);
-    if(!m) return '';
-    const last = String(m[m.length - 1]).match(/\d{1,3}/);
-    return last ? last[0].padStart(3, '0') : '';
-  }
-
-  function cleanHL(text){
-    const s = normalizeOcrToken(text).replace(/\s+/g, '');
-    const m = s.match(/HL(\d{4})/);
-    return m ? m[1] : '';
-  }
-
-  function buildBaseMemo(dayKey){
+  function buildMemoFromScan(side, team, rowData, dayKey){
     return {
-      id: Date.now() + Math.floor(Math.random() * 1000000),
+      id: Date.now() + Math.floor(Math.random()*1000000),
       memoDate: dayKey,
       dayKey,
-      hasIn: false,
-      hasOut: false,
-      team: '',
-      teamLabel: 'TEAM NONE',
-      sharedHL: '',
-      sharedHASH: '',
-      'INBOUND-7C': '', 'INBOUND-STA': '', 'INBOUND-t': '', 'INBOUND-d': '', 'INBOUND-bb': '',
-      'INBOUND-cmpt1': 'F', 'INBOUND-cmpt2': 'F', 'INBOUND-cmpt3': '', 'INBOUND-cmpt4': '', 'INBOUND-note': '', 'INBOUND-TIME': '', 'INBOUND-EXTRAS': [], 'INBOUND-LIRPHOTO': '',
-      'OUTBOUND-7C': '', 'OUTBOUND-STD': '', 'OUTBOUND-t': '', 'OUTBOUND-d': '', 'OUTBOUND-bb': '', 'OUTBOUND-tt': '', 'OUTBOUND-tb': '',
-      'OUTBOUND-cmpt1': 'F', 'OUTBOUND-cmpt2': 'F', 'OUTBOUND-cmpt3': '', 'OUTBOUND-cmpt4': '', 'OUTBOUND-note': '', 'OUTBOUND-TIME': '', 'OUTBOUND-EXTRAS': [], 'OUTBOUND-LIRPHOTO': ''
+      team,
+      teamLabel: teamLabelOf(team),
+      hasIn: side === "BOTH" || side === "INBOUND",
+      hasOut: side === "BOTH" || side === "OUTBOUND",
+      sharedHL: side === "OUTBOUND" || side === "BOTH" ? pad((rowData.hl || "").replace(/^HL/,""), 4) : "",
+      sharedHASH: side === "INBOUND" || side === "BOTH" ? pad(rowData.hash || "", 3) : "",
+      "INBOUND-7C": side === "INBOUND" || side === "BOTH" ? pad((rowData.in7c || "").replace(/^7C/,""), 4) : "",
+      "OUTBOUND-7C": side === "OUTBOUND" || side === "BOTH" ? pad((rowData.out7c || "").replace(/^7C/,""), 4) : "",
+      "INBOUND-STA": "",
+      "OUTBOUND-STD": "",
+      "INBOUND-t": "", "INBOUND-d":"", "INBOUND-bb":"",
+      "OUTBOUND-t":"", "OUTBOUND-d":"", "OUTBOUND-bb":"",
+      "OUTBOUND-tt":"", "OUTBOUND-tb":"",
+      "INBOUND-cmpt1":"F", "INBOUND-cmpt2":"F", "INBOUND-cmpt3":"", "INBOUND-cmpt4":"",
+      "OUTBOUND-cmpt1":"F", "OUTBOUND-cmpt2":"F", "OUTBOUND-cmpt3":"", "OUTBOUND-cmpt4":"",
+      "INBOUND-note":"", "OUTBOUND-note":"",
+      "INBOUND-TIME":"", "OUTBOUND-TIME":"",
+      "INBOUND-EXTRAS":[], "OUTBOUND-EXTRAS":[],
+      "INBOUND-LIRPHOTO":"", "OUTBOUND-LIRPHOTO":""
     };
   }
 
-  function createMemosFromDetectedRow(cells){
-    if(!cells || cells.length < 8) return [];
-    const firstCell = normalizeOcrToken(cells[0] || '');
-    if(!/^7C\d{4}$/.test(firstCell)) return [];
-
-    const inbound7C = cleanFlight(cells[0], '7C');
-    const hash = cleanHash(cells[2] || '');
-    const outbound7C = cleanFlight(cells[5] || '7C', '7C');
-    const hl = cleanHL(cells[6] || '');
-
-    const teamCol = Math.max(0, cells.length - 2);
-    const team = parseTeamCell(cells[teamCol], cells[teamCol + 1] || '');
-    if(!team) return [];
-
-    const dayKey = getViewingDayKey();
-    const hasInboundData = !!(inbound7C || hash);
-    const hasOutboundData = !!(outbound7C || hl);
-    if(!hasInboundData && !hasOutboundData) return [];
-
-    if(team.inbound === team.outbound){
-      const memo = buildBaseMemo(dayKey);
-      memo.team = team.inbound;
-      memo.teamLabel = teamLabelOf(team.inbound);
-      memo.hasIn = hasInboundData;
-      memo.hasOut = hasOutboundData;
-      memo['INBOUND-7C'] = inbound7C;
-      memo['OUTBOUND-7C'] = outbound7C;
-      memo.sharedHASH = hash;
-      memo.sharedHL = hl;
-      return [memo];
-    }
-
-    const list = [];
-    if(hasInboundData){
-      const memoIn = buildBaseMemo(dayKey);
-      memoIn.team = team.inbound;
-      memoIn.teamLabel = teamLabelOf(team.inbound);
-      memoIn.hasIn = true;
-      memoIn['INBOUND-7C'] = inbound7C;
-      memoIn.sharedHASH = hash;
-      list.push(memoIn);
-    }
-    if(hasOutboundData){
-      const memoOut = buildBaseMemo(dayKey);
-      memoOut.team = team.outbound;
-      memoOut.teamLabel = teamLabelOf(team.outbound);
-      memoOut.hasOut = true;
-      memoOut['OUTBOUND-7C'] = outbound7C;
-      memoOut.sharedHL = hl;
-      list.push(memoOut);
-    }
-    return list;
-  }
-
-  function fallbackRowsFromText(text){
-    return String(text || '').split(/\n+/).map(line => normalizeOcrToken(line)).filter(Boolean).map(line => line.split(/\s+/));
-  }
-
-  async function autoGenerateMemosFromPhoto(){
-    if(ocrBusy || !photo || !window.Tesseract) return;
-    ocrBusy = true;
+  async function autoScanFromImage(file){
+    if(scanBusy) return;
+    setScanBusy(true);
     try{
-      const img = await loadPhotoImage();
-      const bounds = detectGridBounds(img);
-      const worker = await Tesseract.createWorker('eng');
-      const result = await worker.recognize(photo);
-      await worker.terminate();
-
-      let candidateRows = [];
-      if((result?.data?.words || []).length && bounds.vBounds.length >= 8 && bounds.hBounds.length >= 8){
-        const matrix = buildCellMatrixFromWords(result.data.words, bounds);
-        candidateRows = matrix.filter(row => row.some(Boolean));
-      }
-      if(!candidateRows.length){
-        candidateRows = fallbackRowsFromText(result?.data?.text || '');
-      }
-
-      const existing = new Set(memos.map(m => JSON.stringify([m.memoDate || '', m.team || '', m.hasIn !== false, m.hasOut !== false, m['INBOUND-7C'] || '', m.sharedHASH || '', m['OUTBOUND-7C'] || '', m.sharedHL || ''])));
+      const imgEl = await loadImageFromFile(file);
+      const { xLines, yLines } = detectGridLinesFromImage(imgEl);
+      const xs = [0].concat(xLines);
+      const ys = [0].concat(yLines);
+      const worker = await getOcrWorker();
       const created = [];
-      const seen = new Set();
-      for(const row of candidateRows){
-        const parsed = createMemosFromDetectedRow(row);
-        for(const item of parsed){
-          const sig = JSON.stringify([item.memoDate, item.team, item.hasIn, item.hasOut, item['INBOUND-7C'], item.sharedHASH, item['OUTBOUND-7C'], item.sharedHL]);
-          if(seen.has(sig) || existing.has(sig)) continue;
-          seen.add(sig);
-          created.push(item);
+      const dayKey = getViewingDayKey();
+
+      for(let r=0; r<ys.length-1; r++){
+        const y0 = ys[r] + 1;
+        const y1 = ys[r+1] - 1;
+        if(y1 - y0 < 12) continue;
+
+        const in7cRaw = await recognizeCell(imgEl, worker, xs[0]+1, y0, xs[1]-1, y1, "7C0123456789");
+        const hashRaw = await recognizeCell(imgEl, worker, xs[2]+1, y0, xs[3]-1, y1, "0123456789");
+        const out7cRaw = await recognizeCell(imgEl, worker, xs[5]+1, y0, xs[6]-1, y1, "7C0123456789LO");
+        const hlRaw = await recognizeCell(imgEl, worker, xs[6]+1, y0, xs[7]-1, y1, "HL0123456789I1");
+        const teamRaw = await recognizeCell(imgEl, worker, xs[9]+1, y0, xs[10]-1, y1, "0123456789/|");
+
+        const rowData = {
+          in7c: normalizeFlightCode(in7cRaw),
+          hash: normalizeHash(hashRaw),
+          out7c: normalizeFlightCode(out7cRaw),
+          hl: normalizeHLCode(hlRaw)
+        };
+        const teamData = parseTeamValue(teamRaw);
+
+        if(!teamData) continue;
+        if(!rowData.in7c && !rowData.out7c && !rowData.hl && !rowData.hash) continue;
+
+        if(teamData.same){
+          const memo = buildMemoFromScan("BOTH", teamData.in, rowData, dayKey);
+          if(memo["INBOUND-7C"] || memo.sharedHASH || memo["OUTBOUND-7C"] || memo.sharedHL){
+            created.push(memo);
+          }
+        }else{
+          const inMemo = buildMemoFromScan("INBOUND", teamData.in, rowData, dayKey);
+          const outMemo = buildMemoFromScan("OUTBOUND", teamData.out, rowData, dayKey);
+          if(inMemo["INBOUND-7C"] || inMemo.sharedHASH) created.push(inMemo);
+          if(outMemo["OUTBOUND-7C"] || outMemo.sharedHL) created.push(outMemo);
         }
       }
 
       if(!created.length){
-        alert('AUTO SCAN FAIL');
+        alert("AUTO SCAN FAIL - NO ROW");
         return;
       }
 
-      memos.push(...created);
+      memos = memos.concat(created);
       persistMemos();
-      dayOffset = 0;
+      dayOffset = calcDayOffsetFromDate(dayKey);
       updateDayLabel();
-      renderList(created[created.length - 1].id);
-      alert(`${created.length} MEMO ADDED`);
+      renderList();
+      alert(`AUTO SCAN OK ${created.length} MEMO`);
     }catch(err){
       console.error(err);
-      alert('AUTO SCAN FAIL');
+      alert("AUTO SCAN FAIL");
     }finally{
-      ocrBusy = false;
+      setScanBusy(false);
     }
   }
 
@@ -2016,12 +2008,17 @@
 
   function newMemo(){
     editId = null;
-    fillTeamSelects();
+    quickTeamSelect.addEventListener("change", ()=>{
+    if(modal.style.display === "flex" && !editId){
+      memoTeam.value = quickTeamSelect.value;
+    }
+  });
+
   memoDate.value = getViewingDayKey();
+    memoTeam.value = quickTeamSelect.value || "";
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
-    if(memoTeam) memoTeam.value = quickTeamSelect ? quickTeamSelect.value : "";
     buildSectionsBlank();
     openModal();
   }
@@ -2083,7 +2080,7 @@
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
-    data.team = (memoTeam && memoTeam.value) || (quickTeamSelect && quickTeamSelect.value) || "";
+    data.team = memoTeam.value || quickTeamSelect.value || "";
     data.teamLabel = teamLabelOf(data.team);
 
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
@@ -2154,33 +2151,23 @@
       memos.push(data);
     }
 
-    persistMemos();
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     dayOffset = calcDayOffsetFromDate(data.memoDate);
     updateDayLabel();
     closeModal();
     renderList(data.id);
   }
 
-  function formatCombinedLine(m){
-    const hasIn = m.hasIn !== false;
-    const hasOut = m.hasOut !== false;
-    if(hasIn && !hasOut) return formatSplitLine(m, "INBOUND");
-    if(!hasIn && hasOut) return formatSplitLine(m, "OUTBOUND");
-    const v7cIn = (m["INBOUND-7C"] || "").trim();
-    const v7cOut = (m["OUTBOUND-7C"] || "").trim();
-    const vhl = (m.sharedHL || "").trim();
+
+  function formatInboundLine(m){
+    const v7c = (m["INBOUND-7C"] || "").trim();
     const hash = (m.sharedHASH || "").trim();
-    return `IN 7C[${v7cIn}] #[${hash}] / OUT 7C[${v7cOut}] HL[${vhl}]`;
+    return `7C[${v7c}] #[${hash}]`;
   }
 
-  function formatSplitLine(m, type){
-    const v7c = (m[type+"-7C"] || "").trim();
+  function formatOutboundLine(m){
+    const v7c = (m["OUTBOUND-7C"] || "").trim();
     const vhl = (m.sharedHL || "").trim();
-    const hash = (m.sharedHASH || "").trim();
-
-    if(type === "INBOUND"){
-      return `7C[${v7c}] #[${hash}]`;
-    }
     return `7C[${v7c}] HL[${vhl}]`;
   }
 
@@ -2202,34 +2189,33 @@
       return;
     }
 
-    const groups = new Map();
+    const grouped = new Map();
     dayMemos.forEach(m=>{
       const key = m.team || "NONE";
-      if(!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(m);
+      if(!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(m);
     });
 
-    groups.forEach((items, key)=>{
-      const group = document.createElement("div");
-      group.className = "teamGroup";
-      group.innerHTML = `<div class="teamHeader"><div class="t1">${teamLabelOf(key)}</div><div class="t2">${items.length} MEMO</div></div>`;
+    grouped.forEach((items, key)=>{
+      const wrap = document.createElement("div");
+      wrap.className = "teamGroup";
+      wrap.innerHTML = `
+        <div class="teamHeader">
+          <div class="t1">${key === "NONE" ? "TEAM NONE" : `${Number(key)}조`}</div>
+          <div class="t2">${items.length} MEMO</div>
+        </div>
+      `;
 
       items.forEach(m=>{
         const hasIn = m.hasIn !== false;
         const hasOut = m.hasOut !== false;
         let linesHtml = "";
 
-        if(hasIn && hasOut){
-          linesHtml = `
-            <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>
-            <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>
-          `;
-        }else{
-          const singleTag = hasIn ? "IN" : "OUT";
-          const singleType = hasIn ? "INBOUND" : "OUTBOUND";
-          linesHtml = `
-            <div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatSplitLine(m, singleType)}</div></div>
-          `;
+        if(hasIn){
+          linesHtml += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatInboundLine(m)}</div></div>`;
+        }
+        if(hasOut){
+          linesHtml += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatOutboundLine(m)}</div></div>`;
         }
 
         const card = document.createElement("div");
@@ -2243,13 +2229,13 @@
           </div>
           <div class="metaRow">
             <div class="miniPill">${m.memoDate || ""}</div>
-            <div class="miniPill">${teamLabelOf(m.team)}</div>
+            <div class="miniPill">${m.teamLabel || "TEAM NONE"}</div>
           </div>
         `;
-        group.appendChild(card);
+        wrap.appendChild(card);
       });
 
-      memoList.appendChild(group);
+      memoList.appendChild(wrap);
     });
 
     memoList.querySelectorAll("[data-open]").forEach(el=>{
@@ -2261,13 +2247,14 @@
   }
 
   function editMemo(id){
+
     const m = memos.find(x=>x.id===id);
     if(!m) return;
 
     editId = id;
     memoDate.value = m.memoDate || getViewingDayKey();
-    if(memoTeam) memoTeam.value = m.team || "";
-    if(quickTeamSelect && m.team) quickTeamSelect.value = m.team || "";
+    memoTeam.value = m.team || "";
+    quickTeamSelect.value = m.team || quickTeamSelect.value;
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
     currentLirPhotos = {
@@ -2389,7 +2376,7 @@
     const f = e.target.files && e.target.files[0];
     if(!f) return;
     await savePhotoFile(f);
-    await autoGenerateMemosFromPhoto();
+    await autoScanFromImage(f);
   };
 
   lirPhotoInput.onchange = async (e)=>{
@@ -2536,6 +2523,12 @@
   dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
+
+  quickTeamSelect.addEventListener("change", ()=>{
+    if(modal.style.display === "flex" && !editId){
+      memoTeam.value = quickTeamSelect.value;
+    }
+  });
 
   memoDate.value = getViewingDayKey();
   updateDayLabel();
