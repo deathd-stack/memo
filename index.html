@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER X.7</title>
+<title>JAS MEMO VER X.8</title>
 
 <style>
   :root{
@@ -1013,6 +1013,20 @@
       font-size:14px;
     }
   }
+
+  #scanPreviewList{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+  .previewCard{background:#111217;border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:12px}
+  .previewTop{display:flex;gap:10px;align-items:flex-start}
+  .previewCheck{width:24px;height:24px;accent-color:#ff7a00;margin-top:4px}
+  .previewBody{flex:1;min-width:0}
+  .previewMain{font-size:14px;font-weight:1000;color:#fff;line-height:1.35;word-break:break-word}
+  .previewMeta{font-size:12px;color:#b4b4bc;margin-top:6px;word-break:break-word}
+  .previewGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .previewGrid input,.previewGrid select{height:42px;border-radius:16px;font-size:14px;padding:0 10px}
+  .previewActions{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px}
+  .previewBtn{padding:10px 14px;font-size:13px}
+  .debugSectionTitleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
+
 </style>
 </head>
 
@@ -2119,7 +2133,7 @@
 
 <script>
 (function(){
-  const VERSION_LABEL = 'VER X.7';
+  const VERSION_LABEL = 'VER X.8';
   const TEAM_NONE = '';
   let teamEnhReady = false;
   let debugSheet = null;
@@ -2127,6 +2141,8 @@
   let debugRowsEl = null;
   let debugParsedEl = null;
   let debugBadgeEl = null;
+  let previewListEl = null;
+  let parsedPreviewRows = [];
   let ocrBusy = false;
   let ocrWorker = null;
 
@@ -2204,6 +2220,8 @@
           <div class="debugCode" id="scanDebugRows"></div>
           <div class="debugSectionTitle">PARSED</div>
           <div class="debugCode" id="scanDebugParsed"></div>
+          <div class="debugSectionTitleRow"><div class="debugSectionTitle" style="margin:0">IMPORT PREVIEW</div><button type="button" class="topMiniBtn previewBtn" id="scanImportBtn">IMPORT SELECTED</button></div>
+          <div id="scanPreviewList"></div>
         </div>`;
       document.body.appendChild(overlay);
       overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.style.display='none'; });
@@ -2213,7 +2231,10 @@
         document.getElementById('scanDebugRows').textContent='';
         document.getElementById('scanDebugParsed').textContent='';
         document.getElementById('scanDebugBadge').textContent='CLEARED';
+        const pl=document.getElementById('scanPreviewList'); if(pl) pl.innerHTML='';
+        parsedPreviewRows = [];
       };
+      document.getElementById('scanImportBtn').onclick = ()=> importSelectedPreview();
     }
 
     debugSheet = document.getElementById('scanDebugOverlay');
@@ -2221,6 +2242,7 @@
     debugRowsEl = document.getElementById('scanDebugRows');
     debugParsedEl = document.getElementById('scanDebugParsed');
     debugBadgeEl = document.getElementById('scanDebugBadge');
+    previewListEl = document.getElementById('scanPreviewList');
     teamEnhReady = true;
   }
 
@@ -2556,7 +2578,88 @@
         outTeam: teams.outTeam,
         y: Math.round(r.y||0)
       };
-    }).filter(r=> r.inbound7c || r.outbound7c || r.hl || r.hash || r.teamRaw);
+    }).filter(r=> {
+      const score = (r.inbound7c?1:0)+(r.outbound7c?1:0)+(r.hl?1:0)+(r.hash?1:0)+(r.teamRaw?1:0);
+      if(score >= 2) return true;
+      if(r.outbound7c && r.hl) return true;
+      return false;
+    });
+  }
+
+
+  function summarizeParsedRow(r){
+    const parts = [];
+    if(r.inbound7c) parts.push(`IN 7C[${r.inbound7c}]`);
+    if(r.hash) parts.push(`#[${r.hash}]`);
+    if(r.outbound7c) parts.push(`OUT 7C[${r.outbound7c}]`);
+    if(r.hl) parts.push(`HL[${r.hl}]`);
+    if(r.inTeam || r.outTeam) parts.push(`TEAM ${r.inTeam || '-'} / ${r.outTeam || '-'}`);
+    return parts.join('  ');
+  }
+
+  function teamOptions(selected){
+    let html = `<option value="">TEAM</option>`;
+    for(let i=1;i<=24;i++) html += `<option value="${i}" ${String(selected||'')===String(i)?'selected':''}>${i}조</option>`;
+    return html;
+  }
+
+  function renderPreviewList(rows){
+    ensureTeamUI();
+    parsedPreviewRows = rows.slice();
+    if(!previewListEl) return;
+    if(!rows.length){ previewListEl.innerHTML = '<div class="debugCode">NO IMPORT CANDIDATE</div>'; return; }
+    previewListEl.innerHTML = rows.map((r,idx)=>{
+      const checked = (r.inTeam || r.outTeam || r.inbound7c || r.outbound7c || r.hl || r.hash) ? 'checked' : '';
+      return `<div class="previewCard" data-preview-idx="${idx}">
+        <div class="previewTop">
+          <input type="checkbox" class="previewCheck" data-role="use" ${checked}>
+          <div class="previewBody">
+            <div class="previewMain">${summarizeParsedRow(r) || 'EMPTY'}</div>
+            <div class="previewMeta">${(r.line||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+            <div class="previewGrid">
+              <input data-role="in7c" value="${r.inbound7c||''}" placeholder="INBOUND 7C">
+              <input data-role="hash" value="${r.hash||''}" placeholder="#">
+              <input data-role="out7c" value="${r.outbound7c||''}" placeholder="OUTBOUND 7C">
+              <input data-role="hl" value="${r.hl||''}" placeholder="HL">
+              <select data-role="inTeam">${teamOptions(r.inTeam)}</select>
+              <select data-role="outTeam">${teamOptions(r.outTeam)}</select>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function collectPreviewRows(){
+    if(!previewListEl) return [];
+    return [...previewListEl.querySelectorAll('[data-preview-idx]')].map(card=>({
+      use: !!card.querySelector('[data-role="use"]')?.checked,
+      inbound7c: onlyNum(card.querySelector('[data-role="in7c"]')?.value || '',4),
+      hash: onlyNum(card.querySelector('[data-role="hash"]')?.value || '',3),
+      outbound7c: onlyNum(card.querySelector('[data-role="out7c"]')?.value || '',4),
+      hl: onlyNum(card.querySelector('[data-role="hl"]')?.value || '',4),
+      inTeam: card.querySelector('[data-role="inTeam"]')?.value || '',
+      outTeam: card.querySelector('[data-role="outTeam"]')?.value || '',
+      line: parsedPreviewRows[Number(card.getAttribute('data-preview-idx'))]?.line || ''
+    }));
+  }
+
+  function importSelectedPreview(){
+    const baseDate = getViewingDayKey();
+    const edited = collectPreviewRows();
+    const newMemos = [];
+    edited.forEach(r=>{
+      if(!r.use) return;
+      if(r.inTeam && r.outTeam && r.inTeam === r.outTeam){
+        newMemos.push(createAutoMemo(baseDate,{team:r.inTeam,hasIn:!!(r.inbound7c||r.hash),hasOut:!!(r.outbound7c||r.hl),inbound7c:r.inbound7c,outbound7c:r.outbound7c,hl:r.hl,hash:r.hash}));
+      }else{
+        if(r.inTeam && (r.inbound7c || r.hash || r.hl)) newMemos.push(createAutoMemo(baseDate,{team:r.inTeam,hasIn:true,hasOut:false,inbound7c:r.inbound7c,hl:r.hl,hash:r.hash}));
+        if(r.outTeam && (r.outbound7c || r.hl || r.hash)) newMemos.push(createAutoMemo(baseDate,{team:r.outTeam,hasIn:false,hasOut:true,outbound7c:r.outbound7c,hl:r.hl,hash:r.hash}));
+      }
+    });
+    const added = dedupeAndAppend(newMemos);
+    setDebug(`IMPORTED ${added} MEMOS`, debugTextEl?.textContent || '', debugRowsEl?.textContent || '', debugParsedEl?.textContent || '', true);
+    renderList();
   }
 
   function createAutoMemo(baseDate, opts){
