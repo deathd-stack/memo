@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER X.3</title>
+<title>JAS MEMO VER 6.4</title>
 
 <style>
   :root{
@@ -1021,7 +1021,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER X.3</div>
+    <div class="titleVer">VER 6.4</div>
   </div>
 </header>
 
@@ -2119,224 +2119,356 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 (function(){
-  function injectStyles(){
-    const st = document.createElement('style');
-    st.textContent = `
+  const VERSION = 'X.4';
+  const OCR_LANG = 'eng';
+  let memoTeam = null;
+  let quickTeamSelect = null;
+  let debugModal = null;
+  let debugContent = null;
+
+  function injectExtraStyles(){
+    const css = `
       .teamQuickWrap{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));border-radius:999px;padding:10px 14px;border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow-soft)}
-      .teamQuickLabel,.teamLab{font-size:14px;font-weight:1000;color:#fff;text-transform:uppercase}
-      .teamQuickSelect,.teamSelect{height:42px;padding:0 12px;border:2px solid var(--line);background:#121214;color:#fff;border-radius:20px;font-family:inherit;font-weight:1000}
-      .teamLine{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:8px}
-      .teamSelect{height:54px;min-width:150px;border-radius:22px}
-      .teamGroup{margin-bottom:18px}
-      .teamHeader{margin:8px 0 10px;padding:12px 16px;background:rgba(20,20,24,.9);border:1px solid rgba(255,255,255,.07);border-radius:999px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 8px 18px rgba(0,0,0,.18)}
-      .teamHeader .t1{font-size:18px;font-weight:1000;color:#fff}
-      .teamHeader .t2{font-size:12px;font-weight:1000;color:var(--muted);text-transform:uppercase}
-      .metaRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;margin-left:42px}
-      .miniPill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--muted);text-transform:uppercase}
-      #scanDebugWrap{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;justify-content:center;align-items:flex-end;z-index:140}
-      #scanDebugBox{width:100%;max-width:900px;background:#17171a;border-radius:34px 34px 0 0;padding:0 14px 18px;max-height:92vh;overflow:auto;border-top:1px solid rgba(255,255,255,.05)}
-      .scanDebugPre{white-space:pre-wrap;word-break:break-word;background:#101012;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:12px;color:#fff;font-size:12px;line-height:1.45;margin:8px 0}
+      .teamQuickLabel,.teamLab{font-size:14px;font-weight:1000;color:#fff;text-transform:uppercase;white-space:nowrap}
+      .teamQuickSelect,.teamSelect{height:42px;padding:0 12px;border:2px solid var(--line);border-radius:18px;background:#121214;color:#fff;font-weight:1000}
+      .teamLine{display:flex;justify-content:center;align-items:center;gap:8px;margin:6px 0 8px}
+      .teamSelect{height:54px;min-width:120px;border-radius:22px}
+      .teamGroup{margin-bottom:16px}
+      .teamHeader{margin:8px 0 10px;padding:10px 14px;background:rgba(34,34,38,.95);border:1px solid rgba(255,255,255,.06);border-radius:999px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+      .teamHeader .left{font-size:16px;font-weight:1000;color:#fff;text-transform:uppercase}
+      .teamHeader .right{font-size:12px;font-weight:1000;color:var(--muted);text-transform:uppercase}
+      .metaPills{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;margin-left:42px}
+      .miniPill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:1000;color:var(--muted);text-transform:uppercase}
+      .debugOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:flex-end;z-index:160}
+      .debugSheet{width:100%;max-width:900px;max-height:92vh;overflow:auto;background:#17171a;border-radius:34px 34px 0 0;padding:14px;border-top:1px solid rgba(255,255,255,.06)}
+      .debugTop{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:0;background:#17171a;padding-bottom:10px}
+      .debugTitle{font-size:20px;font-weight:1000;color:#fff;text-transform:uppercase}
+      .debugBox{background:#0c0c10;border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:14px;color:#fff;font:700 14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word;margin:10px 0 20px}
+      .debugSec{font-size:16px;font-weight:1000;color:#fff;text-transform:uppercase;margin:18px 0 8px}
+      .statusPill{display:inline-block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:1000;color:#fff;text-transform:uppercase;margin-bottom:10px}
+      @media (max-width:520px){ .teamQuickWrap{width:100%;justify-content:center} }
     `;
-    document.head.appendChild(st);
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
   }
 
-  function fillTeamSelect(select){
-    if(!select) return;
-    select.innerHTML = '<option value="">TEAM</option>' + Array.from({length:24}, (_,i)=>`<option value="${i+1}">${i+1}조</option>`).join('');
+  function buildTeamOptions(){
+    let html = '<option value="">TEAM</option>';
+    for(let i=1;i<=24;i++) html += `<option value="${i}">${i}조</option>`;
+    return html;
   }
 
-  function ensureTeamUI(){
-    const controls = document.getElementById('topControls');
-    if(controls && !document.getElementById('quickTeamSelect')){
+  function injectTeamUI(){
+    document.querySelectorAll('.titleVer').forEach(el=>el.textContent = 'VER ' + VERSION);
+    document.title = 'JAS MEMO VER ' + VERSION;
+
+    if(!document.getElementById('quickTeamWrap')){
       const wrap = document.createElement('div');
       wrap.className = 'teamQuickWrap';
-      wrap.innerHTML = '<div class="teamQuickLabel">TEAM</div><select id="quickTeamSelect" class="teamQuickSelect"></select>';
-      controls.appendChild(wrap);
-      fillTeamSelect(document.getElementById('quickTeamSelect'));
+      wrap.id = 'quickTeamWrap';
+      wrap.innerHTML = `<div class="teamQuickLabel">TEAM</div><select id="quickTeamSelectX4" class="teamQuickSelect">${buildTeamOptions()}</select>`;
+      topControls.appendChild(wrap);
     }
-    const dateLine = document.querySelector('.dateLine');
-    if(dateLine && !document.getElementById('memoTeam')){
+    quickTeamSelect = document.getElementById('quickTeamSelectX4');
+
+    if(!document.getElementById('memoTeamX4')){
       const line = document.createElement('div');
       line.className = 'teamLine';
-      line.innerHTML = '<div class="teamLab">TEAM</div><select id="memoTeam" class="teamSelect"></select>';
-      dateLine.insertAdjacentElement('afterend', line);
-      fillTeamSelect(document.getElementById('memoTeam'));
+      line.innerHTML = `<div class="teamLab">TEAM</div><select id="memoTeamX4" class="teamSelect">${buildTeamOptions()}</select>`;
+      const pickRow = modal.querySelector('.pickRow');
+      pickRow.parentNode.insertBefore(line, pickRow);
     }
+    memoTeam = document.getElementById('memoTeamX4');
   }
 
-  function ensureDebugUI(){
-    if(document.getElementById('scanDebugWrap')) return;
-    const wrap = document.createElement('div');
-    wrap.id = 'scanDebugWrap';
-    wrap.innerHTML = `
-      <div id="scanDebugBox" onclick="event.stopPropagation()">
-        <div class="dragArea"><div class="drag-handle"></div><div class="topActionBar"><button type="button" class="topMiniBtn" id="scanDebugCloseTop">CLOSE</button><button type="button" class="topMiniBtn" id="scanDebugClearTop">CLEAR</button></div></div>
-        <div style="font-weight:1000;font-size:20px;margin:6px 0 12px;text-transform:uppercase;color:#fff;">AUTO SCAN DEBUG</div>
-        <div class="miniPill" id="scanDebugStatus" style="margin-left:0;display:inline-block;">READY</div>
-        <div style="margin-top:12px;font-weight:1000;color:#fff;">OCR TEXT</div>
-        <pre class="scanDebugPre" id="scanDebugText"></pre>
-        <div style="margin-top:12px;font-weight:1000;color:#fff;">ROWS</div>
-        <pre class="scanDebugPre" id="scanDebugRows"></pre>
-        <div style="margin-top:12px;font-weight:1000;color:#fff;">PARSED</div>
-        <pre class="scanDebugPre" id="scanDebugParsed"></pre>
+  function injectDebugUI(){
+    const overlay = document.createElement('div');
+    overlay.className = 'debugOverlay';
+    overlay.id = 'debugOverlayX4';
+    overlay.innerHTML = `
+      <div class="debugSheet">
+        <div class="debugTop">
+          <button type="button" class="topMiniBtn" id="debugCloseBtnX4">CLOSE</button>
+          <div class="debugTitle">AUTO SCAN DEBUG</div>
+          <button type="button" class="topMiniBtn" id="debugClearBtnX4">CLEAR</button>
+        </div>
+        <div id="debugContentX4"></div>
       </div>`;
-    wrap.addEventListener('click', ()=> wrap.style.display='none');
-    document.body.appendChild(wrap);
-    document.getElementById('scanDebugCloseTop').onclick = ()=> wrap.style.display='none';
-    document.getElementById('scanDebugClearTop').onclick = ()=> setScanDebug({status:'CLEARED', text:'', rows:[], parsed:[]});
+    document.body.appendChild(overlay);
+    debugModal = overlay;
+    debugContent = document.getElementById('debugContentX4');
+    document.getElementById('debugCloseBtnX4').onclick = ()=> debugModal.style.display = 'none';
+    document.getElementById('debugClearBtnX4').onclick = ()=> debugContent.innerHTML = '';
   }
 
-  let lastScanDebug = {status:'READY', text:'', rows:[], parsed:[]};
-  function setScanDebug(partial){
-    lastScanDebug = Object.assign({status:'', text:'', rows:[], parsed:[]}, lastScanDebug, partial || {});
-    const statusEl = document.getElementById('scanDebugStatus');
-    const textEl = document.getElementById('scanDebugText');
-    const rowsEl = document.getElementById('scanDebugRows');
-    const parsedEl = document.getElementById('scanDebugParsed');
-    if(statusEl) statusEl.textContent = lastScanDebug.status || '';
-    if(textEl) textEl.textContent = lastScanDebug.text || '';
-    if(rowsEl) rowsEl.textContent = Array.isArray(lastScanDebug.rows) ? lastScanDebug.rows.map((r,i)=> `${i+1}. ${r}`).join('\n') : String(lastScanDebug.rows || '');
-    if(parsedEl) parsedEl.textContent = Array.isArray(lastScanDebug.parsed) ? lastScanDebug.parsed.map((r,i)=> `${i+1}. ${typeof r === 'string' ? r : JSON.stringify(r)}`).join('\n') : String(lastScanDebug.parsed || '');
-  }
-  function openScanDebug(){ const w=document.getElementById('scanDebugWrap'); if(w) w.style.display='flex'; }
-
-  function persistMemos(){ localStorage.setItem(MEMO_KEY, JSON.stringify(memos)); }
-  function getQuickTeamSelect(){ return document.getElementById('quickTeamSelect'); }
-  function getMemoTeam(){ return document.getElementById('memoTeam'); }
-  function getCurrentSelectedTeam(){ return (getMemoTeam() && getMemoTeam().value) || (getQuickTeamSelect() && getQuickTeamSelect().value) || ''; }
-
-  function parseTeamSpec(raw){
-    const txt = String(raw || '').replace(/\s+/g,'').replace(/\|/g,'/');
-    if(!txt) return {in:'', out:''};
-    const m = txt.match(/^(\d{1,2})(?:\/(\d{1,2}))?$/);
-    if(!m) return {in:'', out:''};
-    return {in:m[1], out:m[2] || m[1]};
+  function openDebug(status, rawText, rows, parsed){
+    if(!debugModal) return;
+    const esc = (s)=> String(s || '').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    debugContent.innerHTML = `
+      <div class="statusPill">${esc(status)}</div>
+      <div class="debugSec">OCR TEXT</div>
+      <div class="debugBox">${esc(rawText || '')}</div>
+      <div class="debugSec">ROWS</div>
+      <div class="debugBox">${esc((rows||[]).map((r,i)=>`${i+1}. ${r}`).join('\n'))}</div>
+      <div class="debugSec">PARSED</div>
+      <div class="debugBox">${esc((parsed||[]).map((r,i)=>`${i+1}. ${JSON.stringify(r)}`).join('\n'))}</div>`;
+    debugModal.style.display = 'flex';
   }
 
-  function normalizeLine(line){
-    return String(line || '')
-      .toUpperCase()
-      .replace(/TC(?=\d)/g,'7C')
-      .replace(/H1(?=\d)/g,'HL')
-      .replace(/[|｜]/g,'/')
-      .replace(/[^A-Z0-9#\/\-\.\s]/g,' ')
+  function persistMemosX4(){
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+  }
+
+  function getTeamLabel(team){
+    return team ? `${Number(team)}조` : '미지정';
+  }
+
+  function normalizeOCRText(s){
+    return String(s||'')
+      .replace(/[|｜¦]/g,' / ')
+      .replace(/[—–_]/g,'-')
+      .replace(/H1/g,'HL')
+      .replace(/HL\s+(\d{4})/g,'HL$1')
+      .replace(/7C\s+(\d{4})/g,'7C$1')
+      .replace(/TC(\d{4})/g,'7C$1')
+      .replace(/\bO(\d)\b/g,'0$1')
+      .replace(/(\d)O(\d)/g,'$10$2')
       .replace(/\s+/g,' ')
       .trim();
   }
 
-  function parseRowsFromText(text){
-    const rawLines = String(text || '').split(/\r?\n/).map(normalizeLine).filter(Boolean);
-    const merged = [];
-    for(const line of rawLines){
-      if(!merged.length){ merged.push(line); continue; }
-      const prev = merged[merged.length-1];
-      const hasFlight = /\b7C\d{3,4}\b/.test(line);
-      const prevWeak = !/\b7C\d{3,4}\b/.test(prev) || (!/\bHL\d{3,4}\b/.test(prev) && !/\b\d{1,2}(?:\/\d{1,2})?\b/.test(prev));
-      if(!hasFlight && prevWeak){ merged[merged.length-1] = (prev + ' ' + line).trim(); }
-      else merged.push(line);
+  function makeBWCanvas(img, scale=2.4, threshold=176){
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+    const d = data.data;
+    for(let i=0;i<d.length;i+=4){
+      const g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+      const v = g > threshold ? 255 : 0;
+      d[i]=d[i+1]=d[i+2]=v;
+      d[i+3]=255;
     }
-
-    const parsed = [];
-    for(const line of merged){
-      const flights = [...line.matchAll(/\b7C\s*(\d{3,4})\b/g)].map(m=> pad(m[1],4));
-      const hls = [...line.matchAll(/\bHL\s*(\d{3,4})\b/g)].map(m=> pad(m[1],4));
-      const teamMatches = [...line.matchAll(/(?:^|\s)(\d{1,2}(?:\/\d{1,2})?)(?=\s|$)/g)].map(m=> m[1]);
-      let teamRaw = teamMatches.length ? teamMatches[teamMatches.length-1] : '';
-      if(!teamRaw && getQuickTeamSelect()) teamRaw = getQuickTeamSelect().value || '';
-      const hashMatches = [...line.matchAll(/(?:^|\s)(\d{3})(?=\s|$)/g)].map(m=> m[1]);
-      let hash = hashMatches.find(v => !teamRaw.includes(v));
-      if(!hash){
-        const afterFirstFlight = line.replace(/^.*?\b7C\d{3,4}\b/, '');
-        const m = afterFirstFlight.match(/(?:^|\s)(\d{3})(?=\s|$)/);
-        if(m) hash = m[1];
-      }
-      if(!flights.length || !teamRaw) continue;
-      parsed.push({ line, inbound7c: flights[0] || '', outbound7c: flights[1] || '', hl: hls[0] || '', hash: hash || '', teamRaw });
-    }
-    return { rows: merged, parsed };
+    ctx.putImageData(data,0,0);
+    return canvas;
   }
 
-  function buildAutoMemosFromParsed(parsedRows){
-    const dateValue = (memoDate && memoDate.value) || getViewingDayKey();
+  function canvasToDataURL(canvas){ return canvas.toDataURL('image/png'); }
+
+  function groupWords(words){
+    const arr = (words||[])
+      .map(w=>({text:normalizeOCRText(w.text), x:w.bbox?.x0||0, y:w.bbox?.y0||0, h:(w.bbox?.y1||0)-(w.bbox?.y0||0)}))
+      .filter(w=>w.text);
+    arr.sort((a,b)=>a.y-b.y || a.x-b.x);
+    const rows = [];
+    for(const w of arr){
+      let row = rows.find(r=>Math.abs(r.y - w.y) <= Math.max(14, w.h*0.8));
+      if(!row){ row = {y:w.y, items:[]}; rows.push(row); }
+      row.items.push(w);
+      row.y = (row.y * (row.items.length-1) + w.y) / row.items.length;
+    }
+    return rows
+      .sort((a,b)=>a.y-b.y)
+      .map(r=>r.items.sort((a,b)=>a.x-b.x).map(it=>it.text).join(' '))
+      .map(s=>s.replace(/\s+/g,' ').trim())
+      .filter(Boolean);
+  }
+
+  function mergeRows(rows){
     const out = [];
-    parsedRows.forEach(row => {
-      const teams = parseTeamSpec(row.teamRaw);
-      if(!teams.in && !teams.out) return;
-      if(teams.in && teams.out && teams.in === teams.out){
-        out.push({
-          id: Date.now() + Math.floor(Math.random()*1000000),
-          memoDate: dateValue,
-          dayKey: dateValue,
-          team: teams.in,
-          teamLabel: `${Number(teams.in)}조`,
-          hasIn: !!row.inbound7c || !!row.hash,
-          hasOut: !!row.outbound7c || !!row.hl,
-          sharedHL: row.hl || '',
-          sharedHASH: row.hash || '',
-          'INBOUND-7C': row.inbound7c || '',
-          'OUTBOUND-7C': row.outbound7c || '',
-          'INBOUND-STA':'','OUTBOUND-STD':'','INBOUND-t':'','OUTBOUND-t':'','INBOUND-d':'','OUTBOUND-d':'','INBOUND-bb':'','OUTBOUND-bb':'','OUTBOUND-tt':'','OUTBOUND-tb':'',
-          'INBOUND-cmpt1':'F','INBOUND-cmpt2':'F','INBOUND-cmpt3':'','INBOUND-cmpt4':'','OUTBOUND-cmpt1':'F','OUTBOUND-cmpt2':'F','OUTBOUND-cmpt3':'','OUTBOUND-cmpt4':'',
-          'INBOUND-note':'','OUTBOUND-note':'','INBOUND-TIME':'','OUTBOUND-TIME':'','INBOUND-EXTRAS':[],'OUTBOUND-EXTRAS':[],'INBOUND-LIRPHOTO':'','OUTBOUND-LIRPHOTO':''
-        });
-      } else {
-        if(teams.in && (row.inbound7c || row.hash)){
-          out.push({
-            id: Date.now() + Math.floor(Math.random()*1000000), memoDate: dateValue, dayKey: dateValue, team: teams.in, teamLabel:`${Number(teams.in)}조`, hasIn:true, hasOut:false,
-            sharedHL:'', sharedHASH: row.hash || '', 'INBOUND-7C': row.inbound7c || '', 'OUTBOUND-7C':'', 'INBOUND-STA':'','OUTBOUND-STD':'','INBOUND-t':'','OUTBOUND-t':'','INBOUND-d':'','OUTBOUND-d':'','INBOUND-bb':'','OUTBOUND-bb':'','OUTBOUND-tt':'','OUTBOUND-tb':'',
-            'INBOUND-cmpt1':'F','INBOUND-cmpt2':'F','INBOUND-cmpt3':'','INBOUND-cmpt4':'','OUTBOUND-cmpt1':'F','OUTBOUND-cmpt2':'F','OUTBOUND-cmpt3':'','OUTBOUND-cmpt4':'',
-            'INBOUND-note':'','OUTBOUND-note':'','INBOUND-TIME':'','OUTBOUND-TIME':'','INBOUND-EXTRAS':[],'OUTBOUND-EXTRAS':[],'INBOUND-LIRPHOTO':'','OUTBOUND-LIRPHOTO':''
-          });
-        }
-        if(teams.out && (row.outbound7c || row.hl)){
-          out.push({
-            id: Date.now() + Math.floor(Math.random()*1000000), memoDate: dateValue, dayKey: dateValue, team: teams.out, teamLabel:`${Number(teams.out)}조`, hasIn:false, hasOut:true,
-            sharedHL: row.hl || '', sharedHASH:'', 'INBOUND-7C':'', 'OUTBOUND-7C': row.outbound7c || '', 'INBOUND-STA':'','OUTBOUND-STD':'','INBOUND-t':'','OUTBOUND-t':'','INBOUND-d':'','OUTBOUND-d':'','INBOUND-bb':'','OUTBOUND-bb':'','OUTBOUND-tt':'','OUTBOUND-tb':'',
-            'INBOUND-cmpt1':'F','INBOUND-cmpt2':'F','INBOUND-cmpt3':'','INBOUND-cmpt4':'','OUTBOUND-cmpt1':'F','OUTBOUND-cmpt2':'F','OUTBOUND-cmpt3':'','OUTBOUND-cmpt4':'',
-            'INBOUND-note':'','OUTBOUND-note':'','INBOUND-TIME':'','OUTBOUND-TIME':'','INBOUND-EXTRAS':[],'OUTBOUND-EXTRAS':[],'INBOUND-LIRPHOTO':'','OUTBOUND-LIRPHOTO':''
-          });
-        }
+    let buffer = '';
+    for(const raw of rows){
+      const line = normalizeOCRText(raw);
+      if(!line) continue;
+      if(/\b(7C\d{4}|HL\d{4})\b/.test(line) && buffer){
+        out.push((buffer + ' ' + line).trim());
+        buffer = '';
+        continue;
       }
-    });
+      if(/\b(7C\d{4}|HL\d{4})\b/.test(line)){
+        out.push(line);
+        continue;
+      }
+      if(out.length && line.length < 28){
+        out[out.length-1] = (out[out.length-1] + ' ' + line).trim();
+      }else if(/\d/.test(line)){
+        buffer = buffer ? (buffer + ' ' + line) : line;
+      }
+    }
+    if(buffer) out.push(buffer);
+    return out.map(s=>s.replace(/\s+/g,' ').trim()).filter(Boolean);
+  }
+
+  function parseTeamFromLine(line){
+    const endPair = line.match(/(\d{1,2})\s*[\/|]\s*(\d{1,2})\s*$/);
+    if(endPair) return {raw:`${endPair[1]}/${endPair[2]}`, inTeam:endPair[1], outTeam:endPair[2]};
+    const spacedPair = line.match(/(?:\s|\/)(\d{1,2})\s+(\d{1,2})\s*$/);
+    if(spacedPair) return {raw:`${spacedPair[1]}/${spacedPair[2]}`, inTeam:spacedPair[1], outTeam:spacedPair[2]};
+    const single = line.match(/(\d{1,2})\s*$/);
+    if(single) return {raw:single[1], inTeam:single[1], outTeam:single[1]};
+    return {raw:'', inTeam:'', outTeam:''};
+  }
+
+  function parseHashFromLine(line){
+    const parts = line.split(/\s+/);
+    const timeIdx = parts.findIndex(p=>/^\d{1,2}:\d{2}$/.test(p));
+    if(timeIdx >= 0){
+      for(let i=timeIdx+1;i<Math.min(parts.length, timeIdx+5);i++){
+        const p = parts[i].replace(/[^0-9]/g,'');
+        if(/^\d{1,3}$/.test(p)) return p.padStart(3,'0');
+      }
+    }
+    const all = [...line.matchAll(/(?:^|\s)(\d{1,3})(?=\s+[A-Z]{3}\b)/g)].map(m=>m[1]);
+    if(all.length) return all[0].padStart(3,'0');
+    return '';
+  }
+
+  function parseRow(line){
+    const clean = normalizeOCRText(line);
+    const flights = [...clean.matchAll(/7C\s*(\d{4})/g)].map(m=>m[1]);
+    const hlMatch = clean.match(/HL\s*(\d{4})/);
+    const team = parseTeamFromLine(clean);
+    const hash = parseHashFromLine(clean);
+    let inbound7c = '';
+    let outbound7c = '';
+    if(flights.length >= 2){
+      inbound7c = flights[0];
+      outbound7c = flights[1];
+    }else if(flights.length === 1){
+      if(hlMatch) outbound7c = flights[0];
+      else inbound7c = flights[0];
+    }
+    return {
+      line: clean,
+      inbound7c,
+      outbound7c,
+      hl: hlMatch ? hlMatch[1] : '',
+      hash,
+      teamRaw: team.raw,
+      inTeam: team.inTeam,
+      outTeam: team.outTeam
+    };
+  }
+
+  function createMemoData(baseDate, team, parsed, sideMode){
+    const same = sideMode === 'BOTH';
+    return {
+      id: Date.now() + Math.floor(Math.random()*1000000),
+      memoDate: baseDate,
+      dayKey: baseDate,
+      team: team || '',
+      teamLabel: getTeamLabel(team || ''),
+      hasIn: same || sideMode === 'IN',
+      hasOut: same || sideMode === 'OUT',
+      sharedHL: parsed.hl || '',
+      sharedHASH: parsed.hash || '',
+      'INBOUND-7C': (same || sideMode === 'IN') ? (parsed.inbound7c || '') : '',
+      'OUTBOUND-7C': (same || sideMode === 'OUT') ? (parsed.outbound7c || '') : '',
+      'INBOUND-STA':'','OUTBOUND-STD':'','INBOUND-t':'','OUTBOUND-t':'','INBOUND-d':'','OUTBOUND-d':'','INBOUND-bb':'','OUTBOUND-bb':'','OUTBOUND-tt':'','OUTBOUND-tb':'',
+      'INBOUND-cmpt1':'F','INBOUND-cmpt2':'F','INBOUND-cmpt3':'','INBOUND-cmpt4':'','OUTBOUND-cmpt1':'F','OUTBOUND-cmpt2':'F','OUTBOUND-cmpt3':'','OUTBOUND-cmpt4':'',
+      'INBOUND-note':'','OUTBOUND-note':'','INBOUND-TIME':'','OUTBOUND-TIME':'','INBOUND-EXTRAS':[],'OUTBOUND-EXTRAS':[],
+      'INBOUND-LIRPHOTO':'','OUTBOUND-LIRPHOTO':''
+    };
+  }
+
+  function parsedToMemos(parsedRows){
+    const baseDate = getViewingDayKey();
+    const out = [];
+    for(const p of parsedRows){
+      const hasIn = !!p.inbound7c || (!!p.hash && !!p.inTeam);
+      const hasOut = !!p.outbound7c || (!!p.hl && !!p.outTeam);
+      if(!hasIn && !hasOut) continue;
+      if(p.inTeam && p.outTeam && p.inTeam === p.outTeam && hasIn && hasOut){
+        out.push(createMemoData(baseDate, p.inTeam, p, 'BOTH'));
+      }else{
+        if(hasIn && p.inTeam) out.push(createMemoData(baseDate, p.inTeam, p, 'IN'));
+        if(hasOut && p.outTeam) out.push(createMemoData(baseDate, p.outTeam, p, 'OUT'));
+      }
+    }
     return out;
   }
 
-  async function runAutoScan(){
-    if(!photo){ setScanDebug({status:'NO PHOTO', text:'', rows:[], parsed:[]}); openScanDebug(); return; }
-    if(!window.Tesseract){ setScanDebug({status:'TESSERACT LOAD FAIL', text:'', rows:[], parsed:[]}); openScanDebug(); return; }
-    try{
-      setScanDebug({status:'OCR RUNNING...', text:'', rows:[], parsed:[]});
-      const result = await window.Tesseract.recognize(photo, 'eng');
-      const text = result && result.data ? result.data.text || '' : '';
-      const parsedData = parseRowsFromText(text);
-      setScanDebug({status:`OCR DONE / ${parsedData.parsed.length} ROWS`, text, rows: parsedData.rows, parsed: parsedData.parsed});
-      if(!parsedData.parsed.length){ openScanDebug(); return; }
-      const built = buildAutoMemosFromParsed(parsedData.parsed);
-      if(!built.length){ setScanDebug({status:'NO MEMO BUILT', text, rows: parsedData.rows, parsed: parsedData.parsed}); openScanDebug(); return; }
-      memos.push(...built);
-      persistMemos();
-      dayOffset = calcDayOffsetFromDate((memoDate && memoDate.value) || getViewingDayKey());
-      updateDayLabel();
-      renderList(built[built.length-1].id);
-      setScanDebug({status:`ADDED ${built.length} MEMOS`, text, rows: parsedData.rows, parsed: parsedData.parsed});
-      openScanDebug();
-    } catch(err){
-      console.error(err);
-      setScanDebug({status:'AUTO SCAN FAIL: ' + (err && err.message ? err.message : 'UNKNOWN'), text:'', rows:[], parsed:[String(err)]});
-      openScanDebug();
+  async function recognizeImageData(dataUrl){
+    const result = await Tesseract.recognize(dataUrl, OCR_LANG, {
+      logger: ()=>{},
+      tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+      tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/:|.- '
+    });
+    return result.data;
+  }
+
+  async function autoScanFromFile(file){
+    if(typeof Tesseract === 'undefined'){
+      openDebug('TESSERACT LOAD FAIL', 'TESSERACT CDN NOT LOADED', [], []);
+      return;
+    }
+    const rawDataUrl = await new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=> resolve(String(r.result||''));
+      r.onerror = ()=> reject(new Error('FILE READ FAIL'));
+      r.readAsDataURL(file);
+    });
+    const img = await loadImageFromFile(file);
+    const bw1 = canvasToDataURL(makeBWCanvas(img, 2.6, 175));
+    const bw2 = canvasToDataURL(makeBWCanvas(img, 3.1, 160));
+
+    const attempts = [];
+    for(const src of [rawDataUrl, bw1, bw2]){
+      try{
+        const data = await recognizeImageData(src);
+        const text = String(data.text || '');
+        const wordRows = mergeRows(groupWords(data.words || []));
+        const textRows = mergeRows(text.split(/\n+/));
+        const rows = [...new Set([...wordRows, ...textRows])].filter(Boolean);
+        const parsed = rows.map(parseRow).filter(p=>p.inbound7c || p.outbound7c || p.hl || p.hash || p.teamRaw);
+        const memosToAdd = parsedToMemos(parsed);
+        attempts.push({text, rows, parsed, count:memosToAdd.length});
+        if(memosToAdd.length >= 2){
+          memos.push(...memosToAdd);
+          persistMemosX4();
+          renderList(memosToAdd[memosToAdd.length-1].id);
+          openDebug(`ADDED ${memosToAdd.length} MEMOS`, text, rows, parsed);
+          return;
+        }
+      }catch(err){
+        attempts.push({text:String(err), rows:[], parsed:[], count:0});
+      }
+    }
+    const best = attempts.sort((a,b)=>b.count-a.count)[0] || {text:'',rows:[],parsed:[]};
+    if(best.count){
+      const memosToAdd = parsedToMemos(best.parsed);
+      memos.push(...memosToAdd);
+      persistMemosX4();
+      renderList(memosToAdd[memosToAdd.length-1].id);
+      openDebug(`ADDED ${memosToAdd.length} MEMOS`, best.text, best.rows, best.parsed);
+    }else{
+      openDebug('AUTO SCAN FAIL', best.text, best.rows, best.parsed);
     }
   }
 
-  const originalNewMemo = window.newMemo;
-  window.newMemo = function(){ originalNewMemo(); const mt=getMemoTeam(); const qt=getQuickTeamSelect(); if(mt) mt.value = qt ? qt.value : ''; };
+  const originalSavePhotoFile = savePhotoFile;
+  savePhotoFile = async function(file){
+    await originalSavePhotoFile(file);
+  };
 
-  window.saveMemo = function(){
+  photoInput.onchange = async (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    await savePhotoFile(f);
+    try{ await autoScanFromFile(f); }catch(err){ openDebug('AUTO SCAN FAIL', String(err), [], []); }
+  };
+
+  saveMemo = function(){
     if(!pickInbound.checked && !pickOutbound.checked){ alert('INBOUND OR OUTBOUND SELECT'); return; }
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
-    data.team = getCurrentSelectedTeam();
-    data.teamLabel = data.team ? `${Number(data.team)}조` : '미지정';
+    data.team = memoTeam ? (memoTeam.value || '') : '';
+    data.teamLabel = getTeamLabel(data.team);
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || '', 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || '', 3);
     ['INBOUND','OUTBOUND'].forEach(type=>{
@@ -2350,13 +2482,13 @@
       const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
       data[type+'-7C'] = pad(gi('7C')?.value || '', 4);
-      data[type+'-STA'] = type==='INBOUND' ? pad(gi('STA')?.value || '',4) : '';
-      data[type+'-STD'] = type==='OUTBOUND' ? pad(gi('STD')?.value || '',4) : '';
-      data[type+'-t'] = pad(gi('t')?.value || '',3);
-      data[type+'-d'] = pad(gi('d')?.value || '',2);
-      data[type+'-bb'] = pad(gi('bb')?.value || '',2);
-      data[type+'-tt'] = type==='OUTBOUND' ? pad(gi('tt')?.value || '',4) : '';
-      data[type+'-tb'] = type==='OUTBOUND' ? pad(gi('tb')?.value || '',4) : '';
+      data[type+'-STA'] = type==='INBOUND' ? pad(gi('STA')?.value || '', 4) : '';
+      data[type+'-STD'] = type==='OUTBOUND' ? pad(gi('STD')?.value || '', 4) : '';
+      data[type+'-t'] = pad(gi('t')?.value || '', 3);
+      data[type+'-d'] = pad(gi('d')?.value || '', 2);
+      data[type+'-bb'] = pad(gi('bb')?.value || '', 2);
+      data[type+'-tt'] = type==='OUTBOUND' ? pad(gi('tt')?.value || '', 4) : '';
+      data[type+'-tb'] = type==='OUTBOUND' ? pad(gi('tb')?.value || '', 4) : '';
       data[type+'-cmpt1'] = defaultF(cm(1)?.value || '');
       data[type+'-cmpt2'] = defaultF(cm(2)?.value || '');
       data[type+'-cmpt3'] = cleanTextUpper(cm(3)?.value || '');
@@ -2365,68 +2497,71 @@
       const shown = document.getElementById(type+'-TIMESHOWN');
       data[type+'-TIME'] = shown ? normalizeTimeText(shown.textContent || '') : '';
       const extras = []; const box = root.querySelector(`#${type}-EXTRAS`);
-      if(box){ [...box.querySelectorAll('.extraRow')].forEach(r=>{ const key=(r.querySelector('select')?.value || '').toUpperCase(); const val=pad(r.querySelector('input')?.value || '',3); if(key && val) extras.push({key,val}); }); }
+      if(box){ [...box.querySelectorAll('.extraRow')].forEach(r=>{ const key=(r.querySelector('select')?.value || '').toUpperCase(); const val=pad(r.querySelector('input')?.value || '', 3); if(key && val) extras.push({key,val}); }); }
       data[type+'-EXTRAS'] = extras;
       data[type+'-LIRPHOTO'] = currentLirPhotos[type] || '';
     });
     if(editId){ const idx = memos.findIndex(m=>m.id===editId); if(idx>=0) memos[idx]=data; }
     else memos.push(data);
-    persistMemos();
-    dayOffset = calcDayOffsetFromDate(data.memoDate); updateDayLabel(); closeModal(); renderList(data.id);
+    persistMemosX4();
+    dayOffset = calcDayOffsetFromDate(data.memoDate);
+    updateDayLabel();
+    closeModal();
+    renderList(data.id);
   };
 
-  window.renderList = function(flashId){
-    memoList.innerHTML = '';
-    const viewingDay = getViewingDayKey();
-    const dayMemos = memos.filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay).sort((a,b)=>{ const ta=a.team?Number(a.team):999; const tb=b.team?Number(b.team):999; return ta===tb ? Number(a.id)-Number(b.id) : ta-tb; });
-    if(!dayMemos.length){ memoList.innerHTML = '<div class="emptyDay">NO MEMO IN THIS DAY</div>'; return; }
-    const groups = new Map();
-    dayMemos.forEach(m=>{ const key = m.team || 'NONE'; if(!groups.has(key)) groups.set(key, []); groups.get(key).push(m); });
-    groups.forEach((items,key)=>{
-      const group = document.createElement('div'); group.className='teamGroup';
-      const title = key==='NONE' ? 'TEAM NONE' : `${Number(key)}조`;
-      group.innerHTML = `<div class="teamHeader"><div class="t1">${title}</div><div class="t2">${items.length} MEMO</div></div>`;
-      items.forEach(m=>{
-        const hasIn = m.hasIn !== false; const hasOut = m.hasOut !== false;
-        let linesHtml = '';
-        if(hasIn && hasOut){ linesHtml = `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, 'INBOUND')}</div></div><div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, 'OUTBOUND')}</div></div>`; }
-        else { const singleTag = hasIn ? 'IN' : 'OUT'; linesHtml = `<div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLine(m)}</div></div>`; }
-        const card = document.createElement('div');
-        card.className = 'memoCard' + (m.id===flashId ? ' flash' : '');
-        card.innerHTML = `<div class="memoRow"><input class="selBox" type="checkbox" data-id="${m.id}"><div class="lines" data-open="${m.id}">${linesHtml}</div></div><div class="metaRow"><div class="miniPill">${m.memoDate || ''}</div><div class="miniPill">${m.teamLabel || '미지정'}</div></div>`;
-        group.appendChild(card);
-      });
-      memoList.appendChild(group);
-    });
-    memoList.querySelectorAll('[data-open]').forEach(el=> el.addEventListener('click', ()=> window.editMemo(Number(el.getAttribute('data-open')))) );
-  };
-
-  window.editMemo = function(id){
+  editMemo = function(id){
     const m = memos.find(x=>x.id===id); if(!m) return;
-    editId = id; memoDate.value = m.memoDate || getViewingDayKey();
-    pickInbound.checked = m.hasIn !== false; pickOutbound.checked = m.hasOut !== false;
+    editId = id;
+    memoDate.value = m.memoDate || getViewingDayKey();
+    pickInbound.checked = m.hasIn !== false;
+    pickOutbound.checked = m.hasOut !== false;
     currentLirPhotos = { INBOUND: m['INBOUND-LIRPHOTO'] || '', OUTBOUND: m['OUTBOUND-LIRPHOTO'] || '' };
     rebuildSectionsFromMemo(m);
-    document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el=> el.value = m.sharedHL || '');
-    document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=> el.value = m.sharedHASH || '');
-    const mt = getMemoTeam(); const qt = getQuickTeamSelect(); if(mt) mt.value = m.team || ''; if(qt) qt.value = m.team || qt.value;
+    document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || '');
+    document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || '');
+    if(memoTeam) memoTeam.value = m.team || '';
+    if(quickTeamSelect && m.team) quickTeamSelect.value = m.team;
     openModal();
   };
 
-  const originalOpenModal = window.openModal;
-  window.openModal = function(){ originalOpenModal(); ensureTeamUI(); };
-
-  photoInput.onchange = async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    await savePhotoFile(f);
-    await runAutoScan();
+  renderList = function(flashId){
+    memoList.innerHTML = '';
+    const viewingDay = getViewingDayKey();
+    const dayMemos = memos.filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay).sort((a,b)=>{
+      const ta = Number(a.team || 999), tb = Number(b.team || 999);
+      if(ta !== tb) return ta - tb;
+      return Number(a.id) - Number(b.id);
+    });
+    if(!dayMemos.length){ memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`; return; }
+    const grouped = new Map();
+    dayMemos.forEach(m=>{ const key = m.team || 'NONE'; if(!grouped.has(key)) grouped.set(key, []); grouped.get(key).push(m); });
+    grouped.forEach((items,key)=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'teamGroup';
+      wrap.innerHTML = `<div class="teamHeader"><div class="left">${key==='NONE'?'TEAM NONE':Number(key)+'조'}</div><div class="right">${items.length} MEMO</div></div>`;
+      items.forEach(m=>{
+        const hasIn = m.hasIn !== false;
+        const hasOut = m.hasOut !== false;
+        let html = '';
+        if(hasIn) html += `<div class="line"><div class="tagPill">IN</div><div class="textPill">7C[${m['INBOUND-7C']||''}] #[${m.sharedHASH||''}]</div></div>`;
+        if(hasOut) html += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">7C[${m['OUTBOUND-7C']||''}] HL[${m.sharedHL||''}]</div></div>`;
+        const card = document.createElement('div');
+        card.className = 'memoCard' + (m.id===flashId ? ' flash' : '');
+        card.innerHTML = `<div class="memoRow"><input class="selBox" type="checkbox" data-id="${m.id}"><div class="lines" data-open="${m.id}">${html}</div></div><div class="metaPills"><div class="miniPill">${m.memoDate || ''}</div><div class="miniPill">${m.teamLabel || getTeamLabel(m.team)}</div></div>`;
+        wrap.appendChild(card);
+      });
+      memoList.appendChild(wrap);
+    });
+    memoList.querySelectorAll('[data-open]').forEach(el=> el.addEventListener('click', ()=> editMemo(Number(el.getAttribute('data-open')))));
   };
 
-  injectStyles();
-  ensureTeamUI();
-  ensureDebugUI();
-  if(getQuickTeamSelect()) getQuickTeamSelect().addEventListener('change', ()=>{ const mt=getMemoTeam(); if(mt && modal.style.display==='flex' && !editId) mt.value = getQuickTeamSelect().value; });
+  const oldNewMemo = newMemo;
+  newMemo = function(){ oldNewMemo(); if(memoTeam) memoTeam.value = quickTeamSelect ? (quickTeamSelect.value || '') : ''; };
+
+  injectExtraStyles();
+  injectTeamUI();
+  injectDebugUI();
   renderList();
 })();
 </script>
