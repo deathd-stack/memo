@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER X.1</title>
+<title>JAS MEMO VER X.2</title>
 
 <style>
   :root{
@@ -1114,6 +1114,16 @@
       font-size:14px;
     }
   }
+
+  .scanDebugWrap{position:fixed;inset:0;background:rgba(0,0,0,.64);display:none;justify-content:center;align-items:flex-end;z-index:140;padding:0}
+  .scanDebugBox{width:100%;max-width:calc(880px * var(--ui) / .65);max-height:90vh;overflow:auto;background:#111114;border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;padding:calc(14px * var(--ui));border-top:1px solid rgba(255,255,255,.06)}
+  .scanDebugHead{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:0;background:#111114;padding-bottom:10px}
+  .scanDebugTitle{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase}
+  .scanDebugClose{padding:calc(10px * var(--ui)) calc(16px * var(--ui));font-size:calc(14px * var(--ui));border-radius:999px;box-shadow:none;background:#242429;color:var(--orange1)}
+  .scanDebugSection{margin:calc(10px * var(--ui)) 0;padding:calc(12px * var(--ui));background:#1a1a1f;border:1px solid rgba(255,255,255,.05);border-radius:calc(22px * var(--ui))}
+  .scanDebugLabel{font-size:calc(13px * var(--ui));font-weight:1000;color:var(--orange1);text-transform:uppercase;margin-bottom:8px}
+  .scanDebugPre{white-space:pre-wrap;word-break:break-word;font-size:calc(12px * var(--ui));line-height:1.45;color:#fff;margin:0}
+
 </style>
 </head>
 
@@ -1122,7 +1132,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER X.1</div>
+    <div class="titleVer">VER X.2</div>
   </div>
 </header>
 
@@ -1264,6 +1274,20 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<div id="scanDebugWrap" class="scanDebugWrap" onclick="closeScanDebug()">
+  <div class="scanDebugBox" onclick="event.stopPropagation()">
+    <div class="scanDebugHead">
+      <div class="scanDebugTitle">AUTO SCAN DEBUG</div>
+      <button type="button" class="scanDebugClose" onclick="closeScanDebug()">CLOSE</button>
+    </div>
+    <div class="scanDebugSection"><div class="scanDebugLabel">STATUS</div><pre id="scanDebugStatus" class="scanDebugPre"></pre></div>
+    <div class="scanDebugSection"><div class="scanDebugLabel">OCR TEXT</div><pre id="scanDebugText" class="scanDebugPre"></pre></div>
+    <div class="scanDebugSection"><div class="scanDebugLabel">ROW GROUPS</div><pre id="scanDebugRows" class="scanDebugPre"></pre></div>
+    <div class="scanDebugSection"><div class="scanDebugLabel">PARSED ROWS</div><pre id="scanDebugParsed" class="scanDebugPre"></pre></div>
+  </div>
+</div>
+
 <script>
   const MEMO_KEY = "jas_memos_v64";
   const PHOTO_KEY = "jas_photo_v64";
@@ -1294,6 +1318,11 @@
 
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
+  const scanDebugWrap = document.getElementById("scanDebugWrap");
+  const scanDebugStatus = document.getElementById("scanDebugStatus");
+  const scanDebugText = document.getElementById("scanDebugText");
+  const scanDebugRows = document.getElementById("scanDebugRows");
+  const scanDebugParsed = document.getElementById("scanDebugParsed");
 
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
@@ -1303,6 +1332,7 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
+  let lastScanDebug = { status:"", text:"", rows:[], parsed:[] };
   let tesseractReady = false;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
@@ -2111,6 +2141,59 @@
     }
   }
 
+  function setScanDebug(partial){
+    lastScanDebug = Object.assign({ status:"", text:"", rows:[], parsed:[] }, lastScanDebug, partial || {});
+    scanDebugStatus.textContent = lastScanDebug.status || "";
+    scanDebugText.textContent = lastScanDebug.text || "";
+    scanDebugRows.textContent = Array.isArray(lastScanDebug.rows) ? lastScanDebug.rows.map((r,i)=> `${i+1}. ${r}`).join("
+") : String(lastScanDebug.rows || "");
+    scanDebugParsed.textContent = Array.isArray(lastScanDebug.parsed) ? lastScanDebug.parsed.map((r,i)=> `${i+1}. ${typeof r === 'string' ? r : JSON.stringify(r)}`).join("
+") : String(lastScanDebug.parsed || "");
+  }
+
+  function openScanDebug(){
+    scanDebugWrap.style.display = "flex";
+  }
+
+  function closeScanDebug(){
+    scanDebugWrap.style.display = "none";
+  }
+
+  function lineTokensFromText(text){
+    return (text || "")
+      .split(/
++/)
+      .map(v => v.trim())
+      .filter(Boolean)
+      .map(v => v.toUpperCase().replace(/\s+/g,' ').trim());
+  }
+
+  function normalizeLooseToken(t){
+    return normToken(t).replace(/^TC(\d{3,4})$/, '7C$1').replace(/^H1(\d{3,4})$/, 'HL$1');
+  }
+
+  function parseTextLineLoose(line){
+    const raw = (line || '').toUpperCase();
+    const norm = raw.replace(/TC/g,'7C').replace(/H1/g,'HL').replace(/\|/g,'/');
+    const flights = [...norm.matchAll(/7C\s*([0-9]{3,4})/g)].map(m=>m[1]);
+    const hls = [...norm.matchAll(/HL\s*([0-9]{3,4})/g)].map(m=>m[1]);
+    const teams = [...norm.matchAll(/(?:^|\s)(\d{1,2}(?:\s*\/\s*\d{1,2})?)(?=\s|$)/g)].map(m=>m[1].replace(/\s+/g,''));
+    const hashCandidates = [...norm.matchAll(/(?:^|\s)(\d{1,3})(?=\s|$)/g)].map(m=>m[1]);
+    const teamToken = teams.length ? teams[teams.length-1] : '';
+    const team = parseTeamInfo(teamToken);
+    const hash = hashCandidates.find(v => v !== team.inbound && v !== team.outbound && v !== (teamToken||'').replace('/','')) || '';
+    if(!flights.length || (!team.inbound && !team.outbound)) return null;
+    return {
+      inbound7c: flights[0] || '',
+      hash: hash || '',
+      outbound7c: flights[1] || '',
+      hl: hls[0] || '',
+      teamIn: team.inbound,
+      teamOut: team.outbound,
+      raw: raw
+    };
+  }
+
   function ensureTesseractLoaded(){
     return new Promise((resolve, reject)=>{
       if(window.Tesseract){
@@ -2308,22 +2391,52 @@
   async function autoScanPhoto(dataUrl){
     await ensureTesseractLoaded();
     if(!window.Tesseract) throw new Error('TESSERACT LOAD FAIL');
+    setScanDebug({ status:'SCAN START', text:'', rows:[], parsed:[] });
     const result = await window.Tesseract.recognize(dataUrl, 'eng', {
       logger: m => {
-        if(m && m.status === 'recognizing text') updateGlobalCalcDisplay(`${Math.round((m.progress || 0) * 100)}%`);
+        if(m && m.status === 'recognizing text'){
+          const pct = `${Math.round((m.progress || 0) * 100)}%`;
+          updateGlobalCalcDisplay(pct);
+          setScanDebug({ status:`OCR ${pct}` });
+        }
       }
     });
 
-    const words = (result?.data?.words || []).filter(w => (w.confidence ?? w.conf ?? 0) > 10 && (w.text || '').trim());
-    const rows = groupWordsIntoRows(words);
-    const parsedRows = rows.map(parseRowObject).filter(Boolean);
-    if(!parsedRows.length) throw new Error('AUTO SCAN FAIL');
+    const rawText = (result?.data?.text || '').trim();
+    const words = (result?.data?.words || []).filter(w => (w.confidence ?? w.conf ?? 0) > 5 && (w.text || '').trim());
+    const rowsFromWords = groupWordsIntoRows(words);
+    const parsedWordRows = rowsFromWords.map(parseRowObject).filter(Boolean);
+    const textLines = lineTokensFromText(rawText);
+    const parsedTextRows = textLines.map(parseTextLineLoose).filter(Boolean);
+
+    const rowDebug = rowsFromWords.map(r => mergeRowTokens(r.words).map(w => w.text).join(' '));
+    const mergedParsed = [];
+    const seenRaw = new Set();
+    [...parsedWordRows, ...parsedTextRows].forEach(p => {
+      const key = [p.raw, p.inbound7c, p.hash, p.outbound7c, p.hl, p.teamIn, p.teamOut].join('|');
+      if(!seenRaw.has(key)){
+        seenRaw.add(key);
+        mergedParsed.push(p);
+      }
+    });
+
+    setScanDebug({
+      status:`OCR DONE / WORD ROWS ${rowsFromWords.length} / TEXT LINES ${textLines.length} / PARSED ${mergedParsed.length}`,
+      text: rawText || 'NO OCR TEXT',
+      rows: rowDebug.length ? rowDebug : textLines,
+      parsed: mergedParsed
+    });
+
+    if(!mergedParsed.length){
+      openScanDebug();
+      throw new Error('AUTO SCAN FAIL');
+    }
 
     const dayKey = getViewingDayKey();
     const existing = new Set(memos.map(makeMemoSignature));
     const newItems = [];
 
-    parsedRows.forEach(parsed => {
+    mergedParsed.forEach(parsed => {
       const sameTeam = parsed.teamIn && parsed.teamOut && parsed.teamIn === parsed.teamOut;
       if(sameTeam){
         const memo = buildMemoDataFromParsed(parsed, 'BOTH', dayKey);
@@ -2352,7 +2465,12 @@
       }
     });
 
-    if(!newItems.length) throw new Error('AUTO SCAN FAIL');
+    setScanDebug({ status:`PARSED ${mergedParsed.length} / NEW ${newItems.length}`, parsed:[...mergedParsed, `NEW ITEMS: ${newItems.length}`] });
+
+    if(!newItems.length){
+      openScanDebug();
+      throw new Error('AUTO SCAN FAIL');
+    }
     memos.push(...newItems);
     localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList(newItems[newItems.length - 1].id);
@@ -2371,6 +2489,8 @@
     }catch(err){
       console.error(err);
       updateGlobalCalcDisplay('0');
+      setScanDebug({ status:`FAIL: ${err && err.message ? err.message : 'AUTO SCAN FAIL'}` });
+      openScanDebug();
       alert(err && err.message ? err.message : 'AUTO SCAN FAIL');
     }
   };
