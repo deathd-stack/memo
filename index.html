@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.9</title>
+<title>JAS MEMO VER 6.4.10</title>
 
 <style>
   :root{
@@ -1033,7 +1033,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.9</div>
+    <div class="titleVer">VER 6.4.10</div>
   </div>
 </header>
 
@@ -2170,22 +2170,43 @@
   }
 
   function parseNotePayload(noteText){
-    const raw = String(noteText || "").replace(/\r/g, "");
-    const lines = raw.split("\n");
+    const raw = String(noteText || "").replace(/
+/g, "");
+    const lines = raw.split("
+");
     const cmpt = {1:"",2:"",3:"",4:""};
     let current = 0;
+    let inSiBlock = false;
     const workingLines = [];
+    const siLines = [];
 
     for(let line of lines){
       let u = cleanTextUpper(line);
       if(!u) continue;
+
+      if(/^SI/.test(u)){
+        if(/^SI\s*$/.test(u)){
+          inSiBlock = true;
+          current = 0;
+          continue;
+        }
+        inSiBlock = false;
+      }
+
       const m = u.match(/^CPT\s*([1-4])\s*[-:–]\s*(.*)$/);
       if(m){
+        inSiBlock = false;
         current = Number(m[1]);
         cmpt[current] = cleanCmptSegment(m[2]);
         workingLines.push(u);
         continue;
       }
+
+      if(inSiBlock){
+        siLines.push(u);
+        continue;
+      }
+
       if(/^[-•]/.test(u) && current){
         const addon = cleanCmptSegment(u.replace(/^[-•]+\s*/, ""));
         if(addon){ cmpt[current] = (cmpt[current] ? cmpt[current] + " " : "") + addon; }
@@ -2193,10 +2214,13 @@
       }
     }
 
-    const joined = workingLines.join(" \n ");
+    const joined = workingLines.join(" 
+ ");
+    const siJoined = siLines.join(" 
+ ");
     const t = parseCountByKeyword(joined, ["BAG"]);
     const d = parseCountByKeyword(joined, ["D/S","DS"]);
-    const bbMatch = joined.match(/\bBBST\s*(\d+)\b/i);
+    const bbMatch = joined.match(/BBST\s*(\d+)/i);
     const bb = bbMatch ? Number(bbMatch[1]) : 0;
 
     const extras = [];
@@ -2220,6 +2244,26 @@
     pushExtra("CYCLE", parseKeywordExtra(joined, ["CYCLE"]));
     pushExtra("CREW", parseKeywordExtra(joined, ["CREW"]));
     pushExtra("PCB", parseKeywordExtra(joined, ["PCB"]));
+
+    pushExtra("C", parseKeywordExtra(siJoined, ["CGO"]));
+    pushExtra("EMS", parseKeywordExtra(siJoined, ["MAIL","POS","EMS"]));
+    pushExtra("W", parseKeywordExtra(siJoined, ["WCHR"]));
+    pushExtra("COB", parseKeywordExtra(siJoined, ["COB"]));
+    pushExtra("GB", parseKeywordExtra(siJoined, ["G/B","GB"]));
+    pushExtra("TS", parseKeywordExtra(siJoined, ["T/S","TS"]));
+    pushExtra("RUSH", parseKeywordExtra(siJoined, ["RUSH"]));
+    pushExtra("CARSEAT", parseKeywordExtra(siJoined, ["CARSEAT"]));
+    pushExtra("COMAT", parseKeywordExtra(siJoined, ["COMAT"]));
+    pushExtra("LONGFIN", parseKeywordExtra(siJoined, ["LONGFIN"]));
+    pushExtra("CYCLE", parseKeywordExtra(siJoined, ["CYCLE"]));
+    pushExtra("CREW", parseKeywordExtra(siJoined, ["CREW"]));
+    pushExtra("PCB", parseKeywordExtra(siJoined, ["PCB"]));
+
+    const btBagRe = /BT\s+BAG\s+(\d+)\s*(?:PCS?|PC)/gi;
+    let btm;
+    while((btm = btBagRe.exec(siJoined))){
+      pushExtra("TS", Number(btm[1] || 0));
+    }
 
     for(const k of [1,2,3,4]) cmpt[k] = cmpt[k].replace(/\s{2,}/g, " ").trim();
 
