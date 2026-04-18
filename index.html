@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER X.8</title>
+<title>JAS MEMO VER 6.4.1</title>
 
 <style>
   :root{
@@ -1013,20 +1013,6 @@
       font-size:14px;
     }
   }
-
-  #scanPreviewList{display:flex;flex-direction:column;gap:12px;margin-top:10px}
-  .previewCard{background:#111217;border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:12px}
-  .previewTop{display:flex;gap:10px;align-items:flex-start}
-  .previewCheck{width:24px;height:24px;accent-color:#ff7a00;margin-top:4px}
-  .previewBody{flex:1;min-width:0}
-  .previewMain{font-size:14px;font-weight:1000;color:#fff;line-height:1.35;word-break:break-word}
-  .previewMeta{font-size:12px;color:#b4b4bc;margin-top:6px;word-break:break-word}
-  .previewGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-  .previewGrid input,.previewGrid select{height:42px;border-radius:16px;font-size:14px;padding:0 10px}
-  .previewActions{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px}
-  .previewBtn{padding:10px 14px;font-size:13px}
-  .debugSectionTitleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
-
 </style>
 </head>
 
@@ -1035,7 +1021,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4</div>
+    <div class="titleVer">VER 6.4.1</div>
   </div>
 </header>
 
@@ -1204,7 +1190,6 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
-  let activeTeamFilter = "";
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
@@ -1620,7 +1605,123 @@
     return d;
   }
 
-  function buildSectionsBlank(){
+  function parseCptLines(text){
+    const result = {
+      cmpt1:"", cmpt2:"", cmpt3:"", cmpt4:"",
+      bagCount:0, dsCount:0, bbstCount:0,
+      cCount:0, emsCount:0
+    };
+    const lines = String(text || "").replace(/\r/g, "").split("\n");
+    let currentKey = "";
+
+    function addFromLine(line){
+      const bagMatches = [...line.matchAll(/\bBAG\s*(\d+)\s*P?C?S?\b/gi)];
+      bagMatches.forEach(m=> result.bagCount += Number(m[1] || 0));
+
+      const dsMatches = [...line.matchAll(/\bD\/?S\s*(\d+)\s*P?C?S?\b/gi)];
+      dsMatches.forEach(m=> result.dsCount += Number(m[1] || 0));
+
+      const bbstMatches = [...line.matchAll(/\bBBST\s*(\d+)\b/gi)];
+      bbstMatches.forEach(m=> result.bbstCount += Number(m[1] || 0));
+
+      const cgoMatches = [...line.matchAll(/(?:\bCGO\s*[:\/-]?\s*(\d+)\b)|(\b\d+\b)\s*CGO\b/gi)];
+      cgoMatches.forEach(m=> result.cCount += Number(m[1] || m[2] || 0));
+
+      const mailMatches = [...line.matchAll(/(?:\bMAIL\s*[:\/-]?\s*(\d+)\b)|(\b\d+\b)\s*MAIL\b/gi)];
+      mailMatches.forEach(m=> result.emsCount += Number(m[1] || m[2] || 0));
+    }
+
+    for(const raw of lines){
+      const line = String(raw || "").trim();
+      if(!line) continue;
+      addFromLine(line);
+
+      const m = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
+      if(m){
+        currentKey = `cmpt${m[1]}`;
+        result[currentKey] = (m[2] || "").trim();
+        continue;
+      }
+
+      if(currentKey){
+        const cleaned = line.replace(/^[-–—\s]+/, "").trim();
+        if(cleaned && !/^CPT\s*[1-4]\s*-/i.test(cleaned)){
+          result[currentKey] = result[currentKey]
+            ? `${result[currentKey]}, ${cleaned}`
+            : cleaned;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  function setSectionInputValue(root, key, val, maxLen){
+    const input = root.querySelector(`input[data-k="${key}"]`);
+    if(!input) return false;
+    const nextVal = maxLen ? onlyNum(String(val || ""), maxLen) : String(val || "");
+    if(!nextVal) return false;
+    input.value = nextVal;
+    input.dispatchEvent(new Event("input", { bubbles:true }));
+    return true;
+  }
+
+  function upsertExtraRow(root, type, extraKey, addVal){
+    const box = root.querySelector(`#${type}-EXTRAS`);
+    if(!box || !addVal) return false;
+    const rows = [...box.querySelectorAll('.extraRow')];
+    let row = rows.find(r => (r.querySelector('select')?.value || '').toUpperCase() === extraKey);
+    if(!row){
+      row = makeExtraRow(type, extraKey, String(addVal));
+      box.appendChild(row);
+    }else{
+      const input = row.querySelector('input');
+      const prev = Number((input?.value || '0').replace(/[^0-9]/g, '') || 0);
+      if(input){
+        input.value = onlyNum(String(prev + Number(addVal || 0)), 3);
+        input.dispatchEvent(new Event("input", { bubbles:true }));
+      }
+    }
+    return true;
+  }
+
+  function applyParsedCptToSection(type, noteText){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    if(!root) return false;
+
+    const parsed = parseCptLines(noteText);
+    let changed = false;
+
+    [1,2,3,4].forEach(n=>{
+      const value = cleanTextUpper(parsed[`cmpt${n}`] || "");
+      if(!value) return;
+      const input = root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
+      if(!input) return;
+      input.value = value;
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+      changed = true;
+    });
+
+    if(parsed.bagCount > 0){
+      changed = setSectionInputValue(root, `${type}-t`, parsed.bagCount, 3) || changed;
+    }
+    if(parsed.dsCount > 0){
+      changed = setSectionInputValue(root, `${type}-d`, parsed.dsCount, 2) || changed;
+    }
+    if(parsed.bbstCount > 0){
+      changed = setSectionInputValue(root, `${type}-bb`, parsed.bbstCount, 2) || changed;
+    }
+    if(parsed.cCount > 0){
+      changed = upsertExtraRow(root, type, 'C', parsed.cCount) || changed;
+    }
+    if(parsed.emsCount > 0){
+      changed = upsertExtraRow(root, type, 'EMS', parsed.emsCount) || changed;
+    }
+
+    return changed;
+  }
+
+  function buildSectionsBlank(){{
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
@@ -2085,6 +2186,20 @@
     });
   });
 
+
+
+  document.addEventListener("paste", (e)=>{
+    const t = e.target;
+    if(!(t instanceof HTMLTextAreaElement)) return;
+    const k = t.dataset.k || "";
+    const m = k.match(/^(INBOUND|OUTBOUND)-note$/);
+    if(!m) return;
+
+    setTimeout(()=>{
+      applyParsedCptToSection(m[1], t.value || "");
+    }, 0);
+  });
+
   let startY = 0;
   let currentTranslate = 0;
   let dragging = false;
@@ -2128,655 +2243,6 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
-</script>
-
-
-<script>
-(function(){
-  const VERSION_LABEL = 'VER X.8';
-  const TEAM_NONE = '';
-  let teamEnhReady = false;
-  let debugSheet = null;
-  let debugTextEl = null;
-  let debugRowsEl = null;
-  let debugParsedEl = null;
-  let debugBadgeEl = null;
-  let previewListEl = null;
-  let parsedPreviewRows = [];
-  let ocrBusy = false;
-  let ocrWorker = null;
-
-  function injectEnhancementStyles(){
-    const css = `
-      .teamQuickWrap{display:flex;align-items:center;gap:calc(8px * var(--ui));background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));border-radius:999px;padding:calc(10px * var(--ui)) calc(14px * var(--ui));border:1px solid rgba(255,255,255,.06);box-shadow:var(--shadow-soft)}
-      .teamQuickLabel,.teamLab{font-size:calc(14px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase;white-space:nowrap}
-      .teamQuickSelect,.teamSelect{font-family:inherit;font-weight:1000;border:2px solid var(--line);background:#121214;color:#fff;border-radius:calc(20px * var(--ui));height:calc(42px * var(--ui));padding:0 calc(12px * var(--ui));font-size:calc(15px * var(--ui));min-width:calc(104px * var(--ui))}
-      .teamLine{display:flex;justify-content:center;align-items:center;gap:calc(8px * var(--ui));margin:calc(6px * var(--ui)) 0}
-      .teamSelect{height:calc(54px * var(--ui));min-width:calc(150px * var(--ui));font-size:calc(16px * var(--ui))}
-      .teamGroup{margin-bottom:calc(18px * var(--ui))}
-      .teamHeader{margin:calc(8px * var(--ui)) 0 calc(10px * var(--ui));padding:calc(12px * var(--ui)) calc(16px * var(--ui));background:rgba(20,20,24,.9);border:1px solid rgba(255,255,255,.07);border-radius:999px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 8px 18px rgba(0,0,0,.18);cursor:pointer}\n      .teamHeader.active{border-color:rgba(255,179,71,.55);box-shadow:0 0 0 calc(3px * var(--ui)) rgba(255,122,0,.14), 0 8px 18px rgba(0,0,0,.18)}\n      .filterBar{margin:calc(4px * var(--ui)) 0 calc(12px * var(--ui));padding:calc(12px * var(--ui)) calc(14px * var(--ui));border-radius:calc(22px * var(--ui));background:rgba(20,20,24,.92);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:10px}\n      .filterBar .f1{font-size:calc(14px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase}\n      .filterBar button{padding:calc(8px * var(--ui)) calc(14px * var(--ui));font-size:calc(13px * var(--ui));box-shadow:none}
-      .teamHeader .t1{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff}
-      .teamHeader .t2{font-size:calc(12px * var(--ui));font-weight:1000;color:var(--muted);text-transform:uppercase}
-      .metaRow{display:flex;gap:calc(8px * var(--ui));align-items:center;flex-wrap:wrap;margin-top:calc(8px * var(--ui));margin-left:calc(42px * var(--ui))}
-      .miniPill{padding:calc(6px * var(--ui)) calc(10px * var(--ui));border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);font-size:calc(12px * var(--ui));color:var(--muted);text-transform:uppercase}
-      #scanDebugOverlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;justify-content:center;align-items:flex-end;z-index:140}
-      #scanDebugSheet{width:100%;max-width:calc(820px * var(--ui) / .65);background:#17171a;border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));max-height:92vh;overflow:auto;box-shadow:0 -10px 30px rgba(0,0,0,.28);border-top:1px solid rgba(255,255,255,.05)}
-      .debugTitle{font-size:calc(24px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase;margin:calc(8px * var(--ui)) 0 calc(14px * var(--ui))}
-      .debugSectionTitle{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase;margin:calc(18px * var(--ui)) 0 calc(10px * var(--ui))}
-      .debugCode{white-space:pre-wrap;background:#0c0d12;border:1px solid rgba(255,255,255,.07);border-radius:calc(24px * var(--ui));padding:calc(14px * var(--ui));font-size:calc(12px * var(--ui));line-height:1.45;color:#fff;word-break:break-word}
-      .debugBadge{display:inline-flex;align-items:center;padding:calc(6px * var(--ui)) calc(12px * var(--ui));border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;text-transform:uppercase;margin-bottom:calc(12px * var(--ui))}
-      .scanBusy{opacity:.65;pointer-events:none}
-    `;
-    const style = document.createElement('style');
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
-
-  function teamOptionsHtml(){
-    let out = '<option value="">TEAM</option>';
-    for(let i=1;i<=24;i++) out += `<option value="${i}">${i}조</option>`;
-    return out;
-  }
-
-  function ensureTeamUI(){
-    if(teamEnhReady) return;
-    injectEnhancementStyles();
-    const titleVer = document.querySelector('.titleVer');
-    if(titleVer) titleVer.textContent = VERSION_LABEL;
-
-    const photoBtn = Array.from(document.querySelectorAll('#topControls button')).find(b=>b.textContent.trim()==='PHOTO');
-    if(photoBtn && !document.getElementById('quickTeamSelect')){
-      const wrap = document.createElement('div');
-      wrap.className = 'teamQuickWrap';
-      wrap.innerHTML = `<div class="teamQuickLabel">TEAM</div><select id="quickTeamSelect" class="teamQuickSelect">${teamOptionsHtml()}</select>`;
-      photoBtn.insertAdjacentElement('afterend', wrap);
-    }
-
-    const dateLine = document.querySelector('.dateLine');
-    if(dateLine && !document.getElementById('memoTeam')){
-      const teamLine = document.createElement('div');
-      teamLine.className = 'teamLine';
-      teamLine.innerHTML = `<div class="teamLab">TEAM</div><select id="memoTeam" class="teamSelect">${teamOptionsHtml()}</select>`;
-      dateLine.insertAdjacentElement('afterend', teamLine);
-    }
-
-    if(!document.getElementById('scanDebugOverlay')){
-      const overlay = document.createElement('div');
-      overlay.id = 'scanDebugOverlay';
-      overlay.innerHTML = `
-        <div id="scanDebugSheet">
-          <div class="dragArea" style="position:sticky;top:0;background:#17171a;z-index:5;">
-            <div class="drag-handle"></div>
-            <div class="topActionBar">
-              <button type="button" class="topMiniBtn" id="scanDebugClose">CLOSE</button>
-              <button type="button" class="topMiniBtn" id="scanDebugClear">CLEAR</button>
-            </div>
-          </div>
-          <div class="debugTitle">AUTO SCAN DEBUG</div>
-          <div class="debugBadge" id="scanDebugBadge">READY</div>
-          <div class="debugSectionTitle">OCR TEXT</div>
-          <div class="debugCode" id="scanDebugText"></div>
-          <div class="debugSectionTitle">ROWS</div>
-          <div class="debugCode" id="scanDebugRows"></div>
-          <div class="debugSectionTitle">PARSED</div>
-          <div class="debugCode" id="scanDebugParsed"></div>
-          <div class="debugSectionTitleRow"><div class="debugSectionTitle" style="margin:0">IMPORT PREVIEW</div><button type="button" class="topMiniBtn previewBtn" id="scanImportBtn">IMPORT SELECTED</button></div>
-          <div id="scanPreviewList"></div>
-        </div>`;
-      document.body.appendChild(overlay);
-      overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.style.display='none'; });
-      document.getElementById('scanDebugClose').onclick = ()=> overlay.style.display='none';
-      document.getElementById('scanDebugClear').onclick = ()=>{
-        document.getElementById('scanDebugText').textContent='';
-        document.getElementById('scanDebugRows').textContent='';
-        document.getElementById('scanDebugParsed').textContent='';
-        document.getElementById('scanDebugBadge').textContent='CLEARED';
-        const pl=document.getElementById('scanPreviewList'); if(pl) pl.innerHTML='';
-        parsedPreviewRows = [];
-      };
-      document.getElementById('scanImportBtn').onclick = ()=> importSelectedPreview();
-    }
-
-    debugSheet = document.getElementById('scanDebugOverlay');
-    debugTextEl = document.getElementById('scanDebugText');
-    debugRowsEl = document.getElementById('scanDebugRows');
-    debugParsedEl = document.getElementById('scanDebugParsed');
-    debugBadgeEl = document.getElementById('scanDebugBadge');
-    previewListEl = document.getElementById('scanPreviewList');
-    teamEnhReady = true;
-  }
-
-  function setDebug(badge, text, rows, parsed, open){
-    ensureTeamUI();
-    if(debugBadgeEl) debugBadgeEl.textContent = badge || 'READY';
-    if(debugTextEl) debugTextEl.textContent = text || '';
-    if(debugRowsEl) debugRowsEl.textContent = rows || '';
-    if(debugParsedEl) debugParsedEl.textContent = parsed || '';
-    if(open && debugSheet) debugSheet.style.display = 'flex';
-  }
-
-  function getQuickTeamSelect(){ return document.getElementById('quickTeamSelect'); }
-  function getMemoTeam(){ return document.getElementById('memoTeam'); }
-  function teamLabel(v){ return v ? `${Number(v)}조` : '미지정'; }
-
-  function persistAll(){ localStorage.setItem(MEMO_KEY, JSON.stringify(memos)); }
-
-  function parseTeamRaw(raw){
-    const cleaned = String(raw || '').replace(/[^0-9\/|]/g,'').trim();
-    if(!cleaned) return {inTeam:'', outTeam:''};
-    const nums = cleaned.split(/[\/|]/).map(v=>v.trim()).filter(Boolean).map(v=>String(Math.max(1, Math.min(24, parseInt(v,10)||0)))).filter(Boolean);
-    if(!nums.length) return {inTeam:'', outTeam:''};
-    if(nums.length===1) return {inTeam:nums[0], outTeam:nums[0]};
-    return {inTeam:nums[0], outTeam:nums[1]};
-  }
-
-  function formatCombinedLineX(m){
-    const v7cIn = (m['INBOUND-7C'] || '').trim();
-    const v7cOut = (m['OUTBOUND-7C'] || '').trim();
-    const v7c = v7cIn || v7cOut || '';
-    const vhl = (m.sharedHL || '').trim();
-    const hash = (m.sharedHASH || '').trim();
-    return `7C[${v7c}] HL[${vhl}] #[${hash}]`;
-  }
-  function formatSplitLineX(m, type){
-    const v7c = (m[type+'-7C'] || '').trim();
-    const vhl = (m.sharedHL || '').trim();
-    const hash = (m.sharedHASH || '').trim();
-    if(type === 'INBOUND') return `7C[${v7c}] HL[${vhl}]`;
-    return `7C[${v7c}] #[${hash}]`;
-  }
-
-  const _oldRenderList = renderList;
-  renderList = function(flashId){
-    ensureTeamUI();
-    memoList.innerHTML = '';
-    const viewingDay = getViewingDayKey();
-    const allDayMemos = memos
-      .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .sort((a,b)=>{
-        const ta = a.team ? Number(a.team) : 999;
-        const tb = b.team ? Number(b.team) : 999;
-        if(ta !== tb) return ta - tb;
-        return Number(a.id) - Number(b.id);
-      });
-    if(!allDayMemos.length){ memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`; return; }
-    const dayMemos = activeTeamFilter ? allDayMemos.filter(m => (m.team || 'NONE') === activeTeamFilter) : allDayMemos;
-    if(activeTeamFilter){
-      const filterTitle = activeTeamFilter === 'NONE' ? 'TEAM NONE' : `${Number(activeTeamFilter)}조`;
-      const bar = document.createElement('div');
-      bar.className = 'filterBar';
-      bar.innerHTML = `<div class="f1">FILTER ${filterTitle}</div><button type="button">CLEAR</button>`;
-      bar.querySelector('button').addEventListener('click', ()=>{ activeTeamFilter=''; renderList(); });
-      memoList.appendChild(bar);
-    }
-    if(!dayMemos.length){ memoList.innerHTML += `<div class="emptyDay">NO MEMO IN THIS TEAM</div>`; return; }
-    const groups = new Map();
-    dayMemos.forEach(m=>{
-      const key = m.team || 'NONE';
-      if(!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(m);
-    });
-    groups.forEach((items,key)=>{
-      const wrap = document.createElement('div');
-      wrap.className = 'teamGroup';
-      const title = key === 'NONE' ? 'TEAM NONE' : `${Number(key)}조`;
-      wrap.innerHTML = `<div class="teamHeader ${activeTeamFilter===key ? 'active' : ''}" data-team-key="${key}"><div class="t1">${title}</div><div class="t2">${items.length} MEMO</div></div>`;
-      items.forEach(m=>{
-        const hasIn = m.hasIn !== false;
-        const hasOut = m.hasOut !== false;
-        let linesHtml = '';
-        if(hasIn && hasOut){
-          linesHtml = `
-            <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLineX(m,'INBOUND')}</div></div>
-            <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLineX(m,'OUTBOUND')}</div></div>`;
-        }else{
-          const singleTag = hasIn ? 'IN' : 'OUT';
-          linesHtml = `<div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLineX(m)}</div></div>`;
-        }
-        const card = document.createElement('div');
-        card.className = 'memoCard' + (m.id===flashId ? ' flash' : '');
-        card.innerHTML = `
-          <div class="memoRow">
-            <input class="selBox" type="checkbox" data-id="${m.id}">
-            <div class="lines" data-open="${m.id}">${linesHtml}</div>
-          </div>
-          <div class="metaRow"><div class="miniPill">${m.memoDate || ''}</div><div class="miniPill">${m.teamLabel || teamLabel(m.team)}</div></div>`;
-        wrap.appendChild(card);
-      });
-      memoList.appendChild(wrap);
-    });
-    memoList.querySelectorAll('[data-open]').forEach(el=>{
-      el.addEventListener('click', ()=> editMemo(Number(el.getAttribute('data-open'))));
-    });
-    memoList.querySelectorAll('.teamHeader').forEach(el=>{
-      el.addEventListener('click', ()=>{
-        const key = el.getAttribute('data-team-key') || '';
-        activeTeamFilter = activeTeamFilter === key ? '' : key;
-        renderList();
-      });
-    });
-  };
-
-  const _oldNewMemo = newMemo;
-  newMemo = function(){
-    _oldNewMemo();
-    ensureTeamUI();
-    const q = getQuickTeamSelect();
-    const m = getMemoTeam();
-    if(m) m.value = q ? q.value : '';
-  };
-
-  const _oldEditMemo = editMemo;
-  editMemo = function(id){
-    _oldEditMemo(id);
-    ensureTeamUI();
-    const mm = memos.find(x=>x.id===id);
-    const m = getMemoTeam();
-    const q = getQuickTeamSelect();
-    if(m) m.value = mm?.team || '';
-    if(q && mm?.team) q.value = mm.team;
-  };
-
-  const _oldSaveMemo = saveMemo;
-  saveMemo = function(){
-    ensureTeamUI();
-    const beforeId = editId;
-    const m = getMemoTeam();
-    const q = getQuickTeamSelect();
-    _oldSaveMemo();
-    let target = null;
-    if(beforeId){ target = memos.find(x=>x.id===beforeId); }
-    else { target = memos[memos.length - 1]; }
-    if(target){
-      const team = (m && m.value) || (q && q.value) || target.team || '';
-      target.team = team;
-      target.teamLabel = teamLabel(team);
-      persistAll();
-      renderList(target.id);
-    }
-  };
-
-  async function ensureTesseract(){
-    if(window.Tesseract) return;
-    await new Promise((resolve,reject)=>{
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-      s.onload = resolve;
-      s.onerror = ()=> reject(new Error('TESSERACT LOAD FAIL'));
-      document.head.appendChild(s);
-    });
-  }
-
-  async function getWorker(){
-    await ensureTesseract();
-    if(!ocrWorker){
-      ocrWorker = await Tesseract.createWorker('eng');
-      await ocrWorker.setParameters({
-        tessedit_pageseg_mode: '6',
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:/|#[]- .'
-      });
-    }
-    return ocrWorker;
-  }
-
-  function fileToImage(file){
-    return new Promise((resolve,reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        const img = new Image();
-        img.onload = ()=> resolve(img);
-        img.onerror = ()=> reject(new Error('IMAGE LOAD FAIL'));
-        img.src = String(reader.result || '');
-      };
-      reader.onerror = ()=> reject(new Error('FILE READ FAIL'));
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function makeProcessedVariant(img, region){
-    const sx = Math.round(img.width * region.x);
-    const sy = Math.round(img.height * region.y);
-    const sw = Math.max(1, Math.round(img.width * region.w));
-    const sh = Math.max(1, Math.round(img.height * region.h));
-    const scale = region.scale || 2.4;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.round(sw * scale));
-    canvas.height = Math.max(1, Math.round(sh * scale));
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
-    const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
-    const d = imgData.data;
-    for(let i=0;i<d.length;i+=4){
-      let gray = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
-      gray = gray < 172 ? 0 : 255;
-      d[i]=d[i+1]=d[i+2]=gray;
-    }
-    ctx.putImageData(imgData,0,0);
-    return { url: canvas.toDataURL('image/png'), scale, crop: region };
-  }
-
-  function normalizeWordText(v){
-    return String(v||'')
-      .replace(/[‘’'`]/g,'')
-      .replace(/TC(?=\d{4})/gi,'7C')
-      .replace(/7G(?=\d{4})/gi,'7C')
-      .replace(/HC(?=\d{4})/gi,'HL')
-      .replace(/H1(?=\d{4})/gi,'HL')
-      .replace(/\|/g,'|')
-      .trim();
-  }
-
-  function groupWords(words){
-    const clean = (words||[])
-      .filter(w=>w && w.text && String(w.text).trim())
-      .map(w=>{
-        const bbox = w.bbox || {};
-        return {
-          text: normalizeWordText(w.text),
-          x0: bbox.x0 || 0,
-          x1: bbox.x1 || 0,
-          y0: bbox.y0 || 0,
-          y1: bbox.y1 || 0,
-          cy: ((bbox.y0 || 0) + (bbox.y1 || 0)) / 2,
-          h: Math.max(1, (bbox.y1 || 0) - (bbox.y0 || 0))
-        };
-      })
-      .filter(w=>w.text);
-    clean.sort((a,b)=> a.cy - b.cy || a.x0 - b.x0);
-    const avgH = clean.length ? clean.reduce((s,w)=>s+w.h,0)/clean.length : 18;
-    const tol = Math.max(10, avgH * 0.7);
-    const lines = [];
-    clean.forEach(w=>{
-      let line = lines.find(l=> Math.abs(l.cy - w.cy) <= tol);
-      if(!line){ line = {cy:w.cy, words:[]}; lines.push(line); }
-      line.words.push(w);
-      line.cy = (line.cy * (line.words.length-1) + w.cy) / line.words.length;
-    });
-    lines.forEach(l=> l.words.sort((a,b)=> a.x0 - b.x0));
-    lines.sort((a,b)=> a.cy - b.cy);
-    return lines.map(l=>({
-      y: l.cy,
-      text: l.words.map(w=>w.text).join(' ').replace(/\s+/g,' ').trim()
-    }));
-  }
-
-  function textLinesFallback(text){
-    return String(text||'').split(/\n+/).map(v=>v.trim()).filter(Boolean).map((text,idx)=>({y:idx*40,text}));
-  }
-
-  function findHash(text){
-    const m = text.match(/(?:\d{1,2}[: ]\d{2})\s*[|/]?\s*(\d{1,3})\b/);
-    if(m) return onlyNum(m[1],3);
-    const nums = text.match(/\b\d{1,3}\b/g) || [];
-    return nums.find(v=>v.length<=3) || '';
-  }
-
-  function extractTeamRaw(text){
-    const m = text.match(/(\d{1,2}\s*[\/|]\s*\d{1,2}|\b\d{1,2}\b)\s*$/);
-    if(m) return m[1].replace(/\s+/g,'');
-    const m2 = text.match(/\b(\d{1,2}\s*[\/|]\s*\d{1,2})\b/);
-    if(m2) return m2[1].replace(/\s+/g,'');
-    return '';
-  }
-
-  function parseLeftLine(line){
-    const text = normalizeWordText(line.text).replace(/\s+/g,' ').trim();
-    const flightMatch = text.match(/(?:7C|TC)\s*(\d{4})/i);
-    const hash = findHash(text);
-    if(!flightMatch && !hash) return null;
-    return { y: line.y, inbound7c: flightMatch ? onlyNum(flightMatch[1],4) : '', hash, raw:text };
-  }
-
-  function parseRightLine(line){
-    const text = normalizeWordText(line.text).replace(/\s+/g,' ').trim();
-    const out = text.match(/(?:7C|TC)\s*(\d{4})/i);
-    const hl = text.match(/HL\s*(\d{4})/i);
-    const teamRaw = extractTeamRaw(text);
-    if(!out && !hl && !teamRaw) return null;
-    return { y: line.y, outbound7c: out ? onlyNum(out[1],4) : '', hl: hl ? onlyNum(hl[1],4) : '', teamRaw, raw:text };
-  }
-
-  function mergeByY(leftRows, rightRows){
-    const usedL = new Set();
-    const usedR = new Set();
-    const merged = [];
-    const tol = 28;
-    rightRows.forEach((r,ri)=>{
-      let best = -1; let bestDiff = 1e9;
-      leftRows.forEach((l,li)=>{
-        if(usedL.has(li)) return;
-        const diff = Math.abs((l.y||0) - (r.y||0));
-        if(diff < bestDiff){ bestDiff = diff; best = li; }
-      });
-      if(best !== -1 && bestDiff <= tol){
-        usedL.add(best); usedR.add(ri);
-        merged.push({ y:(leftRows[best].y + r.y)/2, ...leftRows[best], ...r });
-      }else{
-        usedR.add(ri);
-        merged.push({ y:r.y, inbound7c:'', hash:'', ...r });
-      }
-    });
-    leftRows.forEach((l,li)=>{
-      if(usedL.has(li)) return;
-      merged.push({ y:l.y, ...l, outbound7c:'', hl:'', teamRaw:'' });
-    });
-    merged.sort((a,b)=> (a.y||0) - (b.y||0));
-    return merged;
-  }
-
-  function sanitizeMergedRows(rows){
-    return rows.map(r=>{
-      const teams = parseTeamRaw(r.teamRaw || '');
-      return {
-        line: [r.raw||'', r.rawR||''].filter(Boolean).join(' || '),
-        inbound7c: onlyNum(r.inbound7c||'',4),
-        outbound7c: onlyNum(r.outbound7c||'',4),
-        hl: onlyNum(r.hl||'',4),
-        hash: onlyNum(r.hash||'',3),
-        teamRaw: r.teamRaw || '',
-        inTeam: teams.inTeam,
-        outTeam: teams.outTeam,
-        y: Math.round(r.y||0)
-      };
-    }).filter(r=> {
-      const score = (r.inbound7c?1:0)+(r.outbound7c?1:0)+(r.hl?1:0)+(r.hash?1:0)+(r.teamRaw?1:0);
-      if(score >= 2) return true;
-      if(r.outbound7c && r.hl) return true;
-      return false;
-    });
-  }
-
-
-  function summarizeParsedRow(r){
-    const parts = [];
-    if(r.inbound7c) parts.push(`IN 7C[${r.inbound7c}]`);
-    if(r.hash) parts.push(`#[${r.hash}]`);
-    if(r.outbound7c) parts.push(`OUT 7C[${r.outbound7c}]`);
-    if(r.hl) parts.push(`HL[${r.hl}]`);
-    if(r.inTeam || r.outTeam) parts.push(`TEAM ${r.inTeam || '-'} / ${r.outTeam || '-'}`);
-    return parts.join('  ');
-  }
-
-  function teamOptions(selected){
-    let html = `<option value="">TEAM</option>`;
-    for(let i=1;i<=24;i++) html += `<option value="${i}" ${String(selected||'')===String(i)?'selected':''}>${i}조</option>`;
-    return html;
-  }
-
-  function renderPreviewList(rows){
-    ensureTeamUI();
-    parsedPreviewRows = rows.slice();
-    if(!previewListEl) return;
-    if(!rows.length){ previewListEl.innerHTML = '<div class="debugCode">NO IMPORT CANDIDATE</div>'; return; }
-    previewListEl.innerHTML = rows.map((r,idx)=>{
-      const checked = (r.inTeam || r.outTeam || r.inbound7c || r.outbound7c || r.hl || r.hash) ? 'checked' : '';
-      return `<div class="previewCard" data-preview-idx="${idx}">
-        <div class="previewTop">
-          <input type="checkbox" class="previewCheck" data-role="use" ${checked}>
-          <div class="previewBody">
-            <div class="previewMain">${summarizeParsedRow(r) || 'EMPTY'}</div>
-            <div class="previewMeta">${(r.line||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-            <div class="previewGrid">
-              <input data-role="in7c" value="${r.inbound7c||''}" placeholder="INBOUND 7C">
-              <input data-role="hash" value="${r.hash||''}" placeholder="#">
-              <input data-role="out7c" value="${r.outbound7c||''}" placeholder="OUTBOUND 7C">
-              <input data-role="hl" value="${r.hl||''}" placeholder="HL">
-              <select data-role="inTeam">${teamOptions(r.inTeam)}</select>
-              <select data-role="outTeam">${teamOptions(r.outTeam)}</select>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  function collectPreviewRows(){
-    if(!previewListEl) return [];
-    return [...previewListEl.querySelectorAll('[data-preview-idx]')].map(card=>({
-      use: !!card.querySelector('[data-role="use"]')?.checked,
-      inbound7c: onlyNum(card.querySelector('[data-role="in7c"]')?.value || '',4),
-      hash: onlyNum(card.querySelector('[data-role="hash"]')?.value || '',3),
-      outbound7c: onlyNum(card.querySelector('[data-role="out7c"]')?.value || '',4),
-      hl: onlyNum(card.querySelector('[data-role="hl"]')?.value || '',4),
-      inTeam: card.querySelector('[data-role="inTeam"]')?.value || '',
-      outTeam: card.querySelector('[data-role="outTeam"]')?.value || '',
-      line: parsedPreviewRows[Number(card.getAttribute('data-preview-idx'))]?.line || ''
-    }));
-  }
-
-  function importSelectedPreview(){
-    const baseDate = getViewingDayKey();
-    const edited = collectPreviewRows();
-    const newMemos = [];
-    edited.forEach(r=>{
-      if(!r.use) return;
-      if(r.inTeam && r.outTeam && r.inTeam === r.outTeam){
-        newMemos.push(createAutoMemo(baseDate,{team:r.inTeam,hasIn:!!(r.inbound7c||r.hash),hasOut:!!(r.outbound7c||r.hl),inbound7c:r.inbound7c,outbound7c:r.outbound7c,hl:r.hl,hash:r.hash}));
-      }else{
-        if(r.inTeam && (r.inbound7c || r.hash || r.hl)) newMemos.push(createAutoMemo(baseDate,{team:r.inTeam,hasIn:true,hasOut:false,inbound7c:r.inbound7c,hl:r.hl,hash:r.hash}));
-        if(r.outTeam && (r.outbound7c || r.hl || r.hash)) newMemos.push(createAutoMemo(baseDate,{team:r.outTeam,hasIn:false,hasOut:true,outbound7c:r.outbound7c,hl:r.hl,hash:r.hash}));
-      }
-    });
-    const added = dedupeAndAppend(newMemos);
-    setDebug(`IMPORTED ${added} MEMOS`, debugTextEl?.textContent || '', debugRowsEl?.textContent || '', debugParsedEl?.textContent || '', true);
-    renderList();
-  }
-
-  function createAutoMemo(baseDate, opts){
-    const id = Date.now() + Math.floor(Math.random()*100000);
-    const m = {
-      id,
-      memoDate: baseDate,
-      dayKey: baseDate,
-      hasIn: !!opts.hasIn,
-      hasOut: !!opts.hasOut,
-      sharedHL: pad(opts.hl || '',4),
-      sharedHASH: pad(opts.hash || '',3),
-      team: opts.team || '',
-      teamLabel: teamLabel(opts.team || ''),
-      'INBOUND-7C': pad(opts.inbound7c || '',4),
-      'OUTBOUND-7C': pad(opts.outbound7c || '',4),
-      'INBOUND-STA':'','OUTBOUND-STD':'',
-      'INBOUND-t':'','INBOUND-d':'','INBOUND-bb':'','INBOUND-tt':'','INBOUND-tb':'',
-      'OUTBOUND-t':'','OUTBOUND-d':'','OUTBOUND-bb':'','OUTBOUND-tt':'','OUTBOUND-tb':'',
-      'INBOUND-cmpt1':'F','INBOUND-cmpt2':'F','INBOUND-cmpt3':'','INBOUND-cmpt4':'','INBOUND-note':'','INBOUND-TIME':'','INBOUND-EXTRAS':[],'INBOUND-LIRPHOTO':'',
-      'OUTBOUND-cmpt1':'F','OUTBOUND-cmpt2':'F','OUTBOUND-cmpt3':'','OUTBOUND-cmpt4':'','OUTBOUND-note':'','OUTBOUND-TIME':'','OUTBOUND-EXTRAS':[],'OUTBOUND-LIRPHOTO':''
-    };
-    return m;
-  }
-
-  function dedupeAndAppend(newMemos){
-    let added = 0;
-    newMemos.forEach(n=>{
-      const sig = `${n.dayKey}|${n.team}|${n.hasIn?'1':'0'}|${n.hasOut?'1':'0'}|${n['INBOUND-7C']}|${n['OUTBOUND-7C']}|${n.sharedHL}|${n.sharedHASH}`;
-      const exists = memos.some(m=> `${m.dayKey || m.memoDate}|${m.team || ''}|${m.hasIn!==false?'1':'0'}|${m.hasOut!==false?'1':'0'}|${m['INBOUND-7C']||''}|${m['OUTBOUND-7C']||''}|${m.sharedHL||''}|${m.sharedHASH||''}` === sig);
-      if(!exists){ memos.push(n); added += 1; }
-    });
-    if(added) persistAll();
-    return added;
-  }
-
-  async function recognizeVariant(variant){
-    const worker = await getWorker();
-    const ret = await worker.recognize(variant.url);
-    return ret.data || {};
-  }
-
-  async function autoScanFileFlexible(file){
-    if(ocrBusy) return;
-    ensureTeamUI();
-    ocrBusy = true;
-    topControls.classList.add('scanBusy');
-    setDebug('SCANNING...', '', '', '', true);
-    try{
-      const img = await fileToImage(file);
-      const leftV = makeProcessedVariant(img, {x:0.00, y:0.00, w:0.47, h:1.00, scale:2.8});
-      const rightV = makeProcessedVariant(img, {x:0.47, y:0.00, w:0.37, h:1.00, scale:2.8});
-      const wholeV = makeProcessedVariant(img, {x:0.00, y:0.00, w:0.84, h:1.00, scale:2.4});
-
-      const [leftData, rightData, wholeData] = await Promise.all([recognizeVariant(leftV), recognizeVariant(rightV), recognizeVariant(wholeV)]);
-      const leftLines = groupWords(leftData.words || []);
-      const rightLines = groupWords(rightData.words || []);
-      const wholeText = [leftData.text||'', rightData.text||'', wholeData.text||''].filter(Boolean).join('\n---\n');
-
-      const parsedLeft = leftLines.map(parseLeftLine).filter(Boolean);
-      const parsedRight = rightLines.map(parseRightLine).filter(Boolean);
-      let merged = sanitizeMergedRows(mergeByY(parsedLeft, parsedRight));
-
-      // fallback by splitting whole text into lines if not enough
-      if(merged.length <= 1){
-        const fallbackLines = textLinesFallback(wholeData.text || '');
-        const combo = [];
-        fallbackLines.forEach(fl=>{
-          const text = normalizeWordText(fl.text);
-          if(!/(7C|TC|HL|\d{1,2}[\/|]\d{1,2}|\b\d{1,2}\b)/i.test(text)) return;
-          combo.push({
-            y: fl.y,
-            inbound7c: '',
-            outbound7c: (text.match(/(?:7C|TC)\s*(\d{4})/i)||[])[1] || '',
-            hl: (text.match(/HL\s*(\d{4})/i)||[])[1] || '',
-            hash: findHash(text),
-            teamRaw: extractTeamRaw(text),
-            line:text
-          });
-        });
-        if(combo.length > merged.length) merged = sanitizeMergedRows(combo);
-      }
-
-      const baseDate = getViewingDayKey();
-      const newMemos = [];
-      merged.forEach(r=>{
-        if(r.inTeam && r.outTeam && r.inTeam === r.outTeam){
-          newMemos.push(createAutoMemo(baseDate, {team:r.inTeam, hasIn:!!r.inbound7c || !!r.hl, hasOut:!!r.outbound7c || !!r.hash, inbound7c:r.inbound7c, outbound7c:r.outbound7c, hl:r.hl, hash:r.hash}));
-        }else{
-          if(r.inTeam && (r.inbound7c || r.hl || r.hash)) newMemos.push(createAutoMemo(baseDate, {team:r.inTeam, hasIn:true, hasOut:false, inbound7c:r.inbound7c, hl:r.hl, hash:r.hash}));
-          if(r.outTeam && (r.outbound7c || r.hl || r.hash)) newMemos.push(createAutoMemo(baseDate, {team:r.outTeam, hasIn:false, hasOut:true, outbound7c:r.outbound7c, hl:r.hl, hash:r.hash}));
-          if(!r.inTeam && !r.outTeam && (r.outbound7c || r.hl || r.hash)) newMemos.push(createAutoMemo(baseDate, {team:(getQuickTeamSelect()?.value || ''), hasIn:false, hasOut:true, outbound7c:r.outbound7c, hl:r.hl, hash:r.hash}));
-        }
-      });
-      const added = dedupeAndAppend(newMemos);
-      renderList();
-      setDebug(`ADDED ${added} MEMOS`, wholeText, merged.map((r,i)=> `${i+1}. ${r.line || [r.inbound7c,r.outbound7c,r.hl,r.hash,r.teamRaw].filter(Boolean).join(' / ')}`).join('\n'), merged.map((r,i)=> `${i+1}. ${JSON.stringify(r)}`).join('\n'), true);
-    }catch(err){
-      console.error(err);
-      setDebug(`AUTO SCAN FAIL: ${err && err.message ? err.message : 'UNKNOWN'}`, '', '', '', true);
-    }finally{
-      ocrBusy = false;
-      topControls.classList.remove('scanBusy');
-    }
-  }
-
-  const _oldPhotoOnChange = photoInput.onchange;
-  photoInput.onchange = async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    await savePhotoFile(f);
-    await autoScanFileFlexible(f);
-  };
-
-  ensureTeamUI();
-  renderList();
-})();
 </script>
 
 </body>
