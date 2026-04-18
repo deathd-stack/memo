@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.8</title>
+<title>JAS MEMO VER 6.4.9</title>
 
 <style>
   :root{
@@ -977,43 +977,6 @@
     min-width:0;
   }
 
-
-  .cmptArea{
-    min-height:calc(54px * var(--ui));
-    height:auto;
-    overflow:hidden;
-    line-height:1.35;
-    text-transform:none;
-    text-align:left;
-    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
-  }
-
-  .noticeOverlay{
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.56);
-    z-index:140;
-    padding:20px;
-  }
-
-  .noticeBox{
-    width:min(92vw, 420px);
-    background:#17171a;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:28px;
-    padding:22px 18px;
-    box-shadow:0 22px 46px rgba(0,0,0,.34);
-  }
-
-  .noticeTitle{font-size:22px; font-weight:1000; color:#fff; text-transform:uppercase; margin-bottom:10px;}
-  .noticeText{font-size:16px; font-weight:900; color:#fff; line-height:1.5; word-break:keep-all;}
-  .noticeRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; flex-wrap:wrap;}
-  .noticeCheck{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:1000; color:#fff;}
-  .noticeCheck input{width:20px; height:20px; accent-color:var(--orange2);}
-
   @media (max-width:520px){
     .bottomLeftButtons{
       left:12px;
@@ -1050,6 +1013,18 @@
       font-size:14px;
     }
   }
+  .cmptArea{
+    width:100%;
+    min-height:calc(54px * var(--ui));
+    height:calc(54px * var(--ui));
+    resize:none;
+    overflow:hidden;
+    line-height:1.35;
+    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
+    text-align:left;
+    text-transform:uppercase;
+  }
+
 </style>
 </head>
 
@@ -1058,7 +1033,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.8</div>
+    <div class="titleVer">VER 6.4.9</div>
   </div>
 </header>
 
@@ -1190,18 +1165,6 @@
   </div>
 </div>
 
-
-<div class="noticeOverlay" id="noticeOverlay" aria-hidden="true">
-  <div class="noticeBox" onclick="event.stopPropagation()">
-    <div class="noticeTitle">수정사항</div>
-    <div class="noticeText">이제 INBOUND NOTE에 LDM 복사해서 넣으시면 자동으로 입력됩니다.</div>
-    <div class="noticeRow">
-      <label class="noticeCheck"><input type="checkbox" id="noticeHideForever"> <span>다시는 보지 않음</span></label>
-      <button type="button" class="topMiniBtn" id="noticeCloseBtn">닫기</button>
-    </div>
-  </div>
-</div>
-
 <script>
   const MEMO_KEY = "jas_memos_v64";
   const PHOTO_KEY = "jas_photo_v64";
@@ -1230,10 +1193,6 @@
 
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
-  const NOTICE_HIDE_KEY = "jas_notice_hide_v648";
-  const noticeOverlay = document.getElementById("noticeOverlay");
-  const noticeHideForever = document.getElementById("noticeHideForever");
-  const noticeCloseBtn = document.getElementById("noticeCloseBtn");
 
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
@@ -1244,159 +1203,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
-
-
-  function showNotice(){
-    if(localStorage.getItem(NOTICE_HIDE_KEY) === "1") return;
-    noticeOverlay.style.display = "flex";
-    noticeOverlay.setAttribute("aria-hidden","false");
-  }
-
-  function closeNotice(){
-    if(noticeHideForever && noticeHideForever.checked){
-      localStorage.setItem(NOTICE_HIDE_KEY, "1");
-    }
-    noticeOverlay.style.display = "none";
-    noticeOverlay.setAttribute("aria-hidden","true");
-  }
-
-  noticeCloseBtn.addEventListener("click", closeNotice);
-  noticeOverlay.addEventListener("click", (e)=>{ if(e.target === noticeOverlay) closeNotice(); });
-
-  function autoGrowField(el){
-    if(!el) return;
-    el.style.height = "auto";
-    el.style.height = Math.max(el.scrollHeight, 54) + "px";
-  }
-
-  function normalizeCommaSpace(s){
-    return s
-      .replace(/\s+,/g, ",")
-      .replace(/,\s*,/g, ", ")
-      .replace(/\s{2,}/g, " ")
-      .replace(/^\s*,\s*|\s*,\s*$/g, "")
-      .trim();
-  }
-
-  function cleanKgAndFak(text){
-    let s = String(text || "");
-    s = s.replace(/\bFAK\s*\d+\s*KG\b/gi, "");
-    s = s.replace(/\b\d+\s*KG\b/gi, "");
-    s = s.replace(/\bFAK\b\s*,?/gi, "");
-    s = s.replace(/\bNIL\b/gi, "NIL");
-    s = s.replace(/\s+-INCLUDING\s+/gi, " INCLUDING ");
-    s = normalizeCommaSpace(s);
-    s = s.replace(/,\s*INCLUDING/gi, " INCLUDING");
-    return s;
-  }
-
-  function upsertExtraRows(type, extras){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
-    if(!box) return;
-    extras.forEach(({key,val})=>{
-      if(!key || !val) return;
-      const existing = [...box.querySelectorAll(".extraRow")].find(r => (r.querySelector("select")?.value || "") === key);
-      if(existing){
-        const input = existing.querySelector("input");
-        if(input) input.value = pad(String(val),3);
-      }else{
-        box.appendChild(makeExtraRow(type, key, pad(String(val),3)));
-      }
-    });
-  }
-
-  function parseCountPair(text, keyword){
-    let sum = 0;
-    const esc = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const re1 = new RegExp("\\b" + esc + "\\b[^\\d]{0,12}(\\d+)", "gi");
-    const re2 = new RegExp("(\\d+)[^\\n]{0,12}\\b" + esc + "\\b", "gi");
-    let m;
-    while((m = re1.exec(text))) sum += Number(m[1] || 0);
-    while((m = re2.exec(text))) sum += Number(m[1] || 0);
-    return sum;
-  }
-
-  function parseLdmNoteToSection(noteEl){
-    if(!noteEl) return;
-    const type = (noteEl.dataset.k || "").startsWith("INBOUND") ? "INBOUND" : "OUTBOUND";
-    const root = noteEl.closest(`.section[data-type="${type}"]`);
-    if(!root) return;
-    const raw = noteEl.value || "";
-    if(!/CPT\s*1|CPT\s*2|CPT\s*3|CPT\s*4/i.test(raw)) return;
-
-    const lines = raw.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
-    const cmpt = {1:"",2:"",3:"",4:""};
-    let current = null;
-
-    for(const lineRaw of lines){
-      const line = lineRaw.replace(/^[-•]\s*/, "").trim();
-      const hit = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
-      if(hit){
-        current = Number(hit[1]);
-        cmpt[current] = cleanKgAndFak(hit[2] || "");
-        continue;
-      }
-      if(current && /^(INCLUDING|D\/S|WCHR|COB|G\/B|T\/S|TS|RUSH|CARSEAT|COMAT|LONGFIN|CYCLE|CREW|PCB|CGO|MAIL)\b/i.test(line)){
-        cmpt[current] = cleanKgAndFak((cmpt[current] + " " + line).trim());
-      }
-    }
-
-    for(let i=1;i<=4;i++){
-      const el = root.querySelector(`[data-k="${type}-cmpt${i}"]`);
-      if(el && cmpt[i]){
-        el.value = cmpt[i];
-        autoGrowField(el);
-      }
-    }
-
-    const bagTotal = [...raw.matchAll(/\bBAG\s*(\d+)\s*PC\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
-    const dsTotal = [...raw.matchAll(/\bD\/S\s*(\d+)\s*PCS?\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
-    const bbst = [...raw.matchAll(/\bBBST\b[^\d]{0,8}(\d+)\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
-
-    const tEl = root.querySelector(`input[data-k="${type}-t"]`);
-    const dEl = root.querySelector(`input[data-k="${type}-d"]`);
-    const bbEl = root.querySelector(`input[data-k="${type}-bb"]`);
-    if(tEl && bagTotal) tEl.value = String(bagTotal);
-    if(dEl && dsTotal) dEl.value = String(dsTotal);
-    if(bbEl && bbst) bbEl.value = String(bbst);
-
-    const extraMap = new Map();
-    const addExtra = (key, val)=>{ if(val>0) extraMap.set(key, (extraMap.get(key)||0) + val); };
-    addExtra("C", parseCountPair(raw, "CGO"));
-    addExtra("EMS", parseCountPair(raw, "MAIL"));
-    addExtra("W", parseCountPair(raw, "WCHR"));
-    addExtra("COB", parseCountPair(raw, "COB"));
-    addExtra("GB", parseCountPair(raw, "G/B"));
-    addExtra("TS", parseCountPair(raw, "T/S") + parseCountPair(raw, "TS"));
-    addExtra("RUSH", parseCountPair(raw, "RUSH"));
-    addExtra("CARSEAT", parseCountPair(raw, "CARSEAT"));
-    addExtra("COMAT", parseCountPair(raw, "COMAT"));
-    addExtra("LONGFIN", parseCountPair(raw, "LONGFIN"));
-    addExtra("CYCLE", parseCountPair(raw, "CYCLE"));
-    addExtra("CREW", parseCountPair(raw, "CREW"));
-    addExtra("PCB", parseCountPair(raw, "PCB"));
-    upsertExtraRows(type, [...extraMap.entries()].map(([key,val])=>({key,val})));
-  }
-
-  function bindSectionEnhancements(sectionEl){
-    if(!sectionEl) return;
-    sectionEl.querySelectorAll("textarea.cmptArea").forEach(el=>{
-      autoGrowField(el);
-      el.addEventListener("input", ()=> autoGrowField(el));
-    });
-    const noteArea = sectionEl.querySelector('textarea[data-k$="-note"]');
-    if(noteArea && !noteArea.dataset.ldmBound){
-      noteArea.dataset.ldmBound = "1";
-      noteArea.addEventListener("paste", ()=> setTimeout(()=> parseLdmNoteToSection(noteArea), 0));
-      noteArea.addEventListener("blur", ()=> parseLdmNoteToSection(noteArea));
-    }
-  }
-
-  function bindAllSectionEnhancements(){
-    sections.querySelectorAll('.section').forEach(bindSectionEnhancements);
-  }
+  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1711,22 +1518,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
+        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
+        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
+        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
+        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
       </div>
 
       <div class="rowGridTDBB">
@@ -1807,7 +1614,6 @@
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
-    bindSectionEnhancements(d);
     return d;
   }
 
@@ -1815,14 +1621,12 @@
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
-    bindAllSectionEnhancements();
   }
 
   function rebuildSectionsFromMemo(memoData){
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", memoData));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
-    bindAllSectionEnhancements();
   }
 
   function newMemo(){
@@ -1920,7 +1724,7 @@
       }
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
+      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
@@ -2321,7 +2125,375 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
-  showNotice();
+
+  const EXTRA_KEYS_V649 = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
+
+  function autoGrowTextarea(el){
+    if(!el) return;
+    el.style.height = "calc(54px * var(--ui))";
+    el.style.height = Math.max(el.scrollHeight, 54) + "px";
+  }
+
+  function cleanCmptSegment(seg){
+    let s = cleanTextUpper(seg || "").replace(/^[-,\s]+|[-,\s]+$/g, "");
+    if(!s) return "";
+    if(/^FAK\b/.test(s)) return "";
+
+    s = s.replace(/\b(BAG)\s+(\d+)\s*(?:PCS?|PC)\s+\d+\s*KG\b/g, "$1 $2PC");
+    s = s.replace(/\b(CGO|MAIL|POS|EMS)\s+(\d+)\s*(?:PCS?|PC)\s+\d+\s*KG\b/g, "$1 $2PC");
+    s = s.replace(/\b(WCHR|COB|G\/B|GB|TS|T\/S|RUSH|CARSEAT|COMAT|LONGFIN|CYCLE|CREW|PCB)\s+(\d+)\s*(?:PCS?|PC)\s+\d+\s*KG\b/g, "$1 $2PC");
+    s = s.replace(/\b(D\/S)\s+(\d+)\s*(?:PCS?|PC)\s+\d+\s*KG\b/g, "$1 $2PCS");
+    s = s.replace(/\s+/g, " ").trim();
+    s = s.replace(/\s+,/g, ",").replace(/,+/g, ",").replace(/,\s*,/g, ", ");
+    return s;
+  }
+
+  function parseCountByKeyword(text, keywords){
+    const arr = Array.isArray(keywords) ? keywords : [keywords];
+    let total = 0;
+    for(const kw of arr){
+      const re = new RegExp("(?:^|[^A-Z])" + kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*(\\d+)\\s*(?:PCS?|PC)\\b", "gi");
+      let m;
+      while((m = re.exec(text))){ total += Number(m[1] || 0); }
+    }
+    return total;
+  }
+
+  function parseKeywordExtra(text, patterns){
+    let total = 0;
+    for(const p of patterns){
+      const re = new RegExp("(?:^|[^A-Z])" + p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*(\\d+)\\s*(?:PCS?|PC)\\b", "gi");
+      let m;
+      while((m = re.exec(text))){ total += Number(m[1] || 0); }
+    }
+    return total;
+  }
+
+  function parseNotePayload(noteText){
+    const raw = String(noteText || "").replace(/\r/g, "");
+    const lines = raw.split("\n");
+    const cmpt = {1:"",2:"",3:"",4:""};
+    let current = 0;
+    const workingLines = [];
+
+    for(let line of lines){
+      let u = cleanTextUpper(line);
+      if(!u) continue;
+      const m = u.match(/^CPT\s*([1-4])\s*[-:–]\s*(.*)$/);
+      if(m){
+        current = Number(m[1]);
+        cmpt[current] = cleanCmptSegment(m[2]);
+        workingLines.push(u);
+        continue;
+      }
+      if(/^[-•]/.test(u) && current){
+        const addon = cleanCmptSegment(u.replace(/^[-•]+\s*/, ""));
+        if(addon){ cmpt[current] = (cmpt[current] ? cmpt[current] + " " : "") + addon; }
+        workingLines.push(u);
+      }
+    }
+
+    const joined = workingLines.join(" \n ");
+    const t = parseCountByKeyword(joined, ["BAG"]);
+    const d = parseCountByKeyword(joined, ["D/S","DS"]);
+    const bbMatch = joined.match(/\bBBST\s*(\d+)\b/i);
+    const bb = bbMatch ? Number(bbMatch[1]) : 0;
+
+    const extras = [];
+    const pushExtra = (key, val) => {
+      if(!val) return;
+      const found = extras.find(x => x.key === key);
+      if(found) found.val = String(Number(found.val || 0) + Number(val));
+      else extras.push({ key, val: String(val) });
+    };
+
+    pushExtra("C", parseKeywordExtra(joined, ["CGO"]));
+    pushExtra("EMS", parseKeywordExtra(joined, ["MAIL","POS","EMS"]));
+    pushExtra("W", parseKeywordExtra(joined, ["WCHR"]));
+    pushExtra("COB", parseKeywordExtra(joined, ["COB"]));
+    pushExtra("GB", parseKeywordExtra(joined, ["G/B","GB"]));
+    pushExtra("TS", parseKeywordExtra(joined, ["T/S","TS"]));
+    pushExtra("RUSH", parseKeywordExtra(joined, ["RUSH"]));
+    pushExtra("CARSEAT", parseKeywordExtra(joined, ["CARSEAT"]));
+    pushExtra("COMAT", parseKeywordExtra(joined, ["COMAT"]));
+    pushExtra("LONGFIN", parseKeywordExtra(joined, ["LONGFIN"]));
+    pushExtra("CYCLE", parseKeywordExtra(joined, ["CYCLE"]));
+    pushExtra("CREW", parseKeywordExtra(joined, ["CREW"]));
+    pushExtra("PCB", parseKeywordExtra(joined, ["PCB"]));
+
+    for(const k of [1,2,3,4]) cmpt[k] = cmpt[k].replace(/\s{2,}/g, " ").trim();
+
+    return { cmpt, t, d, bb, extras };
+  }
+
+  function applyParsedNoteToSection(root, type, noteText){
+    const parsed = parseNotePayload(noteText);
+    for(const n of [1,2,3,4]){
+      const el = root.querySelector(`[data-k="${type}-cmpt${n}"]`);
+      if(el && parsed.cmpt[n]){
+        el.value = parsed.cmpt[n];
+        autoGrowTextarea(el);
+      }
+    }
+    const setNum = (k, val, max) => {
+      if(!val) return;
+      const el = root.querySelector(`input[data-k="${type}-${k}"]`);
+      if(el) el.value = String(val).slice(0,max);
+    };
+    setNum("t", parsed.t, 3);
+    setNum("d", parsed.d, 2);
+    setNum("bb", parsed.bb, 2);
+
+    const box = root.querySelector(`#${type}-EXTRAS`);
+    if(box){
+      box.innerHTML = "";
+      parsed.extras.forEach(ex => box.appendChild(makeExtraRow(type, ex.key, ex.val)));
+    }
+  }
+
+  makeExtraRow = function(type, key="CREW", val=""){
+    const row = document.createElement("div");
+    row.className = "extraRow";
+    row.innerHTML = `
+      <select>
+        ${EXTRA_KEYS_V649.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
+      </select>
+      <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
+      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
+    `;
+    return row;
+  };
+
+  addExtraRow = function(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    box.appendChild(makeExtraRow(type, "CREW", ""));
+  };
+
+  makeSection = function(type, memoData){
+    const d = document.createElement("div");
+    d.className = "section";
+    d.dataset.type = type;
+
+    const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
+    const local7C = memoData ? (memoData[type+"-7C"] || "") : "";
+    const sharedHL = memoData ? (memoData.sharedHL || "") : "";
+    const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
+    const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
+    const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+
+    const cmpt1Val = memoData ? defaultF(memoData[type+"-cmpt1"]) : "F";
+    const cmpt2Val = memoData ? defaultF(memoData[type+"-cmpt2"]) : "F";
+
+    const staStdLabel = type === "INBOUND" ? "STA" : "STD";
+    const staStdKey = type === "INBOUND" ? "STA" : "STD";
+
+    d.innerHTML = `
+      <div class="sectionHead">
+        <div class="sectionTitle">${type}</div>
+        <div class="headRight">
+          <div class="staStdWrap">
+            <div class="staStdLab">${staStdLabel}</div>
+            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-${staStdKey}" value="${v(staStdKey)}">
+          </div>
+          <div class="timeWrap">
+            <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
+            <div class="timeVal" id="${type}-TIMESHOWN"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rowGrid3">
+        <div class="lab">7C</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-7C" value="${local7C}">
+        <div class="lab">HL</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HL" value="${sharedHL}">
+        <div class="lab">#</div>
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
+      </div>
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 1</div>
+        <textarea class="long cmptArea" rows="1" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
+      </div>
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 2</div>
+        <textarea class="long cmptArea" rows="1" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
+      </div>
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 3</div>
+        <textarea class="long cmptArea" rows="1" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
+      </div>
+
+      <div class="row">
+        <div class="lab" style="min-width:96px;">CMPT 4</div>
+        <textarea class="long cmptArea" rows="1" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
+      </div>
+
+      <div class="rowGridTDBB">
+        <div class="lab">T</div>
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t" value="${v("t")}">
+        <div class="lab">D</div>
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d" value="${v("d")}">
+        <div class="lab">BB</div>
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
+      </div>
+
+      ${type === "OUTBOUND" ? `
+      <div class="rowGridTTTB">
+        <div class="lab">T/T</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
+        <div class="lab">T/B</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
+      </div>
+
+      <div class="lirCalcRow">
+        <div class="lirBtns">
+          <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
+          <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
+        </div>
+        <button type="button" class="calcCircleBtn calcIconBtn" data-calc-toggle="${type}">
+          <span class="calcIcon"></span>
+        </button>
+      </div>
+      ` : ""}
+
+      <div class="extraBox">
+        <div class="extraHead">
+          <div class="extraTitle">EXTRA</div>
+          <button type="button" class="iconBtn" onclick="addExtraRow('${type}')">+</button>
+        </div>
+        <div id="${type}-EXTRAS"></div>
+      </div>
+
+      <textarea data-k="${type}-note" placeholder="NOTE (${type})">${noteV}</textarea>
+    `;
+
+    const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
+    const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
+    bindEditableTime(timeShown, savedTime);
+
+    timeBtn.addEventListener("click", ()=>{ timeShown.textContent = nowTime(); });
+    timeBtn.addEventListener("dblclick", ()=>{
+      const t = askTime(timeShown.textContent || "");
+      if(t !== null) timeShown.textContent = t;
+    });
+
+    const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
+    const lirViewBtn = d.querySelector(`[data-lir-view="${type}"]`);
+    const calcToggleBtn = d.querySelector(`[data-calc-toggle="${type}"]`);
+    if(lirAddBtn) lirAddBtn.addEventListener("click", ()=> openLirPicker(type));
+    if(lirViewBtn) lirViewBtn.addEventListener("click", ()=> viewLirPhoto(type));
+    if(calcToggleBtn) calcToggleBtn.addEventListener("click", ()=> openCalc());
+
+    const extrasBox = d.querySelector(`#${type}-EXTRAS`);
+    const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
+    extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
+
+    d.querySelectorAll('.cmptArea').forEach(el=>{
+      autoGrowTextarea(el);
+      el.addEventListener('input', ()=> autoGrowTextarea(el));
+    });
+
+    const noteEl = d.querySelector(`textarea[data-k="${type}-note"]`);
+    if(noteEl){
+      noteEl.addEventListener('paste', ()=> setTimeout(()=> applyParsedNoteToSection(d, type, noteEl.value), 0));
+      noteEl.addEventListener('input', ()=> {
+        if(/CPT\s*[1-4]\s*[-:–]/i.test(noteEl.value)) applyParsedNoteToSection(d, type, noteEl.value);
+      });
+    }
+
+    return d;
+  };
+
+  saveMemo = function(){
+    if(!pickInbound.checked && !pickOutbound.checked){
+      alert("INBOUND OR OUTBOUND SELECT");
+      return;
+    }
+
+    const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
+    data.memoDate = memoDate.value || getViewingDayKey();
+    data.dayKey = data.memoDate;
+
+    data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
+    data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
+
+    ["INBOUND","OUTBOUND"].forEach(type=>{
+      const root = sections.querySelector(`.section[data-type="${type}"]`);
+
+      if(!root){
+        data[type+"-7C"] = "";
+        data[type+"-STA"] = "";
+        data[type+"-STD"] = "";
+        data[type+"-t"] = "";
+        data[type+"-d"] = "";
+        data[type+"-bb"] = "";
+        data[type+"-tt"] = "";
+        data[type+"-tb"] = "";
+        data[type+"-cmpt1"] = "F";
+        data[type+"-cmpt2"] = "F";
+        data[type+"-cmpt3"] = "";
+        data[type+"-cmpt4"] = "";
+        data[type+"-note"] = "";
+        data[type+"-TIME"] = "";
+        data[type+"-EXTRAS"] = [];
+        data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
+        return;
+      }
+
+      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
+      const note = root.querySelector(`textarea[data-k="${type}-note"]`);
+
+      data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
+      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
+      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
+      data[type+"-t"] = pad(gi("t")?.value, 3);
+      data[type+"-d"] = pad(gi("d")?.value, 2);
+      data[type+"-bb"] = pad(gi("bb")?.value, 2);
+      data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
+      data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
+
+      data[type+"-cmpt1"] = cleanTextUpper(cm(1)?.value || "") || "F";
+      data[type+"-cmpt2"] = cleanTextUpper(cm(2)?.value || "") || "F";
+      data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
+      data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
+      data[type+"-note"] = note ? (note.value || "") : "";
+
+      const shown = document.getElementById(type+"-TIMESHOWN");
+      data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
+
+      const extras = [];
+      const box = root.querySelector(`#${type}-EXTRAS`);
+      if(box){
+        [...box.querySelectorAll(".extraRow")].forEach(r=>{
+          const key = (r.querySelector("select")?.value || "").toUpperCase();
+          const val = pad(r.querySelector("input")?.value || "", 3);
+          if(key && val) extras.push({key, val});
+        });
+      }
+      data[type+"-EXTRAS"] = extras;
+      data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
+    });
+
+    if(editId){
+      const idx = memos.findIndex(m=>m.id===editId);
+      if(idx >= 0) memos[idx] = data;
+    }else{
+      memos.push(data);
+    }
+
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    dayOffset = calcDayOffsetFromDate(data.memoDate);
+    updateDayLabel();
+    closeModal();
+    renderList(data.id);
+  };
+
 </script>
 
 </body>
