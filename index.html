@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.2</title>
+<title>JAS MEMO VER 6.4.3</title>
 
 <style>
   :root{
@@ -1021,7 +1021,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.2</div>
+    <div class="titleVer">VER 6.4.3</div>
   </div>
 </header>
 
@@ -1609,180 +1609,21 @@
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
-    wireManifestNoteParser(sections);
   }
 
   function rebuildSectionsFromMemo(memoData){
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", memoData));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
-    wireManifestNoteParser(sections);
   }
 
   function newMemo(){
     editId = null;
-  
-
-  function normalizeManifestNoteText(raw){
-    return String(raw || '')
-      .replace(/\r/g, '')
-      .replace(/[–—]/g, '-')
-      .replace(/\u00a0/g, ' ')
-      .replace(/\t/g, ' ');
-  }
-
-  function parseManifestNote(raw){
-    const text = normalizeManifestNoteText(raw);
-    const lines = text.split('\n').map(v => v.trim()).filter(Boolean);
-    const out = {
-      cmpt1: '', cmpt2: '', cmpt3: '', cmpt4: '',
-      t: null, d: null, bb: null,
-      extras: []
-    };
-    let current = null;
-    const cptRegex = /^CPT\s*([1-4])\s*-\s*(.*)$/i;
-
-    for(const line of lines){
-      const m = line.match(cptRegex);
-      if(m){
-        current = 'cmpt' + m[1];
-        out[current] = (m[2] || '').trim().replace(/\s+/g, ' ');
-        continue;
-      }
-      if(/^[-–]/.test(line) && current){
-        const extra = line.replace(/^[-–]\s*/, '').trim();
-        if(extra){
-          out[current] = (out[current] ? (out[current] + ' ' + extra) : extra).replace(/\s+/g, ' ');
-        }
-      }
-    }
-
-    const bagMatches = [...text.matchAll(/\bBAG\s+(\d+)\s*PCS?\b/gi), ...text.matchAll(/\bBAG\s+(\d+)\s*PC\b/gi)];
-    if(bagMatches.length){
-      out.t = bagMatches.reduce((s, m) => s + Number(m[1] || 0), 0);
-    }
-
-    const dsMatches = [...text.matchAll(/\bD\/?S\s+(\d+)\s*PCS?\b/gi), ...text.matchAll(/\bD\/?S\s+(\d+)\s*PC\b/gi)];
-    if(dsMatches.length){
-      out.d = dsMatches.reduce((s, m) => s + Number(m[1] || 0), 0);
-    }
-
-    const bbst = text.match(/\bBBST\s*[:\/-]?\s*(\d{1,2})\b/i);
-    if(bbst){
-      out.bb = Number(bbst[1] || 0);
-    }
-
-    const extrasMap = new Map();
-    const cgoPatterns = [
-      /\bCGO\s*[:\/-]?\s*(\d{1,3})\b/gi,
-      /\b(\d{1,3})\s*CGO\b/gi
-    ];
-    for(const re of cgoPatterns){
-      let m;
-      while((m = re.exec(text))){
-        const n = Number(m[1] || 0);
-        if(n){
-          extrasMap.set('C', (extrasMap.get('C') || 0) + n);
-        }
-      }
-    }
-
-    const mailPatterns = [
-      /\bMAIL\s*[:\/-]?\s*(\d{1,3})\b/gi,
-      /\b(\d{1,3})\s*MAIL\b/gi
-    ];
-    for(const re of mailPatterns){
-      let m;
-      while((m = re.exec(text))){
-        const n = Number(m[1] || 0);
-        if(n){
-          extrasMap.set('EMS', (extrasMap.get('EMS') || 0) + n);
-        }
-      }
-    }
-
-    out.extras = [...extrasMap.entries()].map(([key, val]) => ({ key, val: String(val) }));
-    return out;
-  }
-
-  function setInputValueAndSync(input, value){
-    if(!input) return;
-    input.value = value;
-    input.dispatchEvent(new Event('input', { bubbles:true }));
-  }
-
-  function upsertExtraRow(box, type, key, val){
-    if(!box || !key || !val) return;
-    const rows = [...box.querySelectorAll('.extraRow')];
-    let found = null;
-    for(const row of rows){
-      const s = row.querySelector('select');
-      if((s?.value || '').toUpperCase() === key.toUpperCase()){
-        found = row;
-        break;
-      }
-    }
-    if(!found){
-      found = makeExtraRow(type, key.toUpperCase(), String(val));
-      box.appendChild(found);
-      return;
-    }
-    const input = found.querySelector('input');
-    if(input){
-      const cur = Number((input.value || '0').replace(/[^0-9]/g, '') || 0);
-      const next = Number(val || 0);
-      input.value = String(cur + next).slice(0,3);
-      input.dispatchEvent(new Event('input', { bubbles:true }));
-    }
-  }
-
-  function applyParsedManifestToSection(type, noteText){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
-    const parsed = parseManifestNote(noteText);
-
-    const cm1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
-    const cm2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
-    const cm3 = root.querySelector(`input[data-k="${type}-cmpt3"]`);
-    const cm4 = root.querySelector(`input[data-k="${type}-cmpt4"]`);
-    if(parsed.cmpt1) cm1.value = parsed.cmpt1;
-    if(parsed.cmpt2) cm2.value = parsed.cmpt2;
-    if(parsed.cmpt3) cm3.value = parsed.cmpt3;
-    if(parsed.cmpt4) cm4.value = parsed.cmpt4;
-
-    if(parsed.t !== null) setInputValueAndSync(root.querySelector(`input[data-k="${type}-t"]`), String(parsed.t));
-    if(parsed.d !== null) setInputValueAndSync(root.querySelector(`input[data-k="${type}-d"]`), String(parsed.d));
-    if(parsed.bb !== null) setInputValueAndSync(root.querySelector(`input[data-k="${type}-bb"]`), String(parsed.bb));
-
-    const extraBox = root.querySelector(`#${type}-EXTRAS`);
-    for(const ex of parsed.extras){
-      upsertExtraRow(extraBox, type, ex.key, ex.val);
-    }
-  }
-
-  function wireManifestNoteParser(scope){
-    const host = scope || document;
-    host.querySelectorAll('textarea[data-k$="-note"]').forEach(area => {
-      if(area.dataset.manifestBound === '1') return;
-      area.dataset.manifestBound = '1';
-      const handler = () => {
-        const key = area.dataset.k || '';
-        const type = key.startsWith('INBOUND-') ? 'INBOUND' : (key.startsWith('OUTBOUND-') ? 'OUTBOUND' : '');
-        if(!type) return;
-        applyParsedManifestToSection(type, area.value || '');
-      };
-      area.addEventListener('paste', () => setTimeout(handler, 0));
-      area.addEventListener('change', handler);
-      area.addEventListener('blur', handler);
-    });
-  }
-
-  memoDate.value = getViewingDayKey();
+    memoDate.value = getViewingDayKey();
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
     buildSectionsBlank();
-    wireManifestNoteParser(sections);
     openModal();
   }
 
@@ -2005,7 +1846,6 @@
       OUTBOUND: m["OUTBOUND-LIRPHOTO"] || ""
     };
     rebuildSectionsFromMemo(m);
-    wireManifestNoteParser(sections);
 
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
@@ -2273,6 +2113,126 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
+
+  function normalizeNoteLine(line){
+    return (line || '').replace(/\s+/g,' ').trim();
+  }
+
+  function extractFirstInt(text){
+    const m = String(text || '').match(/(\d{1,4})/);
+    return m ? String(parseInt(m[1], 10)) : "";
+  }
+
+  function upsertExtraByKey(root, type, key, val){
+    if(!root) return;
+    const box = root.querySelector(`#${type}-EXTRAS`);
+    if(!box) return;
+    const rows = [...box.querySelectorAll('.extraRow')];
+    let row = rows.find(r => (r.querySelector('select')?.value || '').toUpperCase() === key);
+    if(!row){
+      row = makeExtraRow(type, key, val || "");
+      box.appendChild(row);
+    }
+    const input = row.querySelector('input');
+    if(input && val){
+      input.value = onlyNum(val, 3);
+      input.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+  }
+
+  function appendContinuation(targets, lastKey, line){
+    if(!lastKey || !targets[lastKey]) return;
+    const clean = normalizeNoteLine(line).replace(/^[-–—]\s*/, '');
+    if(!clean) return;
+    targets[lastKey].value = [targets[lastKey].value.trim(), clean].filter(Boolean).join(' ');
+  }
+
+  function parseNoteIntoSection(root, type, noteText){
+    if(!root) return;
+    const cmpt1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
+    const cmpt2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
+    const cmpt3 = root.querySelector(`input[data-k="${type}-cmpt3"]`);
+    const cmpt4 = root.querySelector(`input[data-k="${type}-cmpt4"]`);
+    const tInput = root.querySelector(`input[data-k="${type}-t"]`);
+    const dInput = root.querySelector(`input[data-k="${type}-d"]`);
+    const bbInput = root.querySelector(`input[data-k="${type}-bb"]`);
+    const targets = { CPT1: cmpt1, CPT2: cmpt2, CPT3: cmpt3, CPT4: cmpt4 };
+    const raw = String(noteText || '').replace(/\r/g, '');
+    const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    let lastKey = '';
+
+    for(const line of lines){
+      const normalized = normalizeNoteLine(line);
+      const cptMatch = normalized.match(/^CPT\s*([1-4])\s*[-:]\s*(.*)$/i);
+      if(cptMatch){
+        const key = `CPT${cptMatch[1]}`;
+        const value = normalizeNoteLine(cptMatch[2]);
+        if(targets[key] && value){
+          targets[key].value = value.toUpperCase();
+        }
+        lastKey = key;
+        continue;
+      }
+      if(/^[-–—]/.test(normalized)){
+        appendContinuation(targets, lastKey, normalized);
+      }
+    }
+
+    const bagMatches = [...raw.matchAll(/BAG\s+(\d+)\s*PC/gi)];
+    const bagTotal = bagMatches.reduce((sum, m) => sum + parseInt(m[1], 10), 0);
+    if(tInput && bagTotal > 0){
+      tInput.value = String(bagTotal);
+      tInput.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+
+    const dsMatches = [...raw.matchAll(/D\/?S\s+(\d+)\s*PCS?/gi)];
+    const dsTotal = dsMatches.reduce((sum, m) => sum + parseInt(m[1], 10), 0);
+    if(dInput && dsTotal > 0){
+      dInput.value = String(dsTotal);
+      dInput.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+
+    const bbst = raw.match(/BBST\s*[:/\-]?\s*(\d+)/i);
+    if(bbInput && bbst){
+      bbInput.value = String(parseInt(bbst[1], 10));
+      bbInput.dispatchEvent(new Event('input', { bubbles:true }));
+    }
+
+    const cgo1 = raw.match(/CGO\s*[:/\-]?\s*(\d+)/i);
+    const cgo2 = raw.match(/(\d+)\s*CGO/i);
+    const cgoVal = cgo1 ? cgo1[1] : (cgo2 ? cgo2[1] : '');
+    if(cgoVal) upsertExtraByKey(root, type, 'C', cgoVal);
+
+    const mail1 = raw.match(/MAIL\s*[:/\-]?\s*(\d+)/i);
+    const mail2 = raw.match(/(\d+)\s*MAIL/i);
+    const mailVal = mail1 ? mail1[1] : (mail2 ? mail2[1] : '');
+    if(mailVal) upsertExtraByKey(root, type, 'EMS', mailVal);
+  }
+
+  let noteParseTimer = null;
+  sections.addEventListener('input', (e)=>{
+    const t = e.target;
+    if(!(t instanceof HTMLTextAreaElement)) return;
+    const key = t.dataset.k || '';
+    const m = key.match(/^(INBOUND|OUTBOUND)-note$/);
+    if(!m) return;
+    const type = m[1];
+    const root = t.closest(`.section[data-type="${type}"]`);
+    clearTimeout(noteParseTimer);
+    noteParseTimer = setTimeout(()=> parseNoteIntoSection(root, type, t.value), 0);
+  });
+
+  sections.addEventListener('paste', (e)=>{
+    const t = e.target;
+    if(!(t instanceof HTMLTextAreaElement)) return;
+    const key = t.dataset.k || '';
+    const m = key.match(/^(INBOUND|OUTBOUND)-note$/);
+    if(!m) return;
+    const type = m[1];
+    const root = t.closest(`.section[data-type="${type}"]`);
+    setTimeout(()=> parseNoteIntoSection(root, type, t.value), 0);
+  });
+
 </script>
 
 </body>
