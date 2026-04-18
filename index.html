@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.5</title>
+<title>JAS MEMO VER 6.4.6</title>
 
 <style>
   :root{
@@ -1031,37 +1031,37 @@
   .noticeOverlay{
     position:fixed;
     inset:0;
-    background:rgba(0,0,0,.55);
+    background:rgba(0,0,0,.5);
     display:none;
     align-items:center;
     justify-content:center;
-    z-index:160;
+    z-index:200;
     padding:20px;
   }
 
   .noticeOverlay.show{display:flex;}
 
   .noticeCard{
-    width:min(92vw, calc(520px * var(--ui) / .715));
-    background:linear-gradient(180deg, rgba(34,34,38,.98), rgba(24,24,27,.98));
+    width:min(92vw, calc(520px * var(--ui) / .65));
+    background:#19191d;
     border:1px solid rgba(255,255,255,.08);
     border-radius:calc(28px * var(--ui));
-    box-shadow:0 24px 50px rgba(0,0,0,.34);
-    padding:calc(18px * var(--ui));
-    color:#fff;
+    box-shadow:0 24px 48px rgba(0,0,0,.34);
+    padding:calc(20px * var(--ui));
   }
 
   .noticeTitle{
-    font-size:calc(22px * var(--ui));
+    font-size:calc(24px * var(--ui));
     font-weight:1000;
+    color:#fff;
     text-transform:uppercase;
-    margin-bottom:calc(12px * var(--ui));
+    margin-bottom:calc(10px * var(--ui));
   }
 
   .noticeBody{
     font-size:calc(16px * var(--ui));
     line-height:1.5;
-    color:#f5f5f7;
+    color:#fff;
     margin-bottom:calc(16px * var(--ui));
     white-space:pre-line;
   }
@@ -1070,27 +1070,27 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:12px;
+    gap:calc(12px * var(--ui));
     flex-wrap:wrap;
   }
 
   .noticeCheck{
     display:flex;
     align-items:center;
-    gap:10px;
+    gap:calc(8px * var(--ui));
     color:#fff;
     font-size:calc(14px * var(--ui));
     font-weight:1000;
   }
 
   .noticeCheck input{
-    width:20px;
-    height:20px;
+    width:calc(20px * var(--ui));
+    height:calc(20px * var(--ui));
     accent-color:var(--orange2);
   }
 
   .noticeCloseBtn{
-    min-width:calc(120px * var(--ui));
+    min-width:calc(100px * var(--ui));
   }
 
 </style>
@@ -1101,7 +1101,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.5</div>
+    <div class="titleVer">VER 6.4.6</div>
   </div>
 </header>
 
@@ -2371,7 +2371,38 @@
     document.querySelectorAll('.cmptArea').forEach(autoGrowCmpt);
   }, 0);
 
+
+
+  const NOTICE_KEY = "jas_notice_hide_v646";
+
+  function initNoticePopup(){
+    const noticeOverlay = document.getElementById("noticeOverlay");
+    const noticeHideForever = document.getElementById("noticeHideForever");
+    const noticeCloseBtn = document.getElementById("noticeCloseBtn");
+    if(!noticeOverlay || !noticeHideForever || !noticeCloseBtn) return;
+
+    const hidden = localStorage.getItem(NOTICE_KEY) === "1";
+    if(!hidden){
+      setTimeout(()=>{
+        noticeOverlay.classList.add("show");
+      }, 120);
+    }
+
+    const closeNotice = ()=>{
+      if(noticeHideForever.checked){
+        localStorage.setItem(NOTICE_KEY, "1");
+      }
+      noticeOverlay.classList.remove("show");
+    };
+
+    noticeCloseBtn.addEventListener("click", closeNotice);
+    noticeOverlay.addEventListener("click", closeNotice);
+  }
+
+  setTimeout(initNoticePopup, 0);
+
 </script>
+
 
 
 <div class="noticeOverlay" id="noticeOverlay">
