@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.6</title>
+<title>JAS MEMO VER 6.4.8</title>
 
 <style>
   :root{
@@ -666,19 +666,6 @@
     text-align:left;
   }
 
-  .cmptArea{
-    width:100%;
-    min-height:calc(54px * var(--ui));
-    height:auto;
-    resize:none;
-    overflow:hidden;
-    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
-    text-align:left;
-    line-height:1.35;
-    text-transform:uppercase;
-    border-radius:calc(22px * var(--ui));
-  }
-
   .extraBox{
     background:#18181b;
     border:2px solid #27272c;
@@ -990,6 +977,43 @@
     min-width:0;
   }
 
+
+  .cmptArea{
+    min-height:calc(54px * var(--ui));
+    height:auto;
+    overflow:hidden;
+    line-height:1.35;
+    text-transform:none;
+    text-align:left;
+    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
+  }
+
+  .noticeOverlay{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.56);
+    z-index:140;
+    padding:20px;
+  }
+
+  .noticeBox{
+    width:min(92vw, 420px);
+    background:#17171a;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:28px;
+    padding:22px 18px;
+    box-shadow:0 22px 46px rgba(0,0,0,.34);
+  }
+
+  .noticeTitle{font-size:22px; font-weight:1000; color:#fff; text-transform:uppercase; margin-bottom:10px;}
+  .noticeText{font-size:16px; font-weight:900; color:#fff; line-height:1.5; word-break:keep-all;}
+  .noticeRow{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; flex-wrap:wrap;}
+  .noticeCheck{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:1000; color:#fff;}
+  .noticeCheck input{width:20px; height:20px; accent-color:var(--orange2);}
+
   @media (max-width:520px){
     .bottomLeftButtons{
       left:12px;
@@ -1026,73 +1050,6 @@
       font-size:14px;
     }
   }
-
-
-  .noticeOverlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.5);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:200;
-    padding:20px;
-  }
-
-  .noticeOverlay.show{display:flex;}
-
-  .noticeCard{
-    width:min(92vw, calc(520px * var(--ui) / .65));
-    background:#19191d;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:calc(28px * var(--ui));
-    box-shadow:0 24px 48px rgba(0,0,0,.34);
-    padding:calc(20px * var(--ui));
-  }
-
-  .noticeTitle{
-    font-size:calc(24px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-    margin-bottom:calc(10px * var(--ui));
-  }
-
-  .noticeBody{
-    font-size:calc(16px * var(--ui));
-    line-height:1.5;
-    color:#fff;
-    margin-bottom:calc(16px * var(--ui));
-    white-space:pre-line;
-  }
-
-  .noticeActions{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(12px * var(--ui));
-    flex-wrap:wrap;
-  }
-
-  .noticeCheck{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    color:#fff;
-    font-size:calc(14px * var(--ui));
-    font-weight:1000;
-  }
-
-  .noticeCheck input{
-    width:calc(20px * var(--ui));
-    height:calc(20px * var(--ui));
-    accent-color:var(--orange2);
-  }
-
-  .noticeCloseBtn{
-    min-width:calc(100px * var(--ui));
-  }
-
 </style>
 </head>
 
@@ -1101,7 +1058,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.6</div>
+    <div class="titleVer">VER 6.4.8</div>
   </div>
 </header>
 
@@ -1233,6 +1190,18 @@
   </div>
 </div>
 
+
+<div class="noticeOverlay" id="noticeOverlay" aria-hidden="true">
+  <div class="noticeBox" onclick="event.stopPropagation()">
+    <div class="noticeTitle">수정사항</div>
+    <div class="noticeText">이제 INBOUND NOTE에 LDM 복사해서 넣으시면 자동으로 입력됩니다.</div>
+    <div class="noticeRow">
+      <label class="noticeCheck"><input type="checkbox" id="noticeHideForever"> <span>다시는 보지 않음</span></label>
+      <button type="button" class="topMiniBtn" id="noticeCloseBtn">닫기</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const MEMO_KEY = "jas_memos_v64";
   const PHOTO_KEY = "jas_photo_v64";
@@ -1261,6 +1230,10 @@
 
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
+  const NOTICE_HIDE_KEY = "jas_notice_hide_v648";
+  const noticeOverlay = document.getElementById("noticeOverlay");
+  const noticeHideForever = document.getElementById("noticeHideForever");
+  const noticeCloseBtn = document.getElementById("noticeCloseBtn");
 
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
@@ -1272,6 +1245,158 @@
   let activeCalcInput = null;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
+
+
+  function showNotice(){
+    if(localStorage.getItem(NOTICE_HIDE_KEY) === "1") return;
+    noticeOverlay.style.display = "flex";
+    noticeOverlay.setAttribute("aria-hidden","false");
+  }
+
+  function closeNotice(){
+    if(noticeHideForever && noticeHideForever.checked){
+      localStorage.setItem(NOTICE_HIDE_KEY, "1");
+    }
+    noticeOverlay.style.display = "none";
+    noticeOverlay.setAttribute("aria-hidden","true");
+  }
+
+  noticeCloseBtn.addEventListener("click", closeNotice);
+  noticeOverlay.addEventListener("click", (e)=>{ if(e.target === noticeOverlay) closeNotice(); });
+
+  function autoGrowField(el){
+    if(!el) return;
+    el.style.height = "auto";
+    el.style.height = Math.max(el.scrollHeight, 54) + "px";
+  }
+
+  function normalizeCommaSpace(s){
+    return s
+      .replace(/\s+,/g, ",")
+      .replace(/,\s*,/g, ", ")
+      .replace(/\s{2,}/g, " ")
+      .replace(/^\s*,\s*|\s*,\s*$/g, "")
+      .trim();
+  }
+
+  function cleanKgAndFak(text){
+    let s = String(text || "");
+    s = s.replace(/\bFAK\s*\d+\s*KG\b/gi, "");
+    s = s.replace(/\b\d+\s*KG\b/gi, "");
+    s = s.replace(/\bFAK\b\s*,?/gi, "");
+    s = s.replace(/\bNIL\b/gi, "NIL");
+    s = s.replace(/\s+-INCLUDING\s+/gi, " INCLUDING ");
+    s = normalizeCommaSpace(s);
+    s = s.replace(/,\s*INCLUDING/gi, " INCLUDING");
+    return s;
+  }
+
+  function upsertExtraRows(type, extras){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    extras.forEach(({key,val})=>{
+      if(!key || !val) return;
+      const existing = [...box.querySelectorAll(".extraRow")].find(r => (r.querySelector("select")?.value || "") === key);
+      if(existing){
+        const input = existing.querySelector("input");
+        if(input) input.value = pad(String(val),3);
+      }else{
+        box.appendChild(makeExtraRow(type, key, pad(String(val),3)));
+      }
+    });
+  }
+
+  function parseCountPair(text, keyword){
+    let sum = 0;
+    const esc = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re1 = new RegExp("\\b" + esc + "\\b[^\\d]{0,12}(\\d+)", "gi");
+    const re2 = new RegExp("(\\d+)[^\\n]{0,12}\\b" + esc + "\\b", "gi");
+    let m;
+    while((m = re1.exec(text))) sum += Number(m[1] || 0);
+    while((m = re2.exec(text))) sum += Number(m[1] || 0);
+    return sum;
+  }
+
+  function parseLdmNoteToSection(noteEl){
+    if(!noteEl) return;
+    const type = (noteEl.dataset.k || "").startsWith("INBOUND") ? "INBOUND" : "OUTBOUND";
+    const root = noteEl.closest(`.section[data-type="${type}"]`);
+    if(!root) return;
+    const raw = noteEl.value || "";
+    if(!/CPT\s*1|CPT\s*2|CPT\s*3|CPT\s*4/i.test(raw)) return;
+
+    const lines = raw.split(/\r?\n/).map(v => v.trim()).filter(Boolean);
+    const cmpt = {1:"",2:"",3:"",4:""};
+    let current = null;
+
+    for(const lineRaw of lines){
+      const line = lineRaw.replace(/^[-•]\s*/, "").trim();
+      const hit = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
+      if(hit){
+        current = Number(hit[1]);
+        cmpt[current] = cleanKgAndFak(hit[2] || "");
+        continue;
+      }
+      if(current && /^(INCLUDING|D\/S|WCHR|COB|G\/B|T\/S|TS|RUSH|CARSEAT|COMAT|LONGFIN|CYCLE|CREW|PCB|CGO|MAIL)\b/i.test(line)){
+        cmpt[current] = cleanKgAndFak((cmpt[current] + " " + line).trim());
+      }
+    }
+
+    for(let i=1;i<=4;i++){
+      const el = root.querySelector(`[data-k="${type}-cmpt${i}"]`);
+      if(el && cmpt[i]){
+        el.value = cmpt[i];
+        autoGrowField(el);
+      }
+    }
+
+    const bagTotal = [...raw.matchAll(/\bBAG\s*(\d+)\s*PC\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
+    const dsTotal = [...raw.matchAll(/\bD\/S\s*(\d+)\s*PCS?\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
+    const bbst = [...raw.matchAll(/\bBBST\b[^\d]{0,8}(\d+)\b/gi)].reduce((a,m)=>a+Number(m[1]||0),0);
+
+    const tEl = root.querySelector(`input[data-k="${type}-t"]`);
+    const dEl = root.querySelector(`input[data-k="${type}-d"]`);
+    const bbEl = root.querySelector(`input[data-k="${type}-bb"]`);
+    if(tEl && bagTotal) tEl.value = String(bagTotal);
+    if(dEl && dsTotal) dEl.value = String(dsTotal);
+    if(bbEl && bbst) bbEl.value = String(bbst);
+
+    const extraMap = new Map();
+    const addExtra = (key, val)=>{ if(val>0) extraMap.set(key, (extraMap.get(key)||0) + val); };
+    addExtra("C", parseCountPair(raw, "CGO"));
+    addExtra("EMS", parseCountPair(raw, "MAIL"));
+    addExtra("W", parseCountPair(raw, "WCHR"));
+    addExtra("COB", parseCountPair(raw, "COB"));
+    addExtra("GB", parseCountPair(raw, "G/B"));
+    addExtra("TS", parseCountPair(raw, "T/S") + parseCountPair(raw, "TS"));
+    addExtra("RUSH", parseCountPair(raw, "RUSH"));
+    addExtra("CARSEAT", parseCountPair(raw, "CARSEAT"));
+    addExtra("COMAT", parseCountPair(raw, "COMAT"));
+    addExtra("LONGFIN", parseCountPair(raw, "LONGFIN"));
+    addExtra("CYCLE", parseCountPair(raw, "CYCLE"));
+    addExtra("CREW", parseCountPair(raw, "CREW"));
+    addExtra("PCB", parseCountPair(raw, "PCB"));
+    upsertExtraRows(type, [...extraMap.entries()].map(([key,val])=>({key,val})));
+  }
+
+  function bindSectionEnhancements(sectionEl){
+    if(!sectionEl) return;
+    sectionEl.querySelectorAll("textarea.cmptArea").forEach(el=>{
+      autoGrowField(el);
+      el.addEventListener("input", ()=> autoGrowField(el));
+    });
+    const noteArea = sectionEl.querySelector('textarea[data-k$="-note"]');
+    if(noteArea && !noteArea.dataset.ldmBound){
+      noteArea.dataset.ldmBound = "1";
+      noteArea.addEventListener("paste", ()=> setTimeout(()=> parseLdmNoteToSection(noteArea), 0));
+      noteArea.addEventListener("blur", ()=> parseLdmNoteToSection(noteArea));
+    }
+  }
+
+  function bindAllSectionEnhancements(){
+    sections.querySelectorAll('.section').forEach(bindSectionEnhancements);
+  }
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1586,22 +1711,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
+        <textarea class="long cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
+        <textarea class="long cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
+        <textarea class="long cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
+        <textarea class="long cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
       </div>
 
       <div class="rowGridTDBB">
@@ -1682,6 +1807,7 @@
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
+    bindSectionEnhancements(d);
     return d;
   }
 
@@ -1689,12 +1815,14 @@
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
+    bindAllSectionEnhancements();
   }
 
   function rebuildSectionsFromMemo(memoData){
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", memoData));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
+    bindAllSectionEnhancements();
   }
 
   function newMemo(){
@@ -1792,7 +1920,7 @@
       }
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
+      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
@@ -2193,231 +2321,8 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
-
-  function normalizeNoteLine(line){
-    return (line || '').replace(/\s+/g,' ').trim();
-  }
-
-  function extractFirstInt(text){
-    const m = String(text || '').match(/(\d{1,4})/);
-    return m ? String(parseInt(m[1], 10)) : "";
-  }
-
-  function upsertExtraByKey(root, type, key, val){
-    if(!root) return;
-    const box = root.querySelector(`#${type}-EXTRAS`);
-    if(!box) return;
-    const rows = [...box.querySelectorAll('.extraRow')];
-    let row = rows.find(r => (r.querySelector('select')?.value || '').toUpperCase() === key);
-    if(!row){
-      row = makeExtraRow(type, key, val || "");
-      box.appendChild(row);
-    }
-    const input = row.querySelector('input');
-    if(input && val){
-      input.value = onlyNum(val, 3);
-      input.dispatchEvent(new Event('input', { bubbles:true }));
-    }
-  }
-
-  function appendContinuation(targets, lastKey, line){
-    if(!lastKey || !targets[lastKey]) return;
-    const clean = normalizeNoteLine(line).replace(/^[-–—]\s*/, '');
-    if(!clean) return;
-    targets[lastKey].value = [targets[lastKey].value.trim(), clean].filter(Boolean).join(' ');
-  }
-
-  function autoGrowCmpt(area){
-    if(!(area instanceof HTMLTextAreaElement)) return;
-    area.style.height = 'auto';
-    area.style.height = Math.max(area.scrollHeight, 54) + 'px';
-  }
-
-  function setFieldValue(el, value){
-    if(!el) return;
-    el.value = (value || '').toUpperCase().trim();
-    if(el instanceof HTMLTextAreaElement) autoGrowCmpt(el);
-    el.dispatchEvent(new Event('input', { bubbles:true }));
-  }
-
-  function cleanCargoText(value){
-    let s = normalizeNoteLine(value).toUpperCase();
-    s = s.replace(/FAK\s*\d+\s*KG/gi, '');
-    s = s.replace(/(\d+)\s*KG/gi, '');
-    s = s.replace(/\s+,/g, ',');
-    s = s.replace(/,\s*,+/g, ', ');
-    s = s.replace(/\s{2,}/g, ' ');
-    s = s.replace(/(^[\s,]+|[\s,]+$)/g, '');
-    s = s.replace(/,\s*$/g, '');
-    return s.trim();
-  }
-
-  function findKeywordCount(raw, patterns){
-    for(const re of patterns){
-      const m = raw.match(re);
-      if(m) return String(parseInt(m[1], 10));
-    }
-    return '';
-  }
-
-  function parseNoteIntoSection(root, type, noteText){
-    if(!root) return;
-    const cmpt1 = root.querySelector(`textarea[data-k="${type}-cmpt1"], input[data-k="${type}-cmpt1"]`);
-    const cmpt2 = root.querySelector(`textarea[data-k="${type}-cmpt2"], input[data-k="${type}-cmpt2"]`);
-    const cmpt3 = root.querySelector(`textarea[data-k="${type}-cmpt3"], input[data-k="${type}-cmpt3"]`);
-    const cmpt4 = root.querySelector(`textarea[data-k="${type}-cmpt4"], input[data-k="${type}-cmpt4"]`);
-    const tInput = root.querySelector(`input[data-k="${type}-t"]`);
-    const dInput = root.querySelector(`input[data-k="${type}-d"]`);
-    const bbInput = root.querySelector(`input[data-k="${type}-bb"]`);
-    const targets = { CPT1: cmpt1, CPT2: cmpt2, CPT3: cmpt3, CPT4: cmpt4 };
-    const raw = String(noteText || '').replace(/
-/g, '');
-    const lines = raw.split('
-').map(s => s.trim()).filter(Boolean);
-    let lastKey = '';
-
-    for(const line of lines){
-      const normalized = normalizeNoteLine(line);
-      const cptMatch = normalized.match(/^CPT\s*([1-4])\s*[-:]\s*(.*)$/i);
-      if(cptMatch){
-        const key = `CPT${cptMatch[1]}`;
-        const value = cleanCargoText(cptMatch[2]);
-        if(targets[key]) setFieldValue(targets[key], value);
-        lastKey = key;
-        continue;
-      }
-      if(/^[-–—]/.test(normalized)){
-        if(!lastKey || !targets[lastKey]) continue;
-        const clean = cleanCargoText(normalized.replace(/^[-–—]\s*/, ''));
-        const merged = [targets[lastKey].value.trim(), clean].filter(Boolean).join(' ');
-        setFieldValue(targets[lastKey], merged);
-      }
-    }
-
-    const bagMatches = [...raw.matchAll(/BAG\s+(\d+)\s*PC/gi)];
-    const bagTotal = bagMatches.reduce((sum, m) => sum + parseInt(m[1], 10), 0);
-    if(tInput && bagTotal > 0){
-      tInput.value = String(bagTotal);
-      tInput.dispatchEvent(new Event('input', { bubbles:true }));
-    }
-
-    const dsMatches = [...raw.matchAll(/D\/?S\s+(\d+)\s*PCS?/gi)];
-    const dsTotal = dsMatches.reduce((sum, m) => sum + parseInt(m[1], 10), 0);
-    if(dInput && dsTotal > 0){
-      dInput.value = String(dsTotal);
-      dInput.dispatchEvent(new Event('input', { bubbles:true }));
-    }
-
-    const bbst = raw.match(/BBST\s*[:/\-]?\s*(\d+)/i);
-    if(bbInput && bbst){
-      bbInput.value = String(parseInt(bbst[1], 10));
-      bbInput.dispatchEvent(new Event('input', { bubbles:true }));
-    }
-
-    const extraRules = [
-      ['C', [/CGO\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CGO/i]],
-      ['EMS', [/MAIL\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*MAIL/i]],
-      ['W', [/WCHR\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*WCHR/i]],
-      ['COB', [/COB\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*COB/i]],
-      ['GB', [/G\/B\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*G\/B/i]],
-      ['TS', [/(?:T\/S|TS)\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*(?:T\/S|TS)/i]],
-      ['RUSH', [/RUSH\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*RUSH/i]],
-      ['CARSEAT', [/CARSEAT\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CARSEAT/i]],
-      ['COMAT', [/COMAT\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*COMAT/i]],
-      ['LONGFIN', [/LONGFIN\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*LONGFIN/i]],
-      ['CYCLE', [/CYCLE\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CYCLE/i]],
-      ['CREW', [/CREW\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CREW/i]],
-      ['PCB', [/PCB\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*PCB/i]],
-    ];
-
-    for(const [key, patterns] of extraRules){
-      const val = findKeywordCount(raw, patterns);
-      if(val) upsertExtraByKey(root, type, key, val);
-    }
-  }
-
-  let noteParseTimer = null;
-  sections.addEventListener('input', (e)=>{
-    const t = e.target;
-    if(!(t instanceof HTMLTextAreaElement)) return;
-    const key = t.dataset.k || '';
-    const m = key.match(/^(INBOUND|OUTBOUND)-note$/);
-    if(!m) return;
-    const type = m[1];
-    const root = t.closest(`.section[data-type="${type}"]`);
-    clearTimeout(noteParseTimer);
-    noteParseTimer = setTimeout(()=> parseNoteIntoSection(root, type, t.value), 0);
-  });
-
-  sections.addEventListener('paste', (e)=>{
-    const t = e.target;
-    if(!(t instanceof HTMLTextAreaElement)) return;
-    const key = t.dataset.k || '';
-    const m = key.match(/^(INBOUND|OUTBOUND)-note$/);
-    if(!m) return;
-    const type = m[1];
-    const root = t.closest(`.section[data-type="${type}"]`);
-    setTimeout(()=> parseNoteIntoSection(root, type, t.value), 0);
-  });
-
-  sections.addEventListener('input', (e)=>{
-    const t = e.target;
-    if(t instanceof HTMLTextAreaElement && t.classList.contains('cmptArea')){
-      autoGrowCmpt(t);
-    }
-  });
-
-  setTimeout(()=>{
-    document.querySelectorAll('.cmptArea').forEach(autoGrowCmpt);
-  }, 0);
-
-
-
-  const NOTICE_KEY = "jas_notice_hide_v646";
-
-  function initNoticePopup(){
-    const noticeOverlay = document.getElementById("noticeOverlay");
-    const noticeHideForever = document.getElementById("noticeHideForever");
-    const noticeCloseBtn = document.getElementById("noticeCloseBtn");
-    if(!noticeOverlay || !noticeHideForever || !noticeCloseBtn) return;
-
-    const hidden = localStorage.getItem(NOTICE_KEY) === "1";
-    if(!hidden){
-      setTimeout(()=>{
-        noticeOverlay.classList.add("show");
-      }, 120);
-    }
-
-    const closeNotice = ()=>{
-      if(noticeHideForever.checked){
-        localStorage.setItem(NOTICE_KEY, "1");
-      }
-      noticeOverlay.classList.remove("show");
-    };
-
-    noticeCloseBtn.addEventListener("click", closeNotice);
-    noticeOverlay.addEventListener("click", closeNotice);
-  }
-
-  setTimeout(initNoticePopup, 0);
-
+  showNotice();
 </script>
-
-
-
-<div class="noticeOverlay" id="noticeOverlay">
-  <div class="noticeCard" onclick="event.stopPropagation()">
-    <div class="noticeTitle">수정사항</div>
-    <div class="noticeBody">이제 INBOUND NOTE에 LDM 복사해서 넣으시면 자동으로 입력됩니다.</div>
-    <div class="noticeActions">
-      <label class="noticeCheck">
-        <input type="checkbox" id="noticeHideForever">
-        <span>다시는 보지 않음</span>
-      </label>
-      <button type="button" class="noticeCloseBtn" id="noticeCloseBtn">닫기</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
