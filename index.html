@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.3</title>
+<title>JAS MEMO VER 6.4.4</title>
 
 <style>
   :root{
@@ -666,6 +666,19 @@
     text-align:left;
   }
 
+  .cmptArea{
+    width:100%;
+    min-height:calc(54px * var(--ui));
+    height:auto;
+    resize:none;
+    overflow:hidden;
+    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
+    text-align:left;
+    line-height:1.35;
+    text-transform:uppercase;
+    border-radius:calc(22px * var(--ui));
+  }
+
   .extraBox{
     background:#18181b;
     border:2px solid #27272c;
@@ -1021,7 +1034,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.3</div>
+    <div class="titleVer">VER 6.4.4</div>
   </div>
 </header>
 
@@ -1191,7 +1204,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
+  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1506,22 +1519,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
+        <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
+        <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
+        <textarea class="cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
+        <textarea class="cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
       </div>
 
       <div class="rowGridTDBB">
@@ -2147,18 +2160,53 @@
     targets[lastKey].value = [targets[lastKey].value.trim(), clean].filter(Boolean).join(' ');
   }
 
+  function autoGrowCmpt(area){
+    if(!(area instanceof HTMLTextAreaElement)) return;
+    area.style.height = 'auto';
+    area.style.height = Math.max(area.scrollHeight, 54) + 'px';
+  }
+
+  function setFieldValue(el, value){
+    if(!el) return;
+    el.value = (value || '').toUpperCase().trim();
+    if(el instanceof HTMLTextAreaElement) autoGrowCmpt(el);
+    el.dispatchEvent(new Event('input', { bubbles:true }));
+  }
+
+  function cleanCargoText(value){
+    let s = normalizeNoteLine(value).toUpperCase();
+    s = s.replace(/FAK\s*\d+\s*KG/gi, '');
+    s = s.replace(/(\d+)\s*KG/gi, '');
+    s = s.replace(/\s+,/g, ',');
+    s = s.replace(/,\s*,+/g, ', ');
+    s = s.replace(/\s{2,}/g, ' ');
+    s = s.replace(/(^[\s,]+|[\s,]+$)/g, '');
+    s = s.replace(/,\s*$/g, '');
+    return s.trim();
+  }
+
+  function findKeywordCount(raw, patterns){
+    for(const re of patterns){
+      const m = raw.match(re);
+      if(m) return String(parseInt(m[1], 10));
+    }
+    return '';
+  }
+
   function parseNoteIntoSection(root, type, noteText){
     if(!root) return;
-    const cmpt1 = root.querySelector(`input[data-k="${type}-cmpt1"]`);
-    const cmpt2 = root.querySelector(`input[data-k="${type}-cmpt2"]`);
-    const cmpt3 = root.querySelector(`input[data-k="${type}-cmpt3"]`);
-    const cmpt4 = root.querySelector(`input[data-k="${type}-cmpt4"]`);
+    const cmpt1 = root.querySelector(`textarea[data-k="${type}-cmpt1"], input[data-k="${type}-cmpt1"]`);
+    const cmpt2 = root.querySelector(`textarea[data-k="${type}-cmpt2"], input[data-k="${type}-cmpt2"]`);
+    const cmpt3 = root.querySelector(`textarea[data-k="${type}-cmpt3"], input[data-k="${type}-cmpt3"]`);
+    const cmpt4 = root.querySelector(`textarea[data-k="${type}-cmpt4"], input[data-k="${type}-cmpt4"]`);
     const tInput = root.querySelector(`input[data-k="${type}-t"]`);
     const dInput = root.querySelector(`input[data-k="${type}-d"]`);
     const bbInput = root.querySelector(`input[data-k="${type}-bb"]`);
     const targets = { CPT1: cmpt1, CPT2: cmpt2, CPT3: cmpt3, CPT4: cmpt4 };
-    const raw = String(noteText || '').replace(/\r/g, '');
-    const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+    const raw = String(noteText || '').replace(/
+/g, '');
+    const lines = raw.split('
+').map(s => s.trim()).filter(Boolean);
     let lastKey = '';
 
     for(const line of lines){
@@ -2166,15 +2214,16 @@
       const cptMatch = normalized.match(/^CPT\s*([1-4])\s*[-:]\s*(.*)$/i);
       if(cptMatch){
         const key = `CPT${cptMatch[1]}`;
-        const value = normalizeNoteLine(cptMatch[2]);
-        if(targets[key] && value){
-          targets[key].value = value.toUpperCase();
-        }
+        const value = cleanCargoText(cptMatch[2]);
+        if(targets[key]) setFieldValue(targets[key], value);
         lastKey = key;
         continue;
       }
       if(/^[-–—]/.test(normalized)){
-        appendContinuation(targets, lastKey, normalized);
+        if(!lastKey || !targets[lastKey]) continue;
+        const clean = cleanCargoText(normalized.replace(/^[-–—]\s*/, ''));
+        const merged = [targets[lastKey].value.trim(), clean].filter(Boolean).join(' ');
+        setFieldValue(targets[lastKey], merged);
       }
     }
 
@@ -2198,15 +2247,26 @@
       bbInput.dispatchEvent(new Event('input', { bubbles:true }));
     }
 
-    const cgo1 = raw.match(/CGO\s*[:/\-]?\s*(\d+)/i);
-    const cgo2 = raw.match(/(\d+)\s*CGO/i);
-    const cgoVal = cgo1 ? cgo1[1] : (cgo2 ? cgo2[1] : '');
-    if(cgoVal) upsertExtraByKey(root, type, 'C', cgoVal);
+    const extraRules = [
+      ['C', [/CGO\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CGO/i]],
+      ['EMS', [/MAIL\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*MAIL/i]],
+      ['W', [/WCHR\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*WCHR/i]],
+      ['COB', [/COB\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*COB/i]],
+      ['GB', [/G\/B\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*G\/B/i]],
+      ['TS', [/(?:T\/S|TS)\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*(?:T\/S|TS)/i]],
+      ['RUSH', [/RUSH\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*RUSH/i]],
+      ['CARSEAT', [/CARSEAT\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CARSEAT/i]],
+      ['COMAT', [/COMAT\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*COMAT/i]],
+      ['LONGFIN', [/LONGFIN\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*LONGFIN/i]],
+      ['CYCLE', [/CYCLE\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CYCLE/i]],
+      ['CREW', [/CREW\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*CREW/i]],
+      ['PCB', [/PCB\s*[:/\-]?\s*(\d+)/i, /(\d+)\s*PCB/i]],
+    ];
 
-    const mail1 = raw.match(/MAIL\s*[:/\-]?\s*(\d+)/i);
-    const mail2 = raw.match(/(\d+)\s*MAIL/i);
-    const mailVal = mail1 ? mail1[1] : (mail2 ? mail2[1] : '');
-    if(mailVal) upsertExtraByKey(root, type, 'EMS', mailVal);
+    for(const [key, patterns] of extraRules){
+      const val = findKeywordCount(raw, patterns);
+      if(val) upsertExtraByKey(root, type, key, val);
+    }
   }
 
   let noteParseTimer = null;
@@ -2232,6 +2292,17 @@
     const root = t.closest(`.section[data-type="${type}"]`);
     setTimeout(()=> parseNoteIntoSection(root, type, t.value), 0);
   });
+
+  sections.addEventListener('input', (e)=>{
+    const t = e.target;
+    if(t instanceof HTMLTextAreaElement && t.classList.contains('cmptArea')){
+      autoGrowCmpt(t);
+    }
+  });
+
+  setTimeout(()=>{
+    document.querySelectorAll('.cmptArea').forEach(autoGrowCmpt);
+  }, 0);
 
 </script>
 
