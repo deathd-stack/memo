@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.1</title>
+<title>JAS MEMO VER 6.4</title>
 
 <style>
   :root{
@@ -1021,7 +1021,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.1</div>
+    <div class="titleVer">VER 6.4.2</div>
   </div>
 </header>
 
@@ -1605,123 +1605,7 @@
     return d;
   }
 
-  function parseCptLines(text){
-    const result = {
-      cmpt1:"", cmpt2:"", cmpt3:"", cmpt4:"",
-      bagCount:0, dsCount:0, bbstCount:0,
-      cCount:0, emsCount:0
-    };
-    const lines = String(text || "").replace(/\r/g, "").split("\n");
-    let currentKey = "";
-
-    function addFromLine(line){
-      const bagMatches = [...line.matchAll(/\bBAG\s*(\d+)\s*P?C?S?\b/gi)];
-      bagMatches.forEach(m=> result.bagCount += Number(m[1] || 0));
-
-      const dsMatches = [...line.matchAll(/\bD\/?S\s*(\d+)\s*P?C?S?\b/gi)];
-      dsMatches.forEach(m=> result.dsCount += Number(m[1] || 0));
-
-      const bbstMatches = [...line.matchAll(/\bBBST\s*(\d+)\b/gi)];
-      bbstMatches.forEach(m=> result.bbstCount += Number(m[1] || 0));
-
-      const cgoMatches = [...line.matchAll(/(?:\bCGO\s*[:\/-]?\s*(\d+)\b)|(\b\d+\b)\s*CGO\b/gi)];
-      cgoMatches.forEach(m=> result.cCount += Number(m[1] || m[2] || 0));
-
-      const mailMatches = [...line.matchAll(/(?:\bMAIL\s*[:\/-]?\s*(\d+)\b)|(\b\d+\b)\s*MAIL\b/gi)];
-      mailMatches.forEach(m=> result.emsCount += Number(m[1] || m[2] || 0));
-    }
-
-    for(const raw of lines){
-      const line = String(raw || "").trim();
-      if(!line) continue;
-      addFromLine(line);
-
-      const m = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
-      if(m){
-        currentKey = `cmpt${m[1]}`;
-        result[currentKey] = (m[2] || "").trim();
-        continue;
-      }
-
-      if(currentKey){
-        const cleaned = line.replace(/^[-–—\s]+/, "").trim();
-        if(cleaned && !/^CPT\s*[1-4]\s*-/i.test(cleaned)){
-          result[currentKey] = result[currentKey]
-            ? `${result[currentKey]}, ${cleaned}`
-            : cleaned;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  function setSectionInputValue(root, key, val, maxLen){
-    const input = root.querySelector(`input[data-k="${key}"]`);
-    if(!input) return false;
-    const nextVal = maxLen ? onlyNum(String(val || ""), maxLen) : String(val || "");
-    if(!nextVal) return false;
-    input.value = nextVal;
-    input.dispatchEvent(new Event("input", { bubbles:true }));
-    return true;
-  }
-
-  function upsertExtraRow(root, type, extraKey, addVal){
-    const box = root.querySelector(`#${type}-EXTRAS`);
-    if(!box || !addVal) return false;
-    const rows = [...box.querySelectorAll('.extraRow')];
-    let row = rows.find(r => (r.querySelector('select')?.value || '').toUpperCase() === extraKey);
-    if(!row){
-      row = makeExtraRow(type, extraKey, String(addVal));
-      box.appendChild(row);
-    }else{
-      const input = row.querySelector('input');
-      const prev = Number((input?.value || '0').replace(/[^0-9]/g, '') || 0);
-      if(input){
-        input.value = onlyNum(String(prev + Number(addVal || 0)), 3);
-        input.dispatchEvent(new Event("input", { bubbles:true }));
-      }
-    }
-    return true;
-  }
-
-  function applyParsedCptToSection(type, noteText){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return false;
-
-    const parsed = parseCptLines(noteText);
-    let changed = false;
-
-    [1,2,3,4].forEach(n=>{
-      const value = cleanTextUpper(parsed[`cmpt${n}`] || "");
-      if(!value) return;
-      const input = root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
-      if(!input) return;
-      input.value = value;
-      input.dispatchEvent(new Event("input", { bubbles:true }));
-      changed = true;
-    });
-
-    if(parsed.bagCount > 0){
-      changed = setSectionInputValue(root, `${type}-t`, parsed.bagCount, 3) || changed;
-    }
-    if(parsed.dsCount > 0){
-      changed = setSectionInputValue(root, `${type}-d`, parsed.dsCount, 2) || changed;
-    }
-    if(parsed.bbstCount > 0){
-      changed = setSectionInputValue(root, `${type}-bb`, parsed.bbstCount, 2) || changed;
-    }
-    if(parsed.cCount > 0){
-      changed = upsertExtraRow(root, type, 'C', parsed.cCount) || changed;
-    }
-    if(parsed.emsCount > 0){
-      changed = upsertExtraRow(root, type, 'EMS', parsed.emsCount) || changed;
-    }
-
-    return changed;
-  }
-
-  function buildSectionsBlank(){{
+  function buildSectionsBlank(){
     sections.innerHTML = "";
     if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
     if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
@@ -1735,7 +1619,149 @@
 
   function newMemo(){
     editId = null;
-    memoDate.value = getViewingDayKey();
+  
+
+  function setSectionInputValue(root, key, value){
+    const el = root.querySelector(`input[data-k="${key}"]`);
+    if(!el) return;
+    el.value = value || "";
+    el.dispatchEvent(new Event("input", { bubbles:true }));
+  }
+
+  function sumMatches(text, patterns){
+    let total = 0;
+    for(const pattern of patterns){
+      let m;
+      const re = new RegExp(pattern.source, pattern.flags);
+      while((m = re.exec(text))){
+        const n = Number((m[1] || "").replace(/[^0-9]/g, ""));
+        if(Number.isFinite(n)) total += n;
+      }
+    }
+    return total;
+  }
+
+  function detectExtraCount(text, keyword){
+    const patterns = [
+      new RegExp(String.raw`\b` + keyword + String.raw`\s*[:/-]?\s*(\d{1,3})\b`, "gi"),
+      new RegExp(String.raw`\b(\d{1,3})\s*` + keyword + String.raw`\b`, "gi")
+    ];
+    let total = 0;
+    for(const re of patterns){
+      let m;
+      while((m = re.exec(text))){
+        const n = Number((m[1] || "").replace(/[^0-9]/g, ""));
+        if(Number.isFinite(n)) total += n;
+      }
+    }
+    return total;
+  }
+
+  function upsertExtraRowValue(root, extraKey, numericValue){
+    if(!root || !numericValue) return;
+    const box = root.querySelector(`#${root.dataset.type}-EXTRAS`);
+    if(!box) return;
+
+    let row = [...box.querySelectorAll(".extraRow")].find(r => {
+      const sel = r.querySelector("select");
+      return sel && (sel.value || "").toUpperCase() === extraKey;
+    });
+
+    if(!row){
+      row = makeExtraRow(root.dataset.type, extraKey, "");
+      box.appendChild(row);
+    }
+
+    const input = row.querySelector("input");
+    if(input){
+      input.value = String(numericValue).slice(0,3);
+      input.dispatchEvent(new Event("input", { bubbles:true }));
+    }
+  }
+
+  function parseCptBlocksFromNote(rawText){
+    const text = String(rawText || "").replace(/
+/g, "");
+    const lines = text.split("
+").map(v => v.trim()).filter(Boolean);
+    const cpts = {1:"",2:"",3:"",4:""};
+    let active = null;
+
+    for(const line of lines){
+      const cptMatch = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
+      if(cptMatch){
+        active = cptMatch[1];
+        cpts[active] = (cptMatch[2] || "").trim();
+        continue;
+      }
+
+      if(active){
+        if(/^CPT\s*[1-4]\s*-/i.test(line)) continue;
+        const cleaned = line.replace(/^[-•]\s*/, "").trim();
+        if(cleaned){
+          cpts[active] = cpts[active] ? `${cpts[active]} ${cleaned}` : cleaned;
+        }
+      }
+    }
+
+    return cpts;
+  }
+
+  function applyParsedNoteToSection(root, rawText){
+    if(!root) return;
+    const type = root.dataset.type;
+    const text = String(rawText || "");
+
+    const cpts = parseCptBlocksFromNote(text);
+    for(let i=1;i<=4;i++){
+      const key = `${type}-cmpt${i}`;
+      const val = cleanTextUpper(cpts[i] || "");
+      if(val){
+        const el = root.querySelector(`input[data-k="${key}"]`);
+        if(el) el.value = val;
+      }
+    }
+
+    const bagTotal = sumMatches(text, [/BAG\s+(\d{1,3})\s*PC/gi]);
+    const dsTotal = sumMatches(text, [/D\/S\s+(\d{1,3})\s*PC/gi, /D\/S\s+(\d{1,3})\s*PCS/gi, /INCLUDING\s+D\/S\s+(\d{1,3})/gi]);
+    const bbVal = sumMatches(text, [/BBST\s*[:/-]?\s*(\d{1,2})/gi]);
+
+    if(bagTotal > 0) setSectionInputValue(root, `${type}-t`, String(bagTotal));
+    if(dsTotal > 0) setSectionInputValue(root, `${type}-d`, String(dsTotal));
+    if(bbVal > 0) setSectionInputValue(root, `${type}-bb`, String(bbVal));
+
+    const upper = text.toUpperCase();
+    const cgoCount = detectExtraCount(upper, "CGO");
+    const mailCount = detectExtraCount(upper, "MAIL");
+
+    if(cgoCount > 0) upsertExtraRowValue(root, "C", cgoCount);
+    if(mailCount > 0) upsertExtraRowValue(root, "EMS", mailCount);
+  }
+
+  document.addEventListener("paste", (e)=>{
+    const target = e.target;
+    if(!(target instanceof HTMLTextAreaElement)) return;
+    const key = target.dataset.k || "";
+    if(!/-note$/.test(key)) return;
+    const root = target.closest(".section");
+    if(!root) return;
+
+    setTimeout(()=>{
+      applyParsedNoteToSection(root, target.value || "");
+    }, 0);
+  });
+
+  document.addEventListener("change", (e)=>{
+    const target = e.target;
+    if(!(target instanceof HTMLTextAreaElement)) return;
+    const key = target.dataset.k || "";
+    if(!/-note$/.test(key)) return;
+    const root = target.closest(".section");
+    if(!root) return;
+    applyParsedNoteToSection(root, target.value || "");
+  });
+
+  memoDate.value = getViewingDayKey();
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
@@ -2184,20 +2210,6 @@
       globalCalcExpr += val;
       updateGlobalCalcDisplay(globalCalcExpr);
     });
-  });
-
-
-
-  document.addEventListener("paste", (e)=>{
-    const t = e.target;
-    if(!(t instanceof HTMLTextAreaElement)) return;
-    const k = t.dataset.k || "";
-    const m = k.match(/^(INBOUND|OUTBOUND)-note$/);
-    if(!m) return;
-
-    setTimeout(()=>{
-      applyParsedCptToSection(m[1], t.value || "");
-    }, 0);
   });
 
   let startY = 0;
