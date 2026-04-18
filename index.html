@@ -978,10 +978,6 @@
   }
 
 
-  .controls{
-    align-items:center;
-  }
-
   .teamQuickWrap{
     display:flex;
     align-items:center;
@@ -993,7 +989,8 @@
     box-shadow:var(--shadow-soft);
   }
 
-  .teamQuickLabel{
+  .teamQuickLabel,
+  .teamLab{
     font-size:calc(14px * var(--ui));
     font-weight:1000;
     color:#fff;
@@ -1004,20 +1001,17 @@
   .teamQuickSelect,
   .teamSelect{
     font-family:inherit;
+    font-size:calc(15px * var(--ui));
     font-weight:1000;
     border:2px solid var(--line);
-    border-radius:calc(20px * var(--ui));
     outline:none;
     background:#121214;
     color:#fff;
-    text-transform:uppercase;
-  }
-
-  .teamQuickSelect{
+    border-radius:calc(20px * var(--ui));
     height:calc(42px * var(--ui));
     padding:0 calc(12px * var(--ui));
-    font-size:calc(15px * var(--ui));
-    min-width:calc(104px * var(--ui));
+    min-width:calc(108px * var(--ui));
+    text-transform:uppercase;
   }
 
   .teamLine{
@@ -1028,19 +1022,10 @@
     margin-bottom:calc(8px * var(--ui));
   }
 
-  .teamLab{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
   .teamSelect{
-    width:auto !important;
-    min-width:calc(150px * var(--ui));
     height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    font-size:calc(16px * var(--ui));
+    min-width:calc(156px * var(--ui));
+    border-radius:calc(22px * var(--ui));
   }
 
   .teamGroup{
@@ -1092,10 +1077,6 @@
     text-transform:uppercase;
   }
 
-  .scanBusy{
-    opacity:.55;
-    pointer-events:none;
-  }
 
   @media (max-width:520px){
     .bottomLeftButtons{
@@ -1322,265 +1303,23 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
-  let scanBusy = false;
-  let ocrWorker = null;
+  let tesseractReady = false;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
+
   function fillTeamSelects(){
-    const options = ['<option value="">TEAM</option>']
-      .concat(Array.from({length:24}, (_,i)=>`<option value="${i+1}">${i+1}조</option>`))
-      .join("");
-    quickTeamSelect.innerHTML = options;
-    memoTeam.innerHTML = options;
+    const opts = ['<option value="">TEAM</option>'];
+    for(let i=1;i<=24;i++) opts.push(`<option value="${i}">${i}조</option>`);
+    quickTeamSelect.innerHTML = opts.join('');
+    memoTeam.innerHTML = opts.join('');
+  }
+
+  function teamLabel(team){
+    return team ? `${Number(team)}조` : "미지정";
   }
 
   fillTeamSelects();
-
-  function teamLabelOf(team){
-    return team ? `${Number(team)}조` : "TEAM NONE";
-  }
-
-  function persistMemos(){
-    persistMemos();
-  }
-
-  function normalizeFlightCode(raw){
-    let s = (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-    s = s.replace(/^70/, "7C").replace(/^7O/, "7C").replace(/^7D/, "7C");
-    const m = s.match(/(\d{4})$/);
-    if(/^7C\d{4}$/.test(s)) return s;
-    if(m) return "7C" + m[1];
-    return "";
-  }
-
-  function normalizeHLCode(raw){
-    let s = (raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-    s = s.replace(/^HI/, "HL").replace(/^H1/, "HL").replace(/^HL/, "HL");
-    const m = s.match(/(\d{4})$/);
-    if(/^HL\d{4}$/.test(s)) return s;
-    if(m) return "HL" + m[1];
-    return "";
-  }
-
-  function normalizeHash(raw){
-    const digits = (raw || "").replace(/[^0-9]/g, "");
-    return digits.slice(-3);
-  }
-
-  function parseTeamValue(raw){
-    const nums = ((raw || "").match(/\d{1,2}/g) || [])
-      .map(v=>Number(v))
-      .filter(v=>v>=1 && v<=24);
-
-    if(nums.length >= 2){
-      return { in:String(nums[0]), out:String(nums[1]), same:false };
-    }
-    if(nums.length === 1){
-      return { in:String(nums[0]), out:String(nums[0]), same:true };
-    }
-    return null;
-  }
-
-  function setScanBusy(flag){
-    scanBusy = flag;
-    if(flag){
-      topControls.classList.add("scanBusy");
-    }else{
-      topControls.classList.remove("scanBusy");
-    }
-  }
-
-  async function getOcrWorker(){
-    if(ocrWorker) return ocrWorker;
-    if(!window.Tesseract) throw new Error("TESSERACT LOAD FAIL");
-    ocrWorker = await Tesseract.createWorker("eng");
-    return ocrWorker;
-  }
-
-  function detectGridLinesFromImage(imgEl){
-    const cvs = document.createElement("canvas");
-    cvs.width = imgEl.naturalWidth || imgEl.width;
-    cvs.height = imgEl.naturalHeight || imgEl.height;
-    const ctx = cvs.getContext("2d", { willReadFrequently:true });
-    ctx.drawImage(imgEl, 0, 0, cvs.width, cvs.height);
-    const { data, width, height } = ctx.getImageData(0,0,cvs.width,cvs.height);
-
-    const xDark = new Array(width).fill(0);
-    const yDark = new Array(height).fill(0);
-
-    for(let y=0; y<height; y++){
-      for(let x=0; x<width; x++){
-        const i = (y*width + x) * 4;
-        const gray = (data[i] + data[i+1] + data[i+2]) / 3;
-        const dark = 255 - gray;
-        xDark[x] += dark;
-        yDark[y] += dark;
-      }
-    }
-
-    for(let x=0; x<width; x++) xDark[x] /= height;
-    for(let y=0; y<height; y++) yDark[y] /= width;
-
-    function pickLines(arr, threshold, minGap){
-      const raw = [];
-      for(let i=0;i<arr.length;i++){
-        if(arr[i] > threshold) raw.push(i);
-      }
-      const groups = [];
-      raw.forEach(v=>{
-        if(!groups.length || v - groups[groups.length-1][groups[groups.length-1].length-1] > minGap){
-          groups.push([v]);
-        }else{
-          groups[groups.length-1].push(v);
-        }
-      });
-      return groups.map(g=>Math.round(g.reduce((a,b)=>a+b,0)/g.length));
-    }
-
-    const xLines = pickLines(xDark, 200, 5);
-    const yLines = pickLines(yDark, 200, 5);
-
-    if(xLines.length < 10 || yLines.length < 10){
-      throw new Error("GRID DETECT FAIL");
-    }
-
-    return { xLines, yLines };
-  }
-
-  function makeCropCanvas(imgEl, x0, y0, x1, y1, scale=3){
-    const w = Math.max(1, Math.round(x1 - x0));
-    const h = Math.max(1, Math.round(y1 - y0));
-    const src = document.createElement("canvas");
-    src.width = w;
-    src.height = h;
-    const sctx = src.getContext("2d", { willReadFrequently:true });
-    sctx.drawImage(imgEl, x0, y0, w, h, 0, 0, w, h);
-
-    const imgData = sctx.getImageData(0,0,w,h);
-    const d = imgData.data;
-    for(let i=0;i<d.length;i+=4){
-      const gray = (d[i] + d[i+1] + d[i+2]) / 3;
-      const boosted = gray > 170 ? 255 : gray < 95 ? 0 : gray;
-      d[i] = boosted;
-      d[i+1] = boosted;
-      d[i+2] = boosted;
-    }
-    sctx.putImageData(imgData,0,0);
-
-    const out = document.createElement("canvas");
-    out.width = w * scale;
-    out.height = h * scale;
-    const octx = out.getContext("2d");
-    octx.imageSmoothingEnabled = false;
-    octx.drawImage(src, 0, 0, out.width, out.height);
-    return out;
-  }
-
-  async function recognizeCell(imgEl, worker, x0, y0, x1, y1, whitelist){
-    const canvas = makeCropCanvas(imgEl, x0, y0, x1, y1, 3);
-    await worker.setParameters({
-      tessedit_pageseg_mode: "7",
-      preserve_interword_spaces: "1",
-      tessedit_char_whitelist: whitelist || ""
-    });
-    const { data } = await worker.recognize(canvas);
-    return (data.text || "").trim();
-  }
-
-  function buildMemoFromScan(side, team, rowData, dayKey){
-    return {
-      id: Date.now() + Math.floor(Math.random()*1000000),
-      memoDate: dayKey,
-      dayKey,
-      team,
-      teamLabel: teamLabelOf(team),
-      hasIn: side === "BOTH" || side === "INBOUND",
-      hasOut: side === "BOTH" || side === "OUTBOUND",
-      sharedHL: side === "OUTBOUND" || side === "BOTH" ? pad((rowData.hl || "").replace(/^HL/,""), 4) : "",
-      sharedHASH: side === "INBOUND" || side === "BOTH" ? pad(rowData.hash || "", 3) : "",
-      "INBOUND-7C": side === "INBOUND" || side === "BOTH" ? pad((rowData.in7c || "").replace(/^7C/,""), 4) : "",
-      "OUTBOUND-7C": side === "OUTBOUND" || side === "BOTH" ? pad((rowData.out7c || "").replace(/^7C/,""), 4) : "",
-      "INBOUND-STA": "",
-      "OUTBOUND-STD": "",
-      "INBOUND-t": "", "INBOUND-d":"", "INBOUND-bb":"",
-      "OUTBOUND-t":"", "OUTBOUND-d":"", "OUTBOUND-bb":"",
-      "OUTBOUND-tt":"", "OUTBOUND-tb":"",
-      "INBOUND-cmpt1":"F", "INBOUND-cmpt2":"F", "INBOUND-cmpt3":"", "INBOUND-cmpt4":"",
-      "OUTBOUND-cmpt1":"F", "OUTBOUND-cmpt2":"F", "OUTBOUND-cmpt3":"", "OUTBOUND-cmpt4":"",
-      "INBOUND-note":"", "OUTBOUND-note":"",
-      "INBOUND-TIME":"", "OUTBOUND-TIME":"",
-      "INBOUND-EXTRAS":[], "OUTBOUND-EXTRAS":[],
-      "INBOUND-LIRPHOTO":"", "OUTBOUND-LIRPHOTO":""
-    };
-  }
-
-  async function autoScanFromImage(file){
-    if(scanBusy) return;
-    setScanBusy(true);
-    try{
-      const imgEl = await loadImageFromFile(file);
-      const { xLines, yLines } = detectGridLinesFromImage(imgEl);
-      const xs = [0].concat(xLines);
-      const ys = [0].concat(yLines);
-      const worker = await getOcrWorker();
-      const created = [];
-      const dayKey = getViewingDayKey();
-
-      for(let r=0; r<ys.length-1; r++){
-        const y0 = ys[r] + 1;
-        const y1 = ys[r+1] - 1;
-        if(y1 - y0 < 12) continue;
-
-        const in7cRaw = await recognizeCell(imgEl, worker, xs[0]+1, y0, xs[1]-1, y1, "7C0123456789");
-        const hashRaw = await recognizeCell(imgEl, worker, xs[2]+1, y0, xs[3]-1, y1, "0123456789");
-        const out7cRaw = await recognizeCell(imgEl, worker, xs[5]+1, y0, xs[6]-1, y1, "7C0123456789LO");
-        const hlRaw = await recognizeCell(imgEl, worker, xs[6]+1, y0, xs[7]-1, y1, "HL0123456789I1");
-        const teamRaw = await recognizeCell(imgEl, worker, xs[9]+1, y0, xs[10]-1, y1, "0123456789/|");
-
-        const rowData = {
-          in7c: normalizeFlightCode(in7cRaw),
-          hash: normalizeHash(hashRaw),
-          out7c: normalizeFlightCode(out7cRaw),
-          hl: normalizeHLCode(hlRaw)
-        };
-        const teamData = parseTeamValue(teamRaw);
-
-        if(!teamData) continue;
-        if(!rowData.in7c && !rowData.out7c && !rowData.hl && !rowData.hash) continue;
-
-        if(teamData.same){
-          const memo = buildMemoFromScan("BOTH", teamData.in, rowData, dayKey);
-          if(memo["INBOUND-7C"] || memo.sharedHASH || memo["OUTBOUND-7C"] || memo.sharedHL){
-            created.push(memo);
-          }
-        }else{
-          const inMemo = buildMemoFromScan("INBOUND", teamData.in, rowData, dayKey);
-          const outMemo = buildMemoFromScan("OUTBOUND", teamData.out, rowData, dayKey);
-          if(inMemo["INBOUND-7C"] || inMemo.sharedHASH) created.push(inMemo);
-          if(outMemo["OUTBOUND-7C"] || outMemo.sharedHL) created.push(outMemo);
-        }
-      }
-
-      if(!created.length){
-        alert("AUTO SCAN FAIL - NO ROW");
-        return;
-      }
-
-      memos = memos.concat(created);
-      persistMemos();
-      dayOffset = calcDayOffsetFromDate(dayKey);
-      updateDayLabel();
-      renderList();
-      alert(`AUTO SCAN OK ${created.length} MEMO`);
-    }catch(err){
-      console.error(err);
-      alert("AUTO SCAN FAIL");
-    }finally{
-      setScanBusy(false);
-    }
-  }
-
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1679,7 +1418,7 @@
     }
     if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
     memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
-    persistMemos();
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
   }
 
@@ -2008,13 +1747,7 @@
 
   function newMemo(){
     editId = null;
-    quickTeamSelect.addEventListener("change", ()=>{
-    if(modal.style.display === "flex" && !editId){
-      memoTeam.value = quickTeamSelect.value;
-    }
-  });
-
-  memoDate.value = getViewingDayKey();
+    memoDate.value = getViewingDayKey();
     memoTeam.value = quickTeamSelect.value || "";
     pickInbound.checked = true;
     pickOutbound.checked = true;
@@ -2071,6 +1804,12 @@
     }
   });
 
+  quickTeamSelect.addEventListener("change", ()=>{
+    if(!editId && modal.style.display === "flex"){
+      memoTeam.value = quickTeamSelect.value;
+    }
+  });
+
   function saveMemo(){
     if(!pickInbound.checked && !pickOutbound.checked){
       alert("INBOUND OR OUTBOUND SELECT");
@@ -2081,7 +1820,7 @@
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
     data.team = memoTeam.value || quickTeamSelect.value || "";
-    data.teamLabel = teamLabelOf(data.team);
+    data.teamLabel = teamLabel(data.team);
 
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
@@ -2158,16 +1897,23 @@
     renderList(data.id);
   }
 
-
-  function formatInboundLine(m){
-    const v7c = (m["INBOUND-7C"] || "").trim();
+  function formatCombinedLine(m){
+    const v7cIn = (m["INBOUND-7C"] || "").trim();
+    const v7cOut = (m["OUTBOUND-7C"] || "").trim();
+    const v7c = v7cIn || v7cOut || "";
+    const vhl = (m.sharedHL || "").trim();
     const hash = (m.sharedHASH || "").trim();
-    return `7C[${v7c}] #[${hash}]`;
+    return `7C[${v7c}] HL[${vhl}] #[${hash}]`;
   }
 
-  function formatOutboundLine(m){
-    const v7c = (m["OUTBOUND-7C"] || "").trim();
+  function formatSplitLine(m, type){
+    const v7c = (m[type+"-7C"] || "").trim();
     const vhl = (m.sharedHL || "").trim();
+    const hash = (m.sharedHASH || "").trim();
+
+    if(type === "INBOUND"){
+      return `7C[${v7c}] #[${hash}]`;
+    }
     return `7C[${v7c}] HL[${vhl}]`;
   }
 
@@ -2189,33 +1935,29 @@
       return;
     }
 
-    const grouped = new Map();
+    const groups = new Map();
     dayMemos.forEach(m=>{
       const key = m.team || "NONE";
-      if(!grouped.has(key)) grouped.set(key, []);
-      grouped.get(key).push(m);
+      if(!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(m);
     });
 
-    grouped.forEach((items, key)=>{
-      const wrap = document.createElement("div");
-      wrap.className = "teamGroup";
-      wrap.innerHTML = `
-        <div class="teamHeader">
-          <div class="t1">${key === "NONE" ? "TEAM NONE" : `${Number(key)}조`}</div>
-          <div class="t2">${items.length} MEMO</div>
-        </div>
-      `;
+    groups.forEach((items, key)=>{
+      const group = document.createElement("div");
+      group.className = "teamGroup";
+      const title = key === "NONE" ? "TEAM NONE" : `${Number(key)}조`;
+      group.innerHTML = `<div class="teamHeader"><div class="t1">${title}</div><div class="t2">${items.length} MEMO</div></div>`;
 
       items.forEach(m=>{
         const hasIn = m.hasIn !== false;
         const hasOut = m.hasOut !== false;
-        let linesHtml = "";
 
+        let linesHtml = "";
         if(hasIn){
-          linesHtml += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatInboundLine(m)}</div></div>`;
+          linesHtml += `<div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>`;
         }
         if(hasOut){
-          linesHtml += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatOutboundLine(m)}</div></div>`;
+          linesHtml += `<div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>`;
         }
 
         const card = document.createElement("div");
@@ -2227,15 +1969,12 @@
               ${linesHtml}
             </div>
           </div>
-          <div class="metaRow">
-            <div class="miniPill">${m.memoDate || ""}</div>
-            <div class="miniPill">${m.teamLabel || "TEAM NONE"}</div>
-          </div>
+          <div class="metaRow"><div class="miniPill">${m.memoDate || ""}</div><div class="miniPill">${m.teamLabel || teamLabel(m.team)}</div></div>
         `;
-        wrap.appendChild(card);
+        group.appendChild(card);
       });
 
-      memoList.appendChild(wrap);
+      memoList.appendChild(group);
     });
 
     memoList.querySelectorAll("[data-open]").forEach(el=>{
@@ -2247,7 +1986,6 @@
   }
 
   function editMemo(id){
-
     const m = memos.find(x=>x.id===id);
     if(!m) return;
 
@@ -2277,7 +2015,7 @@
       return;
     }
     memos = memos.filter(m=>!ids.includes(m.id));
-    persistMemos();
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
     renderList();
   }
 
@@ -2354,10 +2092,11 @@
       localStorage.setItem(PHOTO_KEY, stableDataUrl);
       photo = stableDataUrl;
       photoImg.src = stableDataUrl;
-      alert("PHOTO SAVED");
+      return stableDataUrl;
     }catch(err){
       console.error(err);
       alert("PHOTO SAVE FAIL");
+      throw err;
     }
   }
 
@@ -2372,11 +2111,268 @@
     }
   }
 
+  function ensureTesseractLoaded(){
+    return new Promise((resolve, reject)=>{
+      if(window.Tesseract){
+        tesseractReady = true;
+        resolve();
+        return;
+      }
+      const existing = document.querySelector('script[data-tesseract="1"]');
+      if(existing){
+        existing.addEventListener('load', ()=>{ tesseractReady = true; resolve(); }, { once:true });
+        existing.addEventListener('error', ()=> reject(new Error('TESSERACT LOAD FAIL')), { once:true });
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.dataset.tesseract = '1';
+      s.onload = ()=>{ tesseractReady = true; resolve(); };
+      s.onerror = ()=> reject(new Error('TESSERACT LOAD FAIL'));
+      document.head.appendChild(s);
+    });
+  }
+
+  function normToken(txt){
+    return (txt || '')
+      .toUpperCase()
+      .replace(/[\[\]{}()]/g, '')
+      .replace(/[“”"'`,;:]/g, '')
+      .replace(/O/g, '0')
+      .replace(/I/g, '1')
+      .replace(/\s+/g, '');
+  }
+
+  function tokenFromWord(word){
+    const x0 = word.bbox ? word.bbox.x0 : (word.x0 ?? 0);
+    const x1 = word.bbox ? word.bbox.x1 : (word.x1 ?? 0);
+    const y0 = word.bbox ? word.bbox.y0 : (word.y0 ?? 0);
+    const y1 = word.bbox ? word.bbox.y1 : (word.y1 ?? 0);
+    return { text:normToken(word.text), raw:word.text || '', x0, x1, y0, y1 };
+  }
+
+  function groupWordsIntoRows(words){
+    const items = words
+      .map(tokenFromWord)
+      .filter(w => w.text && /[A-Z0-9#\/|]/.test(w.text))
+      .sort((a,b)=> ((a.y0+a.y1)/2) - ((b.y0+b.y1)/2));
+
+    if(!items.length) return [];
+    const heights = items.map(w => Math.max(8, w.y1 - w.y0)).sort((a,b)=>a-b);
+    const median = heights[Math.floor(heights.length/2)] || 18;
+    const threshold = Math.max(10, median * 0.75);
+    const rows = [];
+
+    items.forEach(item=>{
+      const cy = (item.y0 + item.y1) / 2;
+      let row = rows.find(r => Math.abs(r.cy - cy) <= threshold);
+      if(!row){
+        row = { cy, words:[] };
+        rows.push(row);
+      }
+      row.words.push(item);
+      row.cy = row.words.reduce((s,w)=>s + ((w.y0+w.y1)/2), 0) / row.words.length;
+    });
+
+    rows.forEach(r => r.words.sort((a,b)=> a.x0 - b.x0));
+    rows.sort((a,b)=> a.cy - b.cy);
+    return rows;
+  }
+
+  function mergeRowTokens(words){
+    const out = [];
+    for(let i=0;i<words.length;i++){
+      let cur = { ...words[i] };
+      const next = words[i+1];
+      const next2 = words[i+2];
+      if(!cur.text) continue;
+
+      if(cur.text === '7C' && next && /^\d{3,4}$/.test(next.text)){
+        cur.text = '7C' + next.text;
+        cur.x1 = next.x1;
+        i += 1;
+      }else if(cur.text === 'HL' && next && /^\d{3,4}$/.test(next.text)){
+        cur.text = 'HL' + next.text;
+        cur.x1 = next.x1;
+        i += 1;
+      }else if(/^\d{1,2}$/.test(cur.text) && next && /^[\/|]$/.test(next.text) && next2 && /^\d{1,2}$/.test(next2.text)){
+        cur.text = `${cur.text}/${next2.text}`;
+        cur.x1 = next2.x1;
+        i += 2;
+      }else if(/^(7C|HL)$/.test(cur.text) && next && /^[A-Z0-9]{3,4}$/.test(next.text)){
+        cur.text = cur.text + next.text;
+        cur.x1 = next.x1;
+        i += 1;
+      }
+
+      out.push(cur);
+    }
+    return out;
+  }
+
+  function looksLikeTeamToken(t){
+    return /^\d{1,2}(?:[\/|]\d{1,2})?$/.test(t);
+  }
+
+  function pickTeamToken(tokens){
+    const tail = tokens.slice(-6).map(t => t.text);
+    for(let i=tail.length-1;i>=0;i--){
+      if(looksLikeTeamToken(tail[i])) return tail[i].replace('|','/');
+    }
+    return '';
+  }
+
+  function parseTeamInfo(token){
+    const raw = (token || '').replace('|','/');
+    if(!raw) return { inbound:'', outbound:'' };
+    if(raw.includes('/')){
+      const [a,b] = raw.split('/').map(v => (v || '').replace(/\D/g,''));
+      return { inbound:a, outbound:b };
+    }
+    const one = raw.replace(/\D/g,'');
+    return { inbound:one, outbound:one };
+  }
+
+  function firstTokenIndex(tokens, test, from = 0, to = tokens.length){
+    for(let i=from;i<to;i++) if(test(tokens[i].text)) return i;
+    return -1;
+  }
+
+  function parseRowObject(row){
+    const tokens = mergeRowTokens(row.words);
+    const texts = tokens.map(t => t.text).filter(Boolean);
+    if(texts.length < 4) return null;
+
+    const flightIdx = [];
+    texts.forEach((t, i)=>{ if(/^7C\d{3,4}$/.test(t)) flightIdx.push(i); });
+    if(!flightIdx.length) return null;
+
+    const inIdx = flightIdx[0];
+    const outIdx = flightIdx.length > 1 ? flightIdx[1] : -1;
+    const inbound7c = texts[inIdx] || '';
+    const outbound7c = outIdx >= 0 ? texts[outIdx] : '';
+    const hashIdx = firstTokenIndex(tokens, t => /^\d{1,3}$/.test(t), inIdx + 1, outIdx >= 0 ? outIdx : tokens.length);
+    const hlIdx = outIdx >= 0 ? firstTokenIndex(tokens, t => /^HL\d{3,4}$/.test(t), outIdx + 1) : firstTokenIndex(tokens, t => /^HL\d{3,4}$/.test(t), inIdx + 1);
+    const teamToken = pickTeamToken(tokens);
+    const team = parseTeamInfo(teamToken);
+
+    if(!inbound7c) return null;
+    if(!team.inbound && !team.outbound) return null;
+
+    return {
+      inbound7c: inbound7c.replace(/^7C/, ''),
+      hash: hashIdx >= 0 ? texts[hashIdx].replace(/\D/g,'').slice(0,3) : '',
+      outbound7c: outbound7c.replace(/^7C/, ''),
+      hl: hlIdx >= 0 ? texts[hlIdx].replace(/^HL/, '') : '',
+      teamIn: team.inbound,
+      teamOut: team.outbound,
+      raw: texts.join(' ')
+    };
+  }
+
+  function buildMemoDataFromParsed(parsed, which, dayKey){
+    const both = which === 'BOTH';
+    const isIn = which === 'IN';
+    const team = both ? parsed.teamIn : (isIn ? parsed.teamIn : parsed.teamOut);
+    const data = { id: Date.now() + Math.floor(Math.random()*1000000), memoDate:dayKey, dayKey, team, teamLabel:teamLabel(team), hasIn: both || isIn, hasOut: both || !isIn };
+    data.sharedHASH = parsed.hash ? pad(parsed.hash, 3) : '';
+    data.sharedHL = parsed.hl ? pad(parsed.hl, 4) : '';
+    data['INBOUND-7C'] = (both || isIn) && parsed.inbound7c ? pad(parsed.inbound7c,4) : '';
+    data['OUTBOUND-7C'] = (both || !isIn) && parsed.outbound7c ? pad(parsed.outbound7c,4) : '';
+    ['INBOUND','OUTBOUND'].forEach(type=>{
+      data[type+'-STA']='';
+      data[type+'-STD']='';
+      data[type+'-t']='';
+      data[type+'-d']='';
+      data[type+'-bb']='';
+      data[type+'-tt']='';
+      data[type+'-tb']='';
+      data[type+'-cmpt1']='F';
+      data[type+'-cmpt2']='F';
+      data[type+'-cmpt3']='';
+      data[type+'-cmpt4']='';
+      data[type+'-note']='';
+      data[type+'-TIME']='';
+      data[type+'-EXTRAS']=[];
+      data[type+'-LIRPHOTO']='';
+    });
+    if(!data.hasIn) data['INBOUND-7C']='';
+    if(!data.hasOut) data['OUTBOUND-7C']='';
+    return data;
+  }
+
+  function makeMemoSignature(m){
+    return [m.dayKey || m.memoDate || '', m.team || '', m.hasIn ? 'I' : '', m.hasOut ? 'O' : '', m['INBOUND-7C'] || '', m.sharedHASH || '', m['OUTBOUND-7C'] || '', m.sharedHL || ''].join('|');
+  }
+
+  async function autoScanPhoto(dataUrl){
+    await ensureTesseractLoaded();
+    if(!window.Tesseract) throw new Error('TESSERACT LOAD FAIL');
+    const result = await window.Tesseract.recognize(dataUrl, 'eng', {
+      logger: m => {
+        if(m && m.status === 'recognizing text') updateGlobalCalcDisplay(`${Math.round((m.progress || 0) * 100)}%`);
+      }
+    });
+
+    const words = (result?.data?.words || []).filter(w => (w.confidence ?? w.conf ?? 0) > 10 && (w.text || '').trim());
+    const rows = groupWordsIntoRows(words);
+    const parsedRows = rows.map(parseRowObject).filter(Boolean);
+    if(!parsedRows.length) throw new Error('AUTO SCAN FAIL');
+
+    const dayKey = getViewingDayKey();
+    const existing = new Set(memos.map(makeMemoSignature));
+    const newItems = [];
+
+    parsedRows.forEach(parsed => {
+      const sameTeam = parsed.teamIn && parsed.teamOut && parsed.teamIn === parsed.teamOut;
+      if(sameTeam){
+        const memo = buildMemoDataFromParsed(parsed, 'BOTH', dayKey);
+        const sig = makeMemoSignature(memo);
+        if(!existing.has(sig)){
+          existing.add(sig);
+          newItems.push(memo);
+        }
+      }else{
+        if(parsed.teamIn && parsed.inbound7c){
+          const memoIn = buildMemoDataFromParsed(parsed, 'IN', dayKey);
+          const sigIn = makeMemoSignature(memoIn);
+          if(!existing.has(sigIn)){
+            existing.add(sigIn);
+            newItems.push(memoIn);
+          }
+        }
+        if(parsed.teamOut && (parsed.outbound7c || parsed.hl)){
+          const memoOut = buildMemoDataFromParsed(parsed, 'OUT', dayKey);
+          const sigOut = makeMemoSignature(memoOut);
+          if(!existing.has(sigOut)){
+            existing.add(sigOut);
+            newItems.push(memoOut);
+          }
+        }
+      }
+    });
+
+    if(!newItems.length) throw new Error('AUTO SCAN FAIL');
+    memos.push(...newItems);
+    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+    renderList(newItems[newItems.length - 1].id);
+    return newItems.length;
+  }
+
   photoInput.onchange = async (e)=>{
     const f = e.target.files && e.target.files[0];
     if(!f) return;
-    await savePhotoFile(f);
-    await autoScanFromImage(f);
+    try{
+      const dataUrl = await savePhotoFile(f);
+      alert('PHOTO SAVED. AUTO SCAN START');
+      const count = await autoScanPhoto(dataUrl);
+      updateGlobalCalcDisplay('0');
+      alert(`AUTO SCAN OK (${count})`);
+    }catch(err){
+      console.error(err);
+      updateGlobalCalcDisplay('0');
+      alert(err && err.message ? err.message : 'AUTO SCAN FAIL');
+    }
   };
 
   lirPhotoInput.onchange = async (e)=>{
@@ -2523,12 +2519,6 @@
   dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
-
-  quickTeamSelect.addEventListener("change", ()=>{
-    if(modal.style.display === "flex" && !editId){
-      memoTeam.value = quickTeamSelect.value;
-    }
-  });
 
   memoDate.value = getViewingDayKey();
   updateDayLabel();
