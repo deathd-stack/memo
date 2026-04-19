@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.13</title>
+<title>JAS MEMO VER 6.5</title>
 
 <style>
   :root{
@@ -666,6 +666,21 @@
     text-align:left;
   }
 
+  .cmptArea{
+    flex:1;
+    min-width:0;
+    min-height:calc(54px * var(--ui));
+    height:calc(54px * var(--ui));
+    line-height:1.35;
+    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
+    text-align:left;
+    resize:none;
+    overflow:hidden;
+    text-transform:uppercase;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
   .extraBox{
     background:#18181b;
     border:2px solid #27272c;
@@ -1013,23 +1028,6 @@
       font-size:14px;
     }
   }
-
-  .cmptArea{
-    flex:1;
-    min-width:0;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
-    text-align:left;
-    text-transform:uppercase;
-    resize:none;
-    overflow:hidden;
-    min-height:calc(54px * var(--ui));
-    height:calc(54px * var(--ui));
-    line-height:1.25;
-    border-radius:calc(22px * var(--ui));
-  }
-
 </style>
 </head>
 
@@ -1038,7 +1036,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.13</div>
+    <div class="titleVer">VER 6.5</div>
   </div>
 </header>
 
@@ -1208,7 +1206,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
+  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1479,6 +1477,132 @@
     activeCalcInput.dispatchEvent(new Event("input", { bubbles:true }));
   }
 
+  function autoGrowTextarea(el){
+    if(!el) return;
+    el.style.height = "calc(54px * var(--ui))";
+    const next = Math.max(el.scrollHeight, 54);
+    el.style.height = next + "px";
+  }
+
+  function normalizeBagText(s){
+    return s.replace(/BAG\s*(\d+)\s*P(?:C|CS)\s*\d+KG/gi, (m,n)=>`BAG ${n}PC`)
+            .replace(/BAG\s*(\d+)\s*P(?:C|CS)/gi, (m,n)=>`BAG ${n}PC`);
+  }
+
+  function removeFakText(s){
+    return s.replace(/(^|,|\s)FAK\s*\d+KG(?=,|$)/gi, '$1')
+            .replace(/,\s*,/g, ', ')
+            .replace(/^\s*,\s*/,'')
+            .replace(/\s{2,}/g,' ')
+            .trim()
+            .replace(/,$/,'');
+  }
+
+  function cleanCmptText(s){
+    let t = (s || '').replace(/\r/g,' ').replace(/\n+/g,' ');
+    t = t.replace(/-INCLUDING/gi, 'INCLUDING');
+    t = normalizeBagText(t);
+    t = removeFakText(t);
+    t = t.replace(/\s+,/g, ',').replace(/,\s+/g, ', ').replace(/\s{2,}/g, ' ').trim();
+    return t || 'NIL';
+  }
+
+  function parseCountList(text, re){
+    let m, total = 0;
+    while((m = re.exec(text))){ total += Number(m[1] || 0); }
+    re.lastIndex = 0;
+    return total;
+  }
+
+  function upsertExtraRow(type, key, val){
+    if(!val) return;
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(!box) return;
+    let found = null;
+    [...box.querySelectorAll('.extraRow')].forEach(r=>{
+      const sel = r.querySelector('select');
+      if(sel && sel.value === key) found = r;
+    });
+    if(found){
+      const inp = found.querySelector('input');
+      inp.value = String((Number(inp.value||0) + Number(val||0))).padStart(3,'0');
+    }else{
+      box.appendChild(makeExtraRow(type, key, String(val)));
+    }
+  }
+
+  function clearExtras(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
+    if(box) box.innerHTML = '';
+  }
+
+  function applyNoteAuto(type, noteText){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    if(!root) return;
+    const text = (noteText || '').replace(/\u00a0/g, ' ');
+    if(!text.trim()) return;
+
+    const blocks = [...text.matchAll(/CPT([1-4])\s*-\s*([\s\S]*?)(?=\n\s*CPT[1-4]\s*-|\n\s*SI\b|$)/gi)];
+    const cmptMap = {1:'',2:'',3:'',4:''};
+    blocks.forEach(m=>{
+      const idx = m[1];
+      cmptMap[idx] = cleanCmptText(m[2]);
+    });
+
+    [1,2,3,4].forEach(i=>{
+      const el = root.querySelector(`[data-k="${type}-cmpt${i}"]`);
+      if(el && cmptMap[i]){
+        el.value = cmptMap[i];
+        autoGrowTextarea(el);
+      }
+    });
+
+    const cptText = Object.values(cmptMap).join(' ');
+    const siMatch = text.match(/(?:^|\n)SI\s*(?:\n|$)([\s\S]*)/i);
+    const siText = siMatch ? siMatch[1] : '';
+    const sourceForExtra = siText.trim() ? siText : cptText;
+
+    const tVal = parseCountList(cptText, /BAG\s*(\d+)\s*P(?:C|CS)/gi);
+    const dVal = parseCountList(sourceForExtra, /(?:D\/S|\bDS\b)\s*(\d+)\s*P?(?:C|CS)?/gi);
+    const bbVal = parseCountList(sourceForExtra, /(?:BBST|\bBB\b)\s*(\d+)/gi);
+    const tEl = root.querySelector(`[data-k="${type}-t"]`);
+    const dEl = root.querySelector(`[data-k="${type}-d"]`);
+    const bbEl = root.querySelector(`[data-k="${type}-bb"]`);
+    if(tEl && tVal) tEl.value = String(tVal).padStart(3,'0');
+    if(dEl && dVal) dEl.value = String(dVal).padStart(2,'0');
+    if(bbEl && bbVal) bbEl.value = String(bbVal).padStart(2,'0');
+
+    clearExtras(type);
+    const patterns = [
+      {key:'C', re:/CGO\s*(\d+)\s*P(?:C|CS)/gi},
+      {key:'EMS', re:/(?:MAIL|POS|EMS)\s*(\d+)\s*P(?:C|CS)/gi},
+      {key:'TS', re:/BT\s*BAG\s*(\d+)\s*P(?:C|CS)/gi},
+      {key:'W', re:/WCHR\s*(\d+)?/gi},
+      {key:'COB', re:/COB\s*(\d+)\s*P?(?:C|CS)?/gi},
+      {key:'GB', re:/G\/B\s*(\d+)?/gi},
+      {key:'TS', re:/(?:\bTS\b|T\/S)\s*(\d+)?/gi},
+      {key:'RUSH', re:/RUSH\s*(\d+)?/gi},
+      {key:'CARSEAT', re:/CARSEAT\s*(\d+)?/gi},
+      {key:'COMAT', re:/COMAT\s*(\d+)?/gi},
+      {key:'LONGFIN', re:/LONGFIN\s*(\d+)?/gi},
+      {key:'CYCLE', re:/CYCLE\s*(\d+)?/gi},
+      {key:'CREW', re:/CREW\s*(\d+)?/gi},
+      {key:'PCB', re:/PCB\s*(\d+)?/gi},
+    ];
+    const totals = {};
+    for(const {key,re} of patterns){
+      let m;
+      while((m = re.exec(sourceForExtra))){
+        const add = Number(m[1] || 1);
+        totals[key] = (totals[key] || 0) + add;
+      }
+      re.lastIndex = 0;
+    }
+    Object.entries(totals).forEach(([k,v])=> upsertExtraRow(type, k, v));
+  }
+
   function makeSection(type, memoData){
     const d = document.createElement("div");
     d.className = "section";
@@ -1491,8 +1615,8 @@
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
 
-    const cmpt1Val = memoData ? defaultF(memoData[type+"-cmpt1"]) : "F";
-    const cmpt2Val = memoData ? defaultF(memoData[type+"-cmpt2"]) : "F";
+    const cmpt1Val = memoData ? (memoData[type+"-cmpt1"] || "") : "";
+    const cmpt2Val = memoData ? (memoData[type+"-cmpt2"] || "") : "";
 
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
@@ -1523,22 +1647,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
+        <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
+        <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
+        <textarea class="cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
+        <textarea class="cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
       </div>
 
       <div class="rowGridTDBB">
@@ -1618,6 +1742,15 @@
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
+
+    [1,2,3,4].forEach(n=> autoGrowTextarea(d.querySelector(`[data-k="${type}-cmpt${n}"]`)));
+    const noteArea = d.querySelector(`textarea[data-k="${type}-note"]`);
+    if(noteArea){
+      noteArea.addEventListener("paste", ()=>{
+        setTimeout(()=> applyNoteAuto(type, noteArea.value), 20);
+      });
+      noteArea.addEventListener("change", ()=> applyNoteAuto(type, noteArea.value));
+    }
 
     return d;
   }
@@ -1717,8 +1850,8 @@
         data[type+"-bb"] = "";
         data[type+"-tt"] = "";
         data[type+"-tb"] = "";
-        data[type+"-cmpt1"] = "F";
-        data[type+"-cmpt2"] = "F";
+        data[type+"-cmpt1"] = "";
+        data[type+"-cmpt2"] = "";
         data[type+"-cmpt3"] = "";
         data[type+"-cmpt4"] = "";
         data[type+"-note"] = "";
@@ -1741,8 +1874,8 @@
       data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
       data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
 
-      data[type+"-cmpt1"] = defaultF(cm(1)?.value || "");
-      data[type+"-cmpt2"] = defaultF(cm(2)?.value || "");
+      data[type+"-cmpt1"] = cleanTextUpper(cm(1)?.value || "");
+      data[type+"-cmpt2"] = cleanTextUpper(cm(2)?.value || "");
       data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
       data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
       data[type+"-note"] = note ? (note.value || "") : "";
@@ -2130,326 +2263,6 @@
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
-  function smartUpper(v){
-    return (v || "").replace(/\s+/g, " ").trim().toUpperCase();
-  }
-
-  function autoResizeTextarea(el){
-    if(!el) return;
-    el.style.height = "calc(54px * var(--ui))";
-    el.style.height = Math.max(el.scrollHeight, 54) + "px";
-  }
-
-  function normalizeForParse(txt){
-    return (txt || "")
-      .replace(/\r/g, "")
-      .replace(/[‐‑–—]/g, "-")
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
-      .replace(/[ \t]+/g, " ")
-      .trim();
-  }
-
-  function stripFakSegments(s){
-    let out = s || "";
-    out = out.replace(/(?:^|,\s*)FAK\s+\d+(?:\.\d+)?\s*KG\b/gi, "");
-    out = out.replace(/,\s*,/g, ", ");
-    out = out.replace(/^,\s*|\s*,\s*$/g, "");
-    out = out.replace(/\s{2,}/g, " ").trim();
-    return out;
-  }
-
-  function normalizeBagSegment(seg){
-    return smartUpper(seg);
-  }
-
-  function normalizeCmptContent(s){
-    let out = smartUpper(s)
-      .replace(/\bN\s+MAIL\b/g, "MAIL")
-      .replace(/\bLDD IN CPT\d\b/g, "")
-      .replace(/\s*,\s*/g, ", ")
-      .replace(/\s{2,}/g, " ")
-      .replace(/,\s*,/g, ", ")
-      .trim();
-
-    out = stripFakSegments(out);
-    return out.replace(/\s{2,}/g, " ").trim() || "NIL";
-  }
-
-  function appendToLast(lines, extra){
-    if(!extra) return;
-    if(!lines.length){
-      lines.push(extra);
-    }else{
-      lines[lines.length - 1] = (lines[lines.length - 1] + " " + extra).replace(/\s{2,}/g, " ").trim();
-    }
-  }
-
-  function splitMainAndSi(noteText){
-    const rawLines = normalizeForParse(noteText).split("\n").map(v=>v.trim()).filter(Boolean);
-    const mainLines = [];
-    const siLines = [];
-    let inSi = false;
-
-    for(let line of rawLines){
-      const upper = line.toUpperCase();
-
-      if(/^SI(?:\s|$)/.test(upper)){
-        if(upper === "SI"){
-          inSi = true;
-          continue;
-        }
-        line = line.replace(/^SI\s*/i, "").trim();
-        inSi = true;
-      }
-
-      if(/^END$/i.test(upper)) break;
-
-      if(/^-/.test(line)){
-        line = line.replace(/^-+\s*/, "").trim();
-        if(inSi) appendToLast(siLines, line);
-        else appendToLast(mainLines, line);
-        continue;
-      }
-
-      if(inSi) siLines.push(line);
-      else mainLines.push(line);
-    }
-
-    return { mainLines, siLines };
-  }
-
-  function parseCptBlocks(noteText){
-    const { mainLines, siLines } = splitMainAndSi(noteText);
-    const cpts = { 1:"", 2:"", 3:"", 4:"" };
-    const mainText = (mainLines || []).join("
-").replace(/
-/g, "");
-    const blocks = mainText.match(/CPT\s*[1-4]\s*-?[\s\S]*?(?=
-\s*CPT\s*[1-4]\s*-?|$)/gi) || [];
-
-    blocks.forEach(block=>{
-      const m = block.match(/^\s*CPT\s*([1-4])\s*-?\s*([\s\S]*)$/i);
-      if(!m) return;
-      const idx = Number(m[1]);
-      const body = (m[2] || "")
-        .split("
-")
-        .map(v=>v.trim())
-        .filter(Boolean)
-        .join(" ")
-        .replace(/\s{2,}/g, " ")
-        .trim();
-      cpts[idx] = normalizeCmptContent(body);
-    });
-
-    Object.keys(cpts).forEach(k=>{
-      if(!cpts[k]) cpts[k] = "NIL";
-    });
-
-    return { cpts, siLines };
-  }
-
-  function extractBagTotal(lines){
-    let total = 0;
-    (lines || []).forEach(v=>{
-      const s = smartUpper(v);
-      let m;
-      const re = /\bBAG\s+(\d+)\s*P(?:C|CS)\b/g;
-      while((m = re.exec(s)) !== null){
-        total += Number(m[1] || 0);
-      }
-    });
-    return total ? String(total) : "";
-  }
-
-  function extractDsTotal(lines){
-    let total = 0;
-    (lines || []).forEach(v=>{
-      const s = smartUpper(v);
-      let m;
-      const re = /\bD\/?S\s+(\d+)\s*P(?:C|CS)\b/g;
-      while((m = re.exec(s)) !== null){
-        total += Number(m[1] || 0);
-      }
-    });
-    return total ? String(total) : "";
-  }
-
-  function extractBbstValue(lines){
-    for(const v of (lines || [])){
-      const s = smartUpper(v);
-      const m = s.match(/\b(?:BBST|BB)\s*[:\/-]?\s*(\d+)\b/);
-      if(m) return m[1];
-    }
-    return "";
-  }
-
-  function collectExtraMatches(lines, fromSi){
-    const extras = [];
-    const add = (key, val)=>{
-      const num = String(val || "").replace(/[^0-9]/g, "");
-      if(!num) return;
-      const exKey = String(key || "").toUpperCase();
-      const found = extras.find(x => x.key === exKey);
-      if(found){
-        found.val = String(Number(found.val || 0) + Number(num));
-      }else{
-        extras.push({ key: exKey, val: num });
-      }
-    };
-
-    const joined = lines.map(smartUpper).join("\n");
-
-    let m;
-    const cgoRe = /\bCGO\s+(\d+)\s*P(?:C|CS)\b/g;
-    while((m = cgoRe.exec(joined)) !== null) add("C", m[1]);
-
-    const emsRe = /\b(?:MAIL|POS|EMS)\s+(\d+)\s*P(?:C|CS)\b/g;
-    while((m = emsRe.exec(joined)) !== null) add("EMS", m[1]);
-
-    const btRe = /\bBT\b[\s,/-]*BAG\s+(\d+)\s*P(?:C|CS)\b/g;
-    while((m = btRe.exec(joined)) !== null) add("TS", m[1]);
-
-    const simpleMap = [
-      ["WCHR","W"], ["COB","COB"], ["G/B","GB"], ["TS","TS"], ["T/S","TS"],
-      ["RUSH","RUSH"], ["CARSEAT","CARSEAT"], ["COMAT","COMAT"], ["LONGFIN","LONGFIN"],
-      ["CYCLE","CYCLE"], ["CREW","CREW"], ["PCB","PCB"]
-    ];
-
-    if(!fromSi){
-      for(const [pattern, key] of simpleMap){
-        const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace("/", "\\/");
-        const re = new RegExp(`\\b${esc}\\b(?:\\s+(\\d+))?`, "g");
-        while((m = re.exec(joined)) !== null){
-          add(key, m[1] || "1");
-        }
-      }
-    }else{
-      for(const [pattern, key] of simpleMap){
-        const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace("/", "\\/");
-        const re = new RegExp(`\\b${esc}\\b(?:\\s+(\\d+))?`, "g");
-        while((m = re.exec(joined)) !== null){
-          add(key, m[1] || "1");
-        }
-      }
-    }
-
-    return extras;
-  }
-
-  function applyExtraRows(type, extras){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
-    const box = root.querySelector(`#${type}-EXTRAS`);
-    if(!box) return;
-    box.innerHTML = "";
-    (extras || []).forEach(ex=>{
-      box.appendChild(makeExtraRow(type, ex.key, ex.val));
-    });
-  }
-
-  function ensureCmptAreas(){
-    ["INBOUND","OUTBOUND"].forEach(type=>{
-      [1,2,3,4].forEach(n=>{
-        const oldEl = sections.querySelector(`[data-k="${type}-cmpt${n}"]`);
-        if(!oldEl || oldEl.tagName === "TEXTAREA") return;
-        const ta = document.createElement("textarea");
-        ta.className = (oldEl.className || "") + " cmptArea";
-        ta.dataset.k = oldEl.dataset.k;
-        ta.placeholder = oldEl.placeholder || "TEXT";
-        ta.value = oldEl.value || "";
-        ta.rows = 1;
-        oldEl.replaceWith(ta);
-        ta.addEventListener("input", ()=> autoResizeTextarea(ta));
-        autoResizeTextarea(ta);
-      });
-    });
-  }
-
-  function attachNoteParser(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
-    const note = root.querySelector(`textarea[data-k="${type}-note"]`);
-    if(!note || note.dataset.noteParserAttached === "1") return;
-    note.dataset.noteParserAttached = "1";
-
-    const run = ()=>{
-      const raw = note.value || "";
-      if(!raw.trim()) return;
-      const { cpts, siLines } = parseCptBlocks(raw);
-
-      [1,2,3,4].forEach(n=>{
-        const el = root.querySelector(`[data-k="${type}-cmpt${n}"]`);
-        if(el && cpts[n]){
-          el.value = cpts[n];
-          if(el.tagName === "TEXTAREA") autoResizeTextarea(el);
-        }
-      });
-
-      const tEl = root.querySelector(`input[data-k="${type}-t"]`);
-      const dEl = root.querySelector(`input[data-k="${type}-d"]`);
-      const bbEl = root.querySelector(`input[data-k="${type}-bb"]`);
-
-      const countLines = siLines.length ? Object.values(cpts).concat(siLines) : Object.values(cpts);
-      const tVal = extractBagTotal(countLines);
-      const dVal = extractDsTotal(countLines);
-      const bbVal = extractBbstValue(countLines);
-
-      if(tEl && tVal) tEl.value = onlyNum(tVal, 3);
-      if(dEl && dVal) dEl.value = onlyNum(dVal, 2);
-      if(bbEl && bbVal) bbEl.value = onlyNum(bbVal, 2);
-
-      let extras = [];
-      if(siLines.length){
-        extras = collectExtraMatches(siLines, true);
-      }else{
-        extras = collectExtraMatches(Object.values(cpts), false);
-      }
-      applyExtraRows(type, extras);
-    };
-
-    note.addEventListener("paste", ()=> setTimeout(run, 0));
-    note.addEventListener("blur", run);
-  }
-
-  function enhanceMemoSections(){
-    ensureCmptAreas();
-    ["INBOUND","OUTBOUND"].forEach(type=>{
-      attachNoteParser(type);
-      [1,2,3,4].forEach(n=>{
-        const el = sections.querySelector(`[data-k="${type}-cmpt${n}"]`);
-        if(el && el.tagName === "TEXTAREA") autoResizeTextarea(el);
-      });
-    });
-  }
-
-  const _buildSectionsBlank = buildSectionsBlank;
-  buildSectionsBlank = function(){
-    _buildSectionsBlank();
-    enhanceMemoSections();
-  };
-
-  const _rebuildSectionsFromMemo = rebuildSectionsFromMemo;
-  rebuildSectionsFromMemo = function(memoData){
-    _rebuildSectionsFromMemo(memoData);
-    enhanceMemoSections();
-  };
-
-  const _newMemo = newMemo;
-  newMemo = function(){
-    _newMemo();
-    enhanceMemoSections();
-  };
-
-  const _editMemo = editMemo;
-  editMemo = function(id){
-    _editMemo(id);
-    enhanceMemoSections();
-  };
-
-  enhanceMemoSections();
-
 </script>
 
 </body>
