@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.12</title>
+<title>JAS MEMO VER 6.4.13</title>
 
 <style>
   :root{
@@ -1038,7 +1038,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.12</div>
+    <div class="titleVer">VER 6.4.13</div>
   </div>
 </header>
 
@@ -1208,7 +1208,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
+  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1729,7 +1729,7 @@
       }
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
+      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
@@ -2160,30 +2160,20 @@
   }
 
   function normalizeBagSegment(seg){
-    let s = smartUpper(seg);
-    const bagPc = s.match(/\bBAG\s+(\d+)\s*P(?:C|CS)\b/);
-    if(bagPc) return `BAG ${bagPc[1]}PC`;
-    return s;
+    return smartUpper(seg);
   }
 
   function normalizeCmptContent(s){
     let out = smartUpper(s)
       .replace(/\bN\s+MAIL\b/g, "MAIL")
       .replace(/\bLDD IN CPT\d\b/g, "")
-      .replace(/\bINCLUDING\b/g, "INCLUDING")
       .replace(/\s*,\s*/g, ", ")
       .replace(/\s{2,}/g, " ")
       .replace(/,\s*,/g, ", ")
       .trim();
 
     out = stripFakSegments(out);
-
-    const parts = out.split(/\s*,\s*/).map(p => p.trim()).filter(Boolean).map(part=>{
-      if(/^BAG\b/i.test(part)) return normalizeBagSegment(part);
-      return part;
-    });
-
-    return parts.join(", ").replace(/\s{2,}/g, " ").trim() || "NIL";
+    return out.replace(/\s{2,}/g, " ").trim() || "NIL";
   }
 
   function appendToLast(lines, extra){
@@ -2232,30 +2222,37 @@
   function parseCptBlocks(noteText){
     const { mainLines, siLines } = splitMainAndSi(noteText);
     const cpts = { 1:"", 2:"", 3:"", 4:"" };
-    let active = 0;
+    const mainText = (mainLines || []).join("
+").replace(/
+/g, "");
+    const blocks = mainText.match(/CPT\s*[1-4]\s*-?[\s\S]*?(?=
+\s*CPT\s*[1-4]\s*-?|$)/gi) || [];
 
-    mainLines.forEach(line=>{
-      const m = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
-      if(m){
-        active = Number(m[1]);
-        cpts[active] = (m[2] || "").trim();
-        return;
-      }
-      if(active){
-        cpts[active] = (cpts[active] + " " + line).replace(/\s{2,}/g, " ").trim();
-      }
+    blocks.forEach(block=>{
+      const m = block.match(/^\s*CPT\s*([1-4])\s*-?\s*([\s\S]*)$/i);
+      if(!m) return;
+      const idx = Number(m[1]);
+      const body = (m[2] || "")
+        .split("
+")
+        .map(v=>v.trim())
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+      cpts[idx] = normalizeCmptContent(body);
     });
 
     Object.keys(cpts).forEach(k=>{
-      cpts[k] = normalizeCmptContent(cpts[k] || "");
+      if(!cpts[k]) cpts[k] = "NIL";
     });
 
     return { cpts, siLines };
   }
 
-  function extractBagTotal(cpts){
+  function extractBagTotal(lines){
     let total = 0;
-    Object.values(cpts).forEach(v=>{
+    (lines || []).forEach(v=>{
       const s = smartUpper(v);
       let m;
       const re = /\bBAG\s+(\d+)\s*P(?:C|CS)\b/g;
@@ -2266,12 +2263,12 @@
     return total ? String(total) : "";
   }
 
-  function extractDsTotal(cpts){
+  function extractDsTotal(lines){
     let total = 0;
-    Object.values(cpts).forEach(v=>{
+    (lines || []).forEach(v=>{
       const s = smartUpper(v);
       let m;
-      const re = /\bD\/S\s+(\d+)\s*P(?:C|CS)\b/g;
+      const re = /\bD\/?S\s+(\d+)\s*P(?:C|CS)\b/g;
       while((m = re.exec(s)) !== null){
         total += Number(m[1] || 0);
       }
@@ -2279,9 +2276,10 @@
     return total ? String(total) : "";
   }
 
-  function extractBbstValue(cpts){
-    for(const v of Object.values(cpts)){
-      const m = smartUpper(v).match(/\bBBST\s*[:\/-]?\s*(\d+)\b/);
+  function extractBbstValue(lines){
+    for(const v of (lines || [])){
+      const s = smartUpper(v);
+      const m = s.match(/\b(?:BBST|BB)\s*[:\/-]?\s*(\d+)\b/);
       if(m) return m[1];
     }
     return "";
@@ -2393,9 +2391,10 @@
       const dEl = root.querySelector(`input[data-k="${type}-d"]`);
       const bbEl = root.querySelector(`input[data-k="${type}-bb"]`);
 
-      const tVal = extractBagTotal(cpts);
-      const dVal = extractDsTotal(cpts);
-      const bbVal = extractBbstValue(cpts);
+      const countLines = siLines.length ? Object.values(cpts).concat(siLines) : Object.values(cpts);
+      const tVal = extractBagTotal(countLines);
+      const dVal = extractDsTotal(countLines);
+      const bbVal = extractBbstValue(countLines);
 
       if(tEl && tVal) tEl.value = onlyNum(tVal, 3);
       if(dEl && dVal) dEl.value = onlyNum(dVal, 2);
