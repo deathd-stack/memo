@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.4.11</title>
+<title>JAS MEMO VER 6.4.12</title>
 
 <style>
   :root{
@@ -1015,67 +1015,19 @@
   }
 
   .cmptArea{
-    min-height:calc(54px * var(--ui));
-    height:auto;
-    resize:none;
-    line-height:1.35;
+    flex:1;
+    min-width:0;
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
     padding:calc(14px * var(--ui)) calc(16px * var(--ui));
     text-align:left;
+    text-transform:uppercase;
+    resize:none;
     overflow:hidden;
-    white-space:pre-wrap;
-    word-break:break-word;
-    text-transform:uppercase;
-  }
-
-  .noticeOverlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.48);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:140;
-    padding:16px;
-  }
-
-  .noticeBox{
-    width:min(92vw, 420px);
-    background:#19191d;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:28px;
-    box-shadow:0 24px 48px rgba(0,0,0,.34);
-    padding:20px;
-  }
-
-  .noticeTitle{
-    font-size:20px;
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-    margin-bottom:10px;
-  }
-
-  .noticeText{
-    font-size:15px;
-    color:#fff;
-    line-height:1.5;
-    word-break:keep-all;
-  }
-
-  .noticeRow{
-    margin-top:14px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:#fff;
-    font-size:14px;
-    font-weight:900;
-  }
-
-  .noticeActions{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:16px;
+    min-height:calc(54px * var(--ui));
+    height:calc(54px * var(--ui));
+    line-height:1.25;
+    border-radius:calc(22px * var(--ui));
   }
 
 </style>
@@ -1086,7 +1038,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.4.11</div>
+    <div class="titleVer">VER 6.4.12</div>
   </div>
 </header>
 
@@ -1218,21 +1170,6 @@
   </div>
 </div>
 
-
-<div class="noticeOverlay" id="noticeOverlay">
-  <div class="noticeBox" onclick="event.stopPropagation()">
-    <div class="noticeTitle">수정사항</div>
-    <div class="noticeText">이제 INBOUND NOTE에 LDM 복사해서 넣으시면 자동으로 입력됩니다.</div>
-    <label class="noticeRow">
-      <input type="checkbox" id="noticeNeverAgain">
-      <span>다시는 보지 않음</span>
-    </label>
-    <div class="noticeActions">
-      <button type="button" class="topMiniBtn" id="noticeCloseBtn">닫기</button>
-    </div>
-  </div>
-</div>
-
 <script>
   const MEMO_KEY = "jas_memos_v64";
   const PHOTO_KEY = "jas_photo_v64";
@@ -1261,9 +1198,6 @@
 
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
-  const noticeOverlay = document.getElementById("noticeOverlay");
-  const noticeNeverAgain = document.getElementById("noticeNeverAgain");
-  const noticeCloseBtn = document.getElementById("noticeCloseBtn");
 
   let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
   let photo = localStorage.getItem(PHOTO_KEY) || "";
@@ -1274,7 +1208,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
 
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PCB"];
+  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1589,22 +1523,22 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
+        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
+        <input class="long" data-k="${type}-cmpt2" value="${cmpt2Val}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt3" placeholder="TEXT" >${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
+        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt3'] || '') : ''}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <textarea class="long cmptArea" data-k="${type}-cmpt4" placeholder="TEXT" >${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
+        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type+'-cmpt4'] || '') : ''}">
       </div>
 
       <div class="rowGridTDBB">
@@ -1795,7 +1729,7 @@
       }
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
+      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
@@ -2190,227 +2124,333 @@
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
-
-  function autoResizeTextarea(el){
-    if(!el || !(el instanceof HTMLTextAreaElement)) return;
-    el.style.height = "auto";
-    el.style.height = Math.max(el.scrollHeight, 54) + "px";
-  }
-
-  function autoResizeAllCmpt(root = document){
-    root.querySelectorAll(".cmptArea").forEach(autoResizeTextarea);
-  }
-
-  function getExtraBox(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    return root ? root.querySelector(`#${type}-EXTRAS`) : null;
-  }
-
-  function clearExtraKey(type, key){
-    const box = getExtraBox(type);
-    if(!box) return;
-    [...box.querySelectorAll(".extraRow")].forEach(row=>{
-      const sel = row.querySelector("select");
-      if((sel?.value || "").toUpperCase() === key.toUpperCase()) row.remove();
-    });
-  }
-
-  function setExtraKey(type, key, val){
-    const box = getExtraBox(type);
-    if(!box) return;
-    clearExtraKey(type, key);
-    const num = onlyNum(String(val || ""), 3);
-    if(!num) return;
-    box.appendChild(makeExtraRow(type, key.toUpperCase(), num));
-  }
-
-  function normalizeSpaces(text){
-    return String(text || "").replace(/\r/g, "").replace(/\t/g, " ").replace(/[ ]{2,}/g, " ");
-  }
-
-  function cleanSegmentText(seg){
-    let s = cleanTextUpper(seg || "");
-    s = s.replace(/\bFAK\s+\d+(?:\.\d+)?KG\b/g, "");
-    s = s.replace(/\s*,\s*,/g, ", ").replace(/\s{2,}/g, " ").replace(/^,\s*|\s*,\s*$/g, "").trim();
-    return s;
-  }
-
-  function normalizeCargoSegment(seg){
-    let s = cleanSegmentText(seg);
-    if(!s) return "";
-    if(/\b(BAG|CGO|MAIL|POS|EMS)\b/.test(s) && /\b\d+\s*(?:PC|PCS)\b/.test(s)){
-      s = s.replace(/\b(\d+)\s*PCS\b/g, "$1PC");
-      s = s.replace(/\b(\d+)\s*PC\b/g, "$1PC");
-      s = s.replace(/\s+\d+(?:\.\d+)?KG\b/g, "");
-      s = s.replace(/\s{2,}/g, " ").trim();
-    }
-    return s;
-  }
-
-  function mergeContinuationLines(lines){
-    const out = [];
-    let lastKey = "";
-    for(const raw of lines){
-      const line = cleanTextUpper(raw);
-      if(!line) continue;
-      const m = line.match(/^CPT([1-4])\s*-\s*(.*)$/);
-      if(m){
-        lastKey = "CPT" + m[1];
-        out.push({ key:lastKey, text:m[2].trim() });
-        continue;
-      }
-      if(lastKey && (/^-\s*/.test(line) || /^INCLUDING\b/.test(line) || /^N\b/.test(line) || /^LDD\b/.test(line))){
-        const target = out[out.length - 1];
-        target.text += " " + line.replace(/^-+\s*/, "");
-      }
-    }
-    return out;
-  }
-
-  function parseSiExtraBlock(text){
-    const result = { C:0, EMS:0, TS:0 };
-    const lines = normalizeSpaces(text).split("\n").map(v=>v.trim()).filter(Boolean);
-    const siIndex = lines.findIndex(v => /^SI$/i.test(v));
-    if(siIndex < 0) return result;
-    const block = lines.slice(siIndex + 1).join(" ").toUpperCase();
-    const cMatches = [...block.matchAll(/\bCGO\s+(\d+)\s*(?:PC|PCS)\b/g)];
-    const emsMatches = [...block.matchAll(/\b(?:MAIL|POS|EMS)\s+(\d+)\s*(?:PC|PCS)\b/g)];
-    const tsMatches = [...block.matchAll(/\bBT\b[^.\n]*?\b(?:BAG\s+)?(\d+)\s*(?:PC|PCS)\b/g)];
-    result.C = cMatches.reduce((a,m)=>a+Number(m[1]||0),0);
-    result.EMS = emsMatches.reduce((a,m)=>a+Number(m[1]||0),0);
-    result.TS = tsMatches.reduce((a,m)=>a+Number(m[1]||0),0);
-    return result;
-  }
-
-  function parseNoteIntoSection(type, text){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
-    const lines = normalizeSpaces(text).split("\n");
-    const merged = mergeContinuationLines(lines);
-    const cmpts = { CPT1:"", CPT2:"", CPT3:"", CPT4:"" };
-
-    merged.forEach(item=>{
-      let value = normalizeCargoSegment(item.text);
-      value = value.replace(/\bNIL\b/g, "NIL");
-      cmpts[item.key] = cleanSegmentText(value);
-    });
-
-    const allText = normalizeSpaces(text).toUpperCase();
-    const bagPcSum = [...allText.matchAll(/\bBAG\s+(\d+)\s*(?:PC|PCS)\b/g)].reduce((a,m)=>a+Number(m[1]||0),0);
-    const dsSum = [...allText.matchAll(/\bD\/S\s+(\d+)\s*(?:PC|PCS)\b/g)].reduce((a,m)=>a+Number(m[1]||0),0);
-    const bbstMatch = allText.match(/\bBBST\s*[:\-]?\s*(\d+)\b/);
-
-    if(bagPcSum){
-      const tInput = root.querySelector(`input[data-k="${type}-t"]`);
-      if(tInput) tInput.value = String(bagPcSum).slice(0,3);
-    }
-    if(dsSum){
-      const dInput = root.querySelector(`input[data-k="${type}-d"]`);
-      if(dInput) dInput.value = String(dsSum).slice(0,2);
-    }
-    if(bbstMatch){
-      const bbInput = root.querySelector(`input[data-k="${type}-bb"]`);
-      if(bbInput) bbInput.value = String(Number(bbstMatch[1]||0)).slice(0,2);
-    }
-
-    for(let i=1;i<=4;i++){
-      const el = root.querySelector(`[data-k="${type}-cmpt${i}"]`);
-      if(el && cmpts["CPT"+i]){
-        el.value = cmpts["CPT"+i];
-        autoResizeTextarea(el);
-      }
-    }
-
-    const siExtras = parseSiExtraBlock(text);
-    const simpleExtraRules = [
-      { key:"W", regex:/\bWCHR\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"COB", regex:/\bCOB\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"GB", regex:/\bG\/B\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"TS", regex:/\b(?:T\/S|TS)\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"RUSH", regex:/\bRUSH\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"CARSEAT", regex:/\bCARSEAT\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"COMAT", regex:/\bCOMAT\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"LONGFIN", regex:/\bLONGFIN\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"CYCLE", regex:/\bCYCLE\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"CREW", regex:/\bCREW\s+(\d+)\s*(?:PC|PCS)\b/g },
-      { key:"PCB", regex:/\bPCB\s+(\d+)\s*(?:PC|PCS)\b/g }
-    ];
-
-    setExtraKey(type, "C", siExtras.C);
-    setExtraKey(type, "EMS", siExtras.EMS);
-    setExtraKey(type, "TS", siExtras.TS);
-
-    for(const rule of simpleExtraRules){
-      const total = [...allText.matchAll(rule.regex)].reduce((a,m)=>a+Number(m[1]||0),0);
-      if(total) setExtraKey(type, rule.key, total);
-    }
-  }
-
-  function bindNoteParsers(root = document){
-    root.querySelectorAll('textarea[data-k$="-note"]').forEach(note=>{
-      if(note.dataset.noteBound === "1") return;
-      note.dataset.noteBound = "1";
-      note.addEventListener("paste", ()=>{
-        setTimeout(()=>{
-          const key = note.dataset.k || "";
-          const type = key.startsWith("OUTBOUND-") ? "OUTBOUND" : "INBOUND";
-          parseNoteIntoSection(type, note.value || "");
-        }, 0);
-      });
-      note.addEventListener("input", ()=>{
-        if((note.value || "").includes("CPT") || (note.value || "").includes("SI")){
-          const key = note.dataset.k || "";
-          const type = key.startsWith("OUTBOUND-") ? "OUTBOUND" : "INBOUND";
-          parseNoteIntoSection(type, note.value || "");
-        }
-      });
-    });
-  }
-
-  function showNoticeIfNeeded(){
-    try{
-      if(localStorage.getItem("jas_notice_hide_6411") === "Y") return;
-    }catch(e){}
-    noticeOverlay.style.display = "flex";
-  }
-
-  function closeNotice(){
-    if(noticeNeverAgain.checked){
-      try{ localStorage.setItem("jas_notice_hide_6411", "Y"); }catch(e){}
-    }
-    noticeOverlay.style.display = "none";
-  }
-
-  if(noticeCloseBtn){
-    noticeCloseBtn.addEventListener("click", closeNotice);
-  }
-  if(noticeOverlay){
-    noticeOverlay.addEventListener("click", closeNotice);
-  }
-
-  const _origBuildSectionsBlank = buildSectionsBlank;
-  buildSectionsBlank = function(){
-    _origBuildSectionsBlank();
-    bindNoteParsers(sections);
-    autoResizeAllCmpt(sections);
-  };
-
-  const _origRebuildSectionsFromMemo = rebuildSectionsFromMemo;
-  rebuildSectionsFromMemo = function(memoData){
-    _origRebuildSectionsFromMemo(memoData);
-    bindNoteParsers(sections);
-    autoResizeAllCmpt(sections);
-  };
-
   memoDate.value = getViewingDayKey();
   updateDayLabel();
   renderList();
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
-  bindNoteParsers(sections);
-  autoResizeAllCmpt(sections);
-  setTimeout(showNoticeIfNeeded, 120);
+  function smartUpper(v){
+    return (v || "").replace(/\s+/g, " ").trim().toUpperCase();
+  }
+
+  function autoResizeTextarea(el){
+    if(!el) return;
+    el.style.height = "calc(54px * var(--ui))";
+    el.style.height = Math.max(el.scrollHeight, 54) + "px";
+  }
+
+  function normalizeForParse(txt){
+    return (txt || "")
+      .replace(/\r/g, "")
+      .replace(/[‐‑–—]/g, "-")
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/[ \t]+/g, " ")
+      .trim();
+  }
+
+  function stripFakSegments(s){
+    let out = s || "";
+    out = out.replace(/(?:^|,\s*)FAK\s+\d+(?:\.\d+)?\s*KG\b/gi, "");
+    out = out.replace(/,\s*,/g, ", ");
+    out = out.replace(/^,\s*|\s*,\s*$/g, "");
+    out = out.replace(/\s{2,}/g, " ").trim();
+    return out;
+  }
+
+  function normalizeBagSegment(seg){
+    let s = smartUpper(seg);
+    const bagPc = s.match(/\bBAG\s+(\d+)\s*P(?:C|CS)\b/);
+    if(bagPc) return `BAG ${bagPc[1]}PC`;
+    return s;
+  }
+
+  function normalizeCmptContent(s){
+    let out = smartUpper(s)
+      .replace(/\bN\s+MAIL\b/g, "MAIL")
+      .replace(/\bLDD IN CPT\d\b/g, "")
+      .replace(/\bINCLUDING\b/g, "INCLUDING")
+      .replace(/\s*,\s*/g, ", ")
+      .replace(/\s{2,}/g, " ")
+      .replace(/,\s*,/g, ", ")
+      .trim();
+
+    out = stripFakSegments(out);
+
+    const parts = out.split(/\s*,\s*/).map(p => p.trim()).filter(Boolean).map(part=>{
+      if(/^BAG\b/i.test(part)) return normalizeBagSegment(part);
+      return part;
+    });
+
+    return parts.join(", ").replace(/\s{2,}/g, " ").trim() || "NIL";
+  }
+
+  function appendToLast(lines, extra){
+    if(!extra) return;
+    if(!lines.length){
+      lines.push(extra);
+    }else{
+      lines[lines.length - 1] = (lines[lines.length - 1] + " " + extra).replace(/\s{2,}/g, " ").trim();
+    }
+  }
+
+  function splitMainAndSi(noteText){
+    const rawLines = normalizeForParse(noteText).split("\n").map(v=>v.trim()).filter(Boolean);
+    const mainLines = [];
+    const siLines = [];
+    let inSi = false;
+
+    for(let line of rawLines){
+      const upper = line.toUpperCase();
+
+      if(/^SI(?:\s|$)/.test(upper)){
+        if(upper === "SI"){
+          inSi = true;
+          continue;
+        }
+        line = line.replace(/^SI\s*/i, "").trim();
+        inSi = true;
+      }
+
+      if(/^END$/i.test(upper)) break;
+
+      if(/^-/.test(line)){
+        line = line.replace(/^-+\s*/, "").trim();
+        if(inSi) appendToLast(siLines, line);
+        else appendToLast(mainLines, line);
+        continue;
+      }
+
+      if(inSi) siLines.push(line);
+      else mainLines.push(line);
+    }
+
+    return { mainLines, siLines };
+  }
+
+  function parseCptBlocks(noteText){
+    const { mainLines, siLines } = splitMainAndSi(noteText);
+    const cpts = { 1:"", 2:"", 3:"", 4:"" };
+    let active = 0;
+
+    mainLines.forEach(line=>{
+      const m = line.match(/^CPT\s*([1-4])\s*-\s*(.*)$/i);
+      if(m){
+        active = Number(m[1]);
+        cpts[active] = (m[2] || "").trim();
+        return;
+      }
+      if(active){
+        cpts[active] = (cpts[active] + " " + line).replace(/\s{2,}/g, " ").trim();
+      }
+    });
+
+    Object.keys(cpts).forEach(k=>{
+      cpts[k] = normalizeCmptContent(cpts[k] || "");
+    });
+
+    return { cpts, siLines };
+  }
+
+  function extractBagTotal(cpts){
+    let total = 0;
+    Object.values(cpts).forEach(v=>{
+      const s = smartUpper(v);
+      let m;
+      const re = /\bBAG\s+(\d+)\s*P(?:C|CS)\b/g;
+      while((m = re.exec(s)) !== null){
+        total += Number(m[1] || 0);
+      }
+    });
+    return total ? String(total) : "";
+  }
+
+  function extractDsTotal(cpts){
+    let total = 0;
+    Object.values(cpts).forEach(v=>{
+      const s = smartUpper(v);
+      let m;
+      const re = /\bD\/S\s+(\d+)\s*P(?:C|CS)\b/g;
+      while((m = re.exec(s)) !== null){
+        total += Number(m[1] || 0);
+      }
+    });
+    return total ? String(total) : "";
+  }
+
+  function extractBbstValue(cpts){
+    for(const v of Object.values(cpts)){
+      const m = smartUpper(v).match(/\bBBST\s*[:\/-]?\s*(\d+)\b/);
+      if(m) return m[1];
+    }
+    return "";
+  }
+
+  function collectExtraMatches(lines, fromSi){
+    const extras = [];
+    const add = (key, val)=>{
+      const num = String(val || "").replace(/[^0-9]/g, "");
+      if(!num) return;
+      const exKey = String(key || "").toUpperCase();
+      const found = extras.find(x => x.key === exKey);
+      if(found){
+        found.val = String(Number(found.val || 0) + Number(num));
+      }else{
+        extras.push({ key: exKey, val: num });
+      }
+    };
+
+    const joined = lines.map(smartUpper).join("\n");
+
+    let m;
+    const cgoRe = /\bCGO\s+(\d+)\s*P(?:C|CS)\b/g;
+    while((m = cgoRe.exec(joined)) !== null) add("C", m[1]);
+
+    const emsRe = /\b(?:MAIL|POS|EMS)\s+(\d+)\s*P(?:C|CS)\b/g;
+    while((m = emsRe.exec(joined)) !== null) add("EMS", m[1]);
+
+    const btRe = /\bBT\b[\s,/-]*BAG\s+(\d+)\s*P(?:C|CS)\b/g;
+    while((m = btRe.exec(joined)) !== null) add("TS", m[1]);
+
+    const simpleMap = [
+      ["WCHR","W"], ["COB","COB"], ["G/B","GB"], ["TS","TS"], ["T/S","TS"],
+      ["RUSH","RUSH"], ["CARSEAT","CARSEAT"], ["COMAT","COMAT"], ["LONGFIN","LONGFIN"],
+      ["CYCLE","CYCLE"], ["CREW","CREW"], ["PCB","PCB"]
+    ];
+
+    if(!fromSi){
+      for(const [pattern, key] of simpleMap){
+        const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace("/", "\\/");
+        const re = new RegExp(`\\b${esc}\\b(?:\\s+(\\d+))?`, "g");
+        while((m = re.exec(joined)) !== null){
+          add(key, m[1] || "1");
+        }
+      }
+    }else{
+      for(const [pattern, key] of simpleMap){
+        const esc = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace("/", "\\/");
+        const re = new RegExp(`\\b${esc}\\b(?:\\s+(\\d+))?`, "g");
+        while((m = re.exec(joined)) !== null){
+          add(key, m[1] || "1");
+        }
+      }
+    }
+
+    return extras;
+  }
+
+  function applyExtraRows(type, extras){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    if(!root) return;
+    const box = root.querySelector(`#${type}-EXTRAS`);
+    if(!box) return;
+    box.innerHTML = "";
+    (extras || []).forEach(ex=>{
+      box.appendChild(makeExtraRow(type, ex.key, ex.val));
+    });
+  }
+
+  function ensureCmptAreas(){
+    ["INBOUND","OUTBOUND"].forEach(type=>{
+      [1,2,3,4].forEach(n=>{
+        const oldEl = sections.querySelector(`[data-k="${type}-cmpt${n}"]`);
+        if(!oldEl || oldEl.tagName === "TEXTAREA") return;
+        const ta = document.createElement("textarea");
+        ta.className = (oldEl.className || "") + " cmptArea";
+        ta.dataset.k = oldEl.dataset.k;
+        ta.placeholder = oldEl.placeholder || "TEXT";
+        ta.value = oldEl.value || "";
+        ta.rows = 1;
+        oldEl.replaceWith(ta);
+        ta.addEventListener("input", ()=> autoResizeTextarea(ta));
+        autoResizeTextarea(ta);
+      });
+    });
+  }
+
+  function attachNoteParser(type){
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    if(!root) return;
+    const note = root.querySelector(`textarea[data-k="${type}-note"]`);
+    if(!note || note.dataset.noteParserAttached === "1") return;
+    note.dataset.noteParserAttached = "1";
+
+    const run = ()=>{
+      const raw = note.value || "";
+      if(!raw.trim()) return;
+      const { cpts, siLines } = parseCptBlocks(raw);
+
+      [1,2,3,4].forEach(n=>{
+        const el = root.querySelector(`[data-k="${type}-cmpt${n}"]`);
+        if(el && cpts[n]){
+          el.value = cpts[n];
+          if(el.tagName === "TEXTAREA") autoResizeTextarea(el);
+        }
+      });
+
+      const tEl = root.querySelector(`input[data-k="${type}-t"]`);
+      const dEl = root.querySelector(`input[data-k="${type}-d"]`);
+      const bbEl = root.querySelector(`input[data-k="${type}-bb"]`);
+
+      const tVal = extractBagTotal(cpts);
+      const dVal = extractDsTotal(cpts);
+      const bbVal = extractBbstValue(cpts);
+
+      if(tEl && tVal) tEl.value = onlyNum(tVal, 3);
+      if(dEl && dVal) dEl.value = onlyNum(dVal, 2);
+      if(bbEl && bbVal) bbEl.value = onlyNum(bbVal, 2);
+
+      let extras = [];
+      if(siLines.length){
+        extras = collectExtraMatches(siLines, true);
+      }else{
+        extras = collectExtraMatches(Object.values(cpts), false);
+      }
+      applyExtraRows(type, extras);
+    };
+
+    note.addEventListener("paste", ()=> setTimeout(run, 0));
+    note.addEventListener("blur", run);
+  }
+
+  function enhanceMemoSections(){
+    ensureCmptAreas();
+    ["INBOUND","OUTBOUND"].forEach(type=>{
+      attachNoteParser(type);
+      [1,2,3,4].forEach(n=>{
+        const el = sections.querySelector(`[data-k="${type}-cmpt${n}"]`);
+        if(el && el.tagName === "TEXTAREA") autoResizeTextarea(el);
+      });
+    });
+  }
+
+  const _buildSectionsBlank = buildSectionsBlank;
+  buildSectionsBlank = function(){
+    _buildSectionsBlank();
+    enhanceMemoSections();
+  };
+
+  const _rebuildSectionsFromMemo = rebuildSectionsFromMemo;
+  rebuildSectionsFromMemo = function(memoData){
+    _rebuildSectionsFromMemo(memoData);
+    enhanceMemoSections();
+  };
+
+  const _newMemo = newMemo;
+  newMemo = function(){
+    _newMemo();
+    enhanceMemoSections();
+  };
+
+  const _editMemo = editMemo;
+  editMemo = function(id){
+    _editMemo(id);
+    enhanceMemoSections();
+  };
+
+  enhanceMemoSections();
+
 </script>
 
 </body>
