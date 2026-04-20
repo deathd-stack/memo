@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>JAS MEMO VER 6.5</title>
+<title>JAS MEMO VER.X</title>
 
 <style>
   :root{
@@ -83,43 +83,40 @@
     flex-wrap:wrap;
   }
 
-  .teamQuickWrap{
+  .teamControlWrap{
     display:flex;
     align-items:center;
     gap:calc(8px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
     border:1px solid rgba(255,255,255,.06);
     border-radius:999px;
     padding:calc(8px * var(--ui)) calc(12px * var(--ui));
+    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
     box-shadow:var(--shadow-soft);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
   }
 
-  .teamQuickLabel{
+  .teamControlLabel{
     color:#fff;
-    font-weight:1000;
     font-size:calc(14px * var(--ui));
+    font-weight:1000;
     text-transform:uppercase;
     white-space:nowrap;
   }
 
-  .teamQuickSelect{
+  .teamControlSelect{
     height:calc(40px * var(--ui));
-    min-width:calc(92px * var(--ui));
-    border:2px solid var(--line);
+    min-width:calc(96px * var(--ui));
+    padding:0 calc(10px * var(--ui));
     border-radius:calc(16px * var(--ui));
+    border:2px solid var(--line);
     background:#121214;
     color:#fff;
-    padding:0 calc(10px * var(--ui));
     font-family:inherit;
     font-size:calc(15px * var(--ui));
     font-weight:1000;
     text-transform:uppercase;
-    outline:none;
   }
 
-  .teamPill{
+  .teamBadge{
     margin-top:calc(8px * var(--ui));
     margin-left:calc(42px * var(--ui));
     display:inline-flex;
@@ -129,8 +126,50 @@
     border-radius:999px;
     background:rgba(255,255,255,.05);
     border:1px solid rgba(255,255,255,.05);
-    font-size:calc(12px * var(--ui));
     color:var(--muted);
+    font-size:calc(12px * var(--ui));
+    font-weight:1000;
+    text-transform:uppercase;
+  }
+
+  .cmptWrap{
+    flex:1;
+    min-width:0;
+    display:flex;
+    align-items:flex-start;
+    gap:calc(8px * var(--ui));
+  }
+
+  .cmptFWrap{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    min-height:calc(54px * var(--ui));
+    padding:0 calc(10px * var(--ui));
+    border:2px solid var(--line);
+    border-radius:calc(22px * var(--ui));
+    background:#121214;
+  }
+
+  .cmptFLabel{
+    color:#fff;
+    font-size:calc(16px * var(--ui));
+    font-weight:1000;
+    text-transform:uppercase;
+  }
+
+  .cmptFSelect{
+    width:calc(58px * var(--ui));
+    min-width:calc(58px * var(--ui));
+    height:calc(38px * var(--ui));
+    padding:0 calc(8px * var(--ui));
+    border-radius:calc(14px * var(--ui));
+    border:2px solid var(--line);
+    background:#0f0f12;
+    color:#fff;
+    font-family:inherit;
+    font-size:calc(16px * var(--ui));
     font-weight:1000;
     text-transform:uppercase;
   }
@@ -1079,11 +1118,6 @@
       padding:8px 12px;
       font-size:14px;
     }
-
-    .teamQuickWrap{
-      width:100%;
-      justify-content:center;
-    }
   }
 </style>
 </head>
@@ -1093,7 +1127,7 @@
 <header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
   <div class="titleWrap">
     <div class="titleMain">JAS MEMO</div>
-    <div class="titleVer">VER 6.5.2</div>
+    <div class="titleVer">VER.X</div>
   </div>
 </header>
 
@@ -1101,9 +1135,9 @@
   <button type="button" onclick="newMemo()">ADD</button>
   <button type="button" onclick="deleteSelected()">DELETE</button>
   <button type="button" onclick="addPhoto()">PHOTO</button>
-  <div class="teamQuickWrap">
-    <div class="teamQuickLabel">TEAM</div>
-    <select id="quickTeamSelect" class="teamQuickSelect"></select>
+  <div class="teamControlWrap">
+    <div class="teamControlLabel">TEAM</div>
+    <select id="quickTeamSelect" class="teamControlSelect"></select>
   </div>
 </div>
 
@@ -1245,10 +1279,10 @@
   const photoImg = document.getElementById("photoImg");
   const memoDate = document.getElementById("memoDate");
   const dayLabel = document.getElementById("dayLabel");
-  const quickTeamSelect = document.getElementById("quickTeamSelect");
   const pickInbound = document.getElementById("pickInbound");
   const pickOutbound = document.getElementById("pickOutbound");
   const topControls = document.getElementById("topControls");
+  const quickTeamSelect = document.getElementById("quickTeamSelect");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -1267,26 +1301,34 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
-  let activeTeamFilter = "";
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW"];
 
-  function getTeamOptions(){
-    return ["", ...Array.from({length:24}, (_,i)=>String(i+1)), "G1", "G2", "T"];
-  }
+  const TEAM_VALUES = ["ALL", ...Array.from({length:24}, (_,i)=> String(i+1)), "G1", "G2", "T"];
+  let activeTeamFilter = "ALL";
 
-  function fillQuickTeamSelect(selected = ""){
+  function fillTeamOptions(selected = "ALL"){
     if(!quickTeamSelect) return;
-    quickTeamSelect.innerHTML = getTeamOptions().map(v=>{
-      const label = v ? v : "ALL";
-      return `<option value="${v}" ${String(v)===String(selected)?"selected":""}>${label}</option>`;
-    }).join("");
+    quickTeamSelect.innerHTML = TEAM_VALUES.map(v => `<option value="${v}" ${String(v)===String(selected) ? "selected" : ""}>${v}</option>`).join("");
   }
 
-  function getTeamLabel(team){
-    return team ? `TEAM ${team}` : "TEAM NONE";
+  function parseFStoredValue(raw){
+    const txt = String(raw || "").trim();
+    const m = txt.match(/^F\s*([0-4])\s*(.*)$/i);
+    if(m) return { level: m[1], text: m[2].trim() };
+    return { level: "0", text: txt };
   }
 
+  function buildStoredCmptValue(type, idx, root){
+    const textarea = root.querySelector(`[data-k="${type}-cmpt${idx}"]`);
+    const text = cleanTextUpper(textarea?.value || "");
+    if(type === "OUTBOUND" && (idx === 1 || idx === 2)){
+      const sel = root.querySelector(`[data-k="${type}-cmpt${idx}-f"]`);
+      const level = sel ? String(sel.value || "0") : "0";
+      return text ? `F${level} ${text}` : `F${level}`;
+    }
+    return text;
+  }
 
   function onlyNum(val, len){
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
@@ -1366,7 +1408,15 @@
 
   function moveDay(n){
     dayOffset += n;
-    updateDayLabel();
+    fillTeamOptions("ALL");
+  if(quickTeamSelect){
+    quickTeamSelect.addEventListener("change", ()=>{
+      activeTeamFilter = quickTeamSelect.value || "ALL";
+      renderList();
+    });
+  }
+
+  updateDayLabel();
     renderList();
   }
 
@@ -1695,8 +1745,10 @@
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
 
-    const cmpt1Val = memoData ? (memoData[type+"-cmpt1"] || "") : "";
-    const cmpt2Val = memoData ? (memoData[type+"-cmpt2"] || "") : "";
+    const cmpt1Raw = memoData ? (memoData[type+"-cmpt1"] || "") : "";
+    const cmpt2Raw = memoData ? (memoData[type+"-cmpt2"] || "") : "";
+    const cmpt1Parsed = parseFStoredValue(cmpt1Raw);
+    const cmpt2Parsed = parseFStoredValue(cmpt2Raw);
 
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
@@ -1727,12 +1779,32 @@
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${cmpt1Val}</textarea>
+        <div class="cmptWrap">
+          ${type === "OUTBOUND" ? `
+            <div class="cmptFWrap">
+              <div class="cmptFLabel">F</div>
+              <select class="cmptFSelect" data-k="${type}-cmpt1-f">
+                ${[0,1,2,3,4].map(n => `<option value="${n}" ${String(n)===cmpt1Parsed.level ? "selected" : ""}>${n}</option>`).join("")}
+              </select>
+            </div>
+          ` : ""}
+          <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${type === "OUTBOUND" ? cmpt1Parsed.text : cmpt1Raw}</textarea>
+        </div>
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${cmpt2Val}</textarea>
+        <div class="cmptWrap">
+          ${type === "OUTBOUND" ? `
+            <div class="cmptFWrap">
+              <div class="cmptFLabel">F</div>
+              <select class="cmptFSelect" data-k="${type}-cmpt2-f">
+                ${[0,1,2,3,4].map(n => `<option value="${n}" ${String(n)===cmpt2Parsed.level ? "selected" : ""}>${n}</option>`).join("")}
+              </select>
+            </div>
+          ` : ""}
+          <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${type === "OUTBOUND" ? cmpt2Parsed.text : cmpt2Raw}</textarea>
+        </div>
       </div>
 
       <div class="row">
@@ -1823,7 +1895,13 @@
     const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
     extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
-    [1,2,3,4].forEach(n=> autoGrowTextarea(d.querySelector(`[data-k="${type}-cmpt${n}"]`)));
+    [1,2,3,4].forEach(n=>{
+      const area = d.querySelector(`[data-k="${type}-cmpt${n}"]`);
+      if(area){
+        autoGrowTextarea(area);
+        area.addEventListener("input", ()=> autoGrowTextarea(area));
+      }
+    });
     const noteArea = d.querySelector(`textarea[data-k="${type}-note"]`);
     if(noteArea){
       noteArea.addEventListener("paste", ()=>{
@@ -1850,7 +1928,6 @@
   function newMemo(){
     editId = null;
     memoDate.value = getViewingDayKey();
-    if(quickTeamSelect && activeTeamFilter) quickTeamSelect.value = activeTeamFilter;
     pickInbound.checked = true;
     pickOutbound.checked = true;
     currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
@@ -1913,9 +1990,9 @@
     }
 
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
+    data.team = (quickTeamSelect && quickTeamSelect.value && quickTeamSelect.value !== "ALL") ? quickTeamSelect.value : "";
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
-    data.team = quickTeamSelect?.value || "";
 
     data.sharedHL = pad(document.querySelector('input[data-k="SHARED-HL"]')?.value || "", 4);
     data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
@@ -1944,7 +2021,6 @@
       }
 
       const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
-      const cm = (n)=> root.querySelector(`[data-k="${type}-cmpt${n}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
@@ -1956,10 +2032,10 @@
       data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
       data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
 
-      data[type+"-cmpt1"] = cleanTextUpper(cm(1)?.value || "");
-      data[type+"-cmpt2"] = cleanTextUpper(cm(2)?.value || "");
-      data[type+"-cmpt3"] = cleanTextUpper(cm(3)?.value || "");
-      data[type+"-cmpt4"] = cleanTextUpper(cm(4)?.value || "");
+      data[type+"-cmpt1"] = buildStoredCmptValue(type, 1, root);
+      data[type+"-cmpt2"] = buildStoredCmptValue(type, 2, root);
+      data[type+"-cmpt3"] = buildStoredCmptValue(type, 3, root);
+      data[type+"-cmpt4"] = buildStoredCmptValue(type, 4, root);
       data[type+"-note"] = note ? (note.value || "") : "";
 
       const shown = document.getElementById(type+"-TIMESHOWN");
@@ -2018,7 +2094,7 @@
     const viewingDay = getViewingDayKey();
     const dayMemos = memos
       .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .filter(m => !activeTeamFilter || String(m.team || "") === String(activeTeamFilter))
+      .filter(m => activeTeamFilter === "ALL" ? true : (m.team || "") === activeTeamFilter)
       .sort((a,b)=> Number(a.id) - Number(b.id));
 
     if(!dayMemos.length){
@@ -2054,7 +2130,7 @@
           </div>
         </div>
         <div class="datePill">${m.memoDate || ""}</div>
-        <div class="teamPill">${getTeamLabel(m.team || "")}</div>
+        ${m.team ? `<div class="teamBadge">TEAM ${m.team}</div>` : ``}
       `;
       memoList.appendChild(card);
     });
@@ -2073,7 +2149,6 @@
 
     editId = id;
     memoDate.value = m.memoDate || getViewingDayKey();
-    if(quickTeamSelect) quickTeamSelect.value = m.team || activeTeamFilter || "";
     pickInbound.checked = m.hasIn !== false;
     pickOutbound.checked = m.hasOut !== false;
     currentLirPhotos = {
@@ -2084,6 +2159,9 @@
 
     document.querySelectorAll('input[data-k="SHARED-HL"]').forEach(el => el.value = m.sharedHL || "");
     document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
+    if(quickTeamSelect){
+      quickTeamSelect.value = m.team || "ALL";
+    }
 
     openModal();
   }
