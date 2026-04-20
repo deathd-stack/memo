@@ -1305,7 +1305,14 @@
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PAX","PAD","DHC"];
 
   const TEAM_VALUES = ["ALL", ...Array.from({length:24}, (_,i)=> String(i+1)), "G1", "G2", "T"];
+  const TT_OPTIONS = ["", "CJU-3-43","CJU-3-44","CJU-3-45","CJU-3-69","CJU-3-70","JAS-3-51","JAS-3-64","JAS-3-72","JAS-3-73","JAS-3-83"];
+  const TB_OPTIONS = ["", "CJU-40","CJU-52","CJU-53","CJU-54","CJU-55","CJU-70","CJU-86","CJU-87","CJU-111","CJU-199","CJU-4-46","CJU-4-47","JAS-1448","JAS-1458","JAS-1459"];
   let activeTeamFilter = "ALL";
+
+  function optionHtml(list, selectedValue=""){
+    const current = String(selectedValue || "");
+    return list.map(v => `<option value="${v}" ${v===current ? "selected" : ""}>${v || "SELECT"}</option>`).join("");
+  }
 
   function fillTeamOptions(selected = "ALL"){
     if(!quickTeamSelect) return;
@@ -1700,8 +1707,7 @@
     }
 
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
-    const staStdMatch = secondLine.match(/(?:^|\.)T\s*([0-9]{3,4})\b/i)
-      || joinedUpper.match(/(?:^|\s)T\s*([0-9]{3,4})\b/i);
+    const staStdMatch = secondLine.match(/^-[A-Z]{3}\.[0-9]{1,3}\/[0-9]{1,3}\/[0-9]{1,3}\.T\s*([0-9]{3,4})\b/i);
     if(staStdMatch){
       setVal(`[data-k="${type}-${staStdKey}"]`, staStdMatch[1]);
     }
@@ -1822,6 +1828,8 @@
     const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
     const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
     const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+    const vtt = memoData ? (memoData[type+"-tt"] || "") : "";
+    const vtb = memoData ? (memoData[type+"-tb"] || "") : "";
 
     const cmpt1Raw = memoData ? (memoData[type+"-cmpt1"] || "") : "";
     const cmpt2Raw = memoData ? (memoData[type+"-cmpt2"] || "") : "";
@@ -1907,9 +1915,9 @@
       ${type === "OUTBOUND" ? `
       <div class="rowGridTTTB">
         <div class="lab">T/T</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
+        <select class="long" data-k="${type}-tt">${optionHtml(TT_OPTIONS, vtt)}</select>
         <div class="lab">T/B</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
+        <select class="long" data-k="${type}-tb">${optionHtml(TB_OPTIONS, vtb)}</select>
       </div>
 
       <div class="lirCalcRow">
@@ -2098,7 +2106,7 @@
         return;
       }
 
-      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const gi = (k)=> root.querySelector(`[data-k="${type}-${k}"]`);
       const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
       data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
