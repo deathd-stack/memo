@@ -116,6 +116,57 @@
     text-transform:uppercase;
   }
 
+  .authorControlWrap{
+    display:flex;
+    align-items:center;
+    gap:calc(8px * var(--ui));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:999px;
+    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
+    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
+    box-shadow:var(--shadow-soft);
+  }
+
+  .authorControlLabel{
+    color:#fff;
+    font-size:calc(14px * var(--ui));
+    font-weight:1000;
+    text-transform:uppercase;
+    white-space:nowrap;
+  }
+
+  .authorControlInput{
+    height:calc(40px * var(--ui));
+    min-width:calc(112px * var(--ui));
+    width:calc(132px * var(--ui));
+    padding:0 calc(12px * var(--ui));
+    border-radius:calc(16px * var(--ui));
+    border:2px solid var(--line);
+    background:#121214;
+    color:#fff;
+    font-family:inherit;
+    font-size:calc(15px * var(--ui));
+    font-weight:1000;
+    text-transform:none;
+    text-align:left;
+  }
+
+  .authorPill{
+    margin-top:calc(8px * var(--ui));
+    margin-left:calc(42px * var(--ui));
+    display:inline-flex;
+    align-items:center;
+    gap:calc(6px * var(--ui));
+    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.05);
+    color:#fff2d8;
+    font-size:calc(12px * var(--ui));
+    font-weight:1000;
+    text-transform:uppercase;
+  }
+
   .teamBadge{
     margin-top:calc(8px * var(--ui));
     margin-left:calc(42px * var(--ui));
@@ -1139,6 +1190,10 @@
     <div class="teamControlLabel">TEAM</div>
     <select id="quickTeamSelect" class="teamControlSelect"></select>
   </div>
+  <div class="authorControlWrap">
+    <div class="authorControlLabel">NAME</div>
+    <input id="authorNameInput" class="authorControlInput" maxlength="12" placeholder="YOUR NAME">
+  </div>
 </div>
 
 <div class="dayBar">
@@ -1265,7 +1320,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
@@ -1279,9 +1334,13 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  enableIndexedDbPersistence(db).catch((err)=>{
+    console.warn("PERSISTENCE OFF", err?.code || err);
+  });
 
   const PHOTO_KEY = "jas_photo_v64";
   const EQUIP_KEY = "jas_equipment_v64";
+  const AUTHOR_KEY = "jas_author_v1";
 
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
@@ -1298,6 +1357,7 @@
   const pickOutbound = document.getElementById("pickOutbound");
   const topControls = document.getElementById("topControls");
   const quickTeamSelect = document.getElementById("quickTeamSelect");
+  const authorNameInput = document.getElementById("authorNameInput");
 
   const equipBadge = document.getElementById("equipBadge");
   const equipModal = document.getElementById("equipModal");
@@ -1310,6 +1370,7 @@
 
   let memos = [];
   let photo = localStorage.getItem(PHOTO_KEY) || "";
+  let authorName = (localStorage.getItem(AUTHOR_KEY) || "").trim();
   let editId = null;
   let dayOffset = 0;
   let activeLirType = null;
@@ -1317,6 +1378,7 @@
   let globalCalcExpr = "";
   let activeCalcInput = null;
   let memosUnsubscribe = null;
+  const memoCache = new Map();
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PAX","PAD","DHC"];
 
@@ -1335,10 +1397,32 @@
     quickTeamSelect.innerHTML = TEAM_VALUES.map(v => `<option value="${v}" ${String(v)===String(selected) ? "selected" : ""}>${v}</option>`).join("");
   }
 
+  function normalizeAuthorName(val){
+    return String(val || "").trim().slice(0, 12);
+  }
+
+  function saveAuthorName(val){
+    authorName = normalizeAuthorName(val);
+    localStorage.setItem(AUTHOR_KEY, authorName);
+    if(authorNameInput && authorNameInput.value !== authorName){
+      authorNameInput.value = authorName;
+    }
+  }
+
+  if(authorNameInput){
+    authorNameInput.value = authorName;
+    authorNameInput.addEventListener("input", ()=>{
+      saveAuthorName(authorNameInput.value);
+    });
+    authorNameInput.addEventListener("change", ()=>{
+      saveAuthorName(authorNameInput.value);
+    });
+  }
+
   if(quickTeamSelect){
     quickTeamSelect.addEventListener("change", ()=>{
       activeTeamFilter = getActiveTeamValue();
-      listenMemos(activeTeamFilter);
+      listenMemos(activeTeamFilter, getViewingDayKey());
     });
   }
 
@@ -1440,30 +1524,49 @@
     return (quickTeamSelect?.value || "ALL").toUpperCase();
   }
 
-  function getTeamQuery(teamValue){
-    if(teamValue === "ALL"){
-      return collection(db, "memos");
-    }
-    return query(collection(db, "memos"), where("team", "==", teamValue));
+  function getCacheKey(teamValue, dayKey){
+    return `${teamValue}__${dayKey}`;
   }
 
-  function listenMemos(teamValue = "ALL"){
+  function getTeamQuery(teamValue, dayKey){
+    return query(
+      collection(db, "memos"),
+      where("team", "==", teamValue),
+      where("dayKey", "==", dayKey)
+    );
+  }
+
+  function listenMemos(teamValue = "ALL", dayKey = getViewingDayKey()){
     if(memosUnsubscribe){
       memosUnsubscribe();
       memosUnsubscribe = null;
     }
 
-    const q = getTeamQuery(teamValue);
+    const cacheKey = getCacheKey(teamValue, dayKey);
+    if(memoCache.has(cacheKey)){
+      memos = [...memoCache.get(cacheKey)];
+      renderList();
+    }else{
+      memos = [];
+      renderList();
+    }
+
+    if(teamValue === "ALL") return;
+
+    const q = getTeamQuery(teamValue, dayKey);
 
     memosUnsubscribe = onSnapshot(q, (snapshot)=>{
-      memos = snapshot.docs.map(docSnap => {
+      const nextMemos = snapshot.docs.map(docSnap => {
         const data = docSnap.data() || {};
         return {
           ...data,
           id: Number(data.id || 0),
-          team: String(data.team || "").toUpperCase()
+          team: String(data.team || "").toUpperCase(),
+          author: normalizeAuthorName(data.author || "")
         };
       });
+      memoCache.set(cacheKey, nextMemos);
+      memos = nextMemos;
       renderList();
     }, (error)=>{
       console.error(error);
@@ -1482,13 +1585,13 @@
   function moveDay(n){
     dayOffset += n;
     updateDayLabel();
-    renderList();
+    listenMemos(activeTeamFilter, getViewingDayKey());
   }
 
   function goToday(){
     dayOffset = 0;
     updateDayLabel();
-    renderList();
+    listenMemos(activeTeamFilter, getViewingDayKey());
   }
 
   async function deleteCurrentDay(){
@@ -2127,8 +2230,17 @@
       return;
     }
 
+    const savedAuthor = normalizeAuthorName(authorNameInput?.value || authorName);
+    if(!savedAuthor){
+      alert("NAME INPUT");
+      authorNameInput?.focus();
+      return;
+    }
+    saveAuthorName(savedAuthor);
+
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
     data.team = selectedTeam;
+    data.author = savedAuthor;
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
 
@@ -2266,6 +2378,7 @@
         </div>
         <div class="datePill">${m.memoDate || ""}</div>
         ${m.team ? `<div class="teamBadge">TEAM ${m.team}</div>` : ``}
+        ${m.author ? `<div class="authorPill">BY ${String(m.author).replace(/[<>&"]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[s]))}</div>` : ``}
       `;
       memoList.appendChild(card);
     });
@@ -2562,7 +2675,7 @@
   memoDate.value = getViewingDayKey();
   updateDayLabel();
   activeTeamFilter = getActiveTeamValue();
-  listenMemos(activeTeamFilter);
+  listenMemos(activeTeamFilter, getViewingDayKey());
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
