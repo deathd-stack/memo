@@ -76,11 +76,34 @@
   }
 
   .controls{
+    width:min(calc(780px * var(--ui) / .65), calc(100% - 24px));
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:calc(8px * var(--ui));
+    padding:calc(8px * var(--ui)) 0 calc(8px * var(--ui));
+  }
+
+  .controlsRow{
     display:flex;
     justify-content:center;
+    align-items:center;
     gap:calc(10px * var(--ui));
-    padding:calc(8px * var(--ui)) calc(14px * var(--ui)) calc(8px * var(--ui));
-    flex-wrap:wrap;
+    flex-wrap:nowrap;
+  }
+
+  .controlsRow .authorControlWrap,
+  .controlsRow .teamControlWrap,
+  .controlsRow .mainControlWrap{
+    flex:1;
+    min-width:0;
+  }
+
+  .controlsRow .authorControlInput,
+  .controlsRow .teamControlSelect,
+  .controlsRow .mainControlSelect{
+    width:100%;
+    min-width:0;
   }
 
   .teamControlWrap{
@@ -1168,6 +1191,32 @@
   }
 
   @media (max-width:520px){
+    .controlsRow{
+      gap:8px;
+    }
+
+    .controlsRow button{
+      padding:12px 14px;
+      font-size:14px;
+    }
+
+    .controlsRow .mainControlWrap{
+      min-width:120px;
+    }
+
+    .controlsRow .teamControlLabel,
+    .controlsRow .mainControlLabel,
+    .controlsRow .authorControlLabel{
+      font-size:13px;
+    }
+
+    .controlsRow .authorControlInput,
+    .controlsRow .teamControlSelect,
+    .controlsRow .mainControlSelect{
+      font-size:14px;
+      height:38px;
+    }
+
     .bottomLeftButtons{
       left:12px;
       bottom:14px;
@@ -1216,20 +1265,24 @@
 </header>
 
 <div class="controls" id="topControls">
-  <button type="button" onclick="newMemo()">ADD</button>
-  <button type="button" onclick="deleteSelected()">DELETE</button>
-  <button type="button" onclick="addPhoto()">PHOTO</button>
-  <div class="authorControlWrap">
-    <div class="authorControlLabel">NAME</div>
-    <input id="authorNameInput" class="authorControlInput" maxlength="12" placeholder="YOUR NAME">
+  <div class="controlsRow">
+    <button type="button" onclick="newMemo()">ADD</button>
+    <button type="button" onclick="deleteSelected()">DELETE</button>
+    <button type="button" onclick="addPhoto()">PHOTO</button>
+    <div class="mainControlWrap">
+      <div class="mainControlLabel">MAIN</div>
+      <select id="mainTeamSelect" class="mainControlSelect"></select>
+    </div>
   </div>
-  <div class="teamControlWrap">
-    <div class="teamControlLabel">TEAM</div>
-    <select id="quickTeamSelect" class="teamControlSelect"></select>
-  </div>
-  <div class="mainControlWrap">
-    <div class="mainControlLabel">MAIN</div>
-    <select id="mainTeamSelect" class="mainControlSelect"></select>
+  <div class="controlsRow">
+    <div class="teamControlWrap">
+      <div class="teamControlLabel">TEAM</div>
+      <select id="quickTeamSelect" class="teamControlSelect"></select>
+    </div>
+    <div class="authorControlWrap">
+      <div class="authorControlLabel">NAME</div>
+      <input id="authorNameInput" class="authorControlInput" maxlength="12" placeholder="YOUR NAME">
+    </div>
   </div>
 </div>
 
