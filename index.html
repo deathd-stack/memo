@@ -1263,8 +1263,23 @@
   </div>
 </div>
 
-<script>
-  const MEMO_KEY = "jas_memos_v64";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
+    authDomain: "jasmemo-3c59b.firebaseapp.com",
+    projectId: "jasmemo-3c59b",
+    storageBucket: "jasmemo-3c59b.firebasestorage.app",
+    messagingSenderId: "891861551666",
+    appId: "1:891861551666:web:0b96ffcead52c73676ca2b",
+    measurementId: "G-0G4R112WVT"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   const PHOTO_KEY = "jas_photo_v64";
   const EQUIP_KEY = "jas_equipment_v64";
 
@@ -1293,7 +1308,7 @@
   const calcWrap = document.getElementById("calcWrap");
   const globalCalcDisplay = document.getElementById("globalCalcDisplay");
 
-  let memos = JSON.parse(localStorage.getItem(MEMO_KEY) || "[]");
+  let memos = [];
   let photo = localStorage.getItem(PHOTO_KEY) || "";
   let editId = null;
   let dayOffset = 0;
@@ -1301,6 +1316,7 @@
   let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
   let globalCalcExpr = "";
   let activeCalcInput = null;
+  let memosUnsubscribe = null;
 
   const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PAX","PAD","DHC"];
 
@@ -1317,6 +1333,13 @@
   function fillTeamOptions(selected = "ALL"){
     if(!quickTeamSelect) return;
     quickTeamSelect.innerHTML = TEAM_VALUES.map(v => `<option value="${v}" ${String(v)===String(selected) ? "selected" : ""}>${v}</option>`).join("");
+  }
+
+  if(quickTeamSelect){
+    quickTeamSelect.addEventListener("change", ()=>{
+      activeTeamFilter = getActiveTeamValue();
+      listenMemos(activeTeamFilter);
+    });
   }
 
   function parseFStoredValue(raw){
@@ -1413,17 +1436,52 @@
     return Math.round((target - base) / 86400000);
   }
 
-  function moveDay(n){
-    dayOffset += n;
-    fillTeamOptions("ALL");
-  if(quickTeamSelect){
-    quickTeamSelect.addEventListener("change", ()=>{
-      activeTeamFilter = quickTeamSelect.value || "ALL";
+  function getActiveTeamValue(){
+    return (quickTeamSelect?.value || "ALL").toUpperCase();
+  }
+
+  function getTeamQuery(teamValue){
+    if(teamValue === "ALL"){
+      return collection(db, "memos");
+    }
+    return query(collection(db, "memos"), where("team", "==", teamValue));
+  }
+
+  function listenMemos(teamValue = "ALL"){
+    if(memosUnsubscribe){
+      memosUnsubscribe();
+      memosUnsubscribe = null;
+    }
+
+    const q = getTeamQuery(teamValue);
+
+    memosUnsubscribe = onSnapshot(q, (snapshot)=>{
+      memos = snapshot.docs.map(docSnap => {
+        const data = docSnap.data() || {};
+        return {
+          ...data,
+          id: Number(data.id || 0),
+          team: String(data.team || "").toUpperCase()
+        };
+      });
       renderList();
+    }, (error)=>{
+      console.error(error);
+      alert("FIREBASE LOAD ERROR");
     });
   }
 
-  updateDayLabel();
+  async function saveMemoRemote(data){
+    await setDoc(doc(db, "memos", String(data.id)), data);
+  }
+
+  async function deleteMemosRemote(ids){
+    await Promise.all(ids.map(id => deleteDoc(doc(db, "memos", String(id)))));
+  }
+
+  function moveDay(n){
+    dayOffset += n;
+    updateDayLabel();
     renderList();
   }
 
@@ -1433,7 +1491,7 @@
     renderList();
   }
 
-  function deleteCurrentDay(){
+  async function deleteCurrentDay(){
     const dk = getViewingDayKey();
     const target = memos.filter(m => (m.dayKey || m.memoDate) === dk);
     if(!target.length){
@@ -1441,9 +1499,12 @@
       return;
     }
     if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
-    memos = memos.filter(m => (m.dayKey || m.memoDate) !== dk);
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    renderList();
+    try{
+      await deleteMemosRemote(target.map(m => m.id));
+    }catch(error){
+      console.error(error);
+      alert("DELETE FAIL");
+    }
   }
 
   function isCalcEligibleInput(el){
@@ -1601,7 +1662,7 @@
       activeCalcInput.value = digits.slice(0,4);
     }else if(k === "SHARED-HASH"){
       activeCalcInput.value = digits.slice(0,3);
-    }else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD") || k.endsWith("-tt") || k.endsWith("-tb")){
+    }else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD")){
       activeCalcInput.value = digits.slice(0,4);
     }else if(k.endsWith("-t") || k.startsWith("extraVal-")){
       activeCalcInput.value = digits.slice(0,3);
@@ -1707,10 +1768,6 @@
     }
 
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
-    const staStdMatch = secondLine.match(/^-[A-Z]{3}\.[0-9]{1,3}\/[0-9]{1,3}\/[0-9]{1,3}\.T\s*([0-9]{3,4})\b/i);
-    if(staStdMatch){
-      setVal(`[data-k="${type}-${staStdKey}"]`, staStdMatch[1]);
-    }
 
     const compactTMatch = secondLine.match(/^-?[A-Z]{3}\.(\d{1,3})\/(\d{1,3})\/(\d{1,3})/i);
     if(compactTMatch){
@@ -1767,10 +1824,6 @@
     const dVal = parseCountList(countSource, /(?:D\/S|\bDS\b)\s*(\d+)\s*P?(?:C|CS)?/gi) || (compactTMatch ? Number(compactTMatch[2] || 0) : 0);
     const bbVal = parseCountList(countSource, /(?:BBST|\bBB\b)\s*(\d+)/gi) || (compactTMatch ? Number(compactTMatch[3] || 0) : 0);
 
-    const paxMatch = joinedUpper.match(/PAX\/\s*(\d+)/i);
-    const padMatch = joinedUpper.match(/PAD\/\s*(\d+)/i);
-    const dhcMatch = joinedUpper.match(/DHC\/\s*(\d+)/i);
-
     setVal(`[data-k="${type}-t"]`, tVal ? String(tVal).padStart(3,'0') : '');
     setVal(`[data-k="${type}-d"]`, dVal ? String(dVal).padStart(2,'0') : '');
     setVal(`[data-k="${type}-bb"]`, bbVal ? String(bbVal).padStart(2,'0') : '');
@@ -1793,9 +1846,6 @@
       {key:'LONGFIN', re:/LONGFIN\s*(\d+)?/gi},
       {key:'CYCLE', re:/CYCLE\s*(\d+)?/gi},
       {key:'CREW', re:/CREW\s*(\d+)?/gi},
-      {key:'PAX', re:/PAX\/\s*(\d+)/gi},
-      {key:'PAD', re:/PAD\/\s*(\d+)/gi},
-      {key:'DHC', re:/DHC\/\s*(\d+)/gi},
       {key:'PCB', re:/PCB\s*(\d+)?/gi},
     ];
     const totals = {};
@@ -1807,10 +1857,6 @@
       }
       re.lastIndex = 0;
     }
-
-    if(paxMatch) totals.PAX = Number(paxMatch[1] || 0);
-    if(padMatch) totals.PAD = Number(padMatch[1] || 0);
-    if(dhcMatch) totals.DHC = Number(dhcMatch[1] || 0);
 
     Object.entries(totals).forEach(([k,v])=>{
       if(v) upsertExtraRow(type, k, v);
@@ -2069,14 +2115,20 @@
     }
   });
 
-  function saveMemo(){
+  async function saveMemo(){
     if(!pickInbound.checked && !pickOutbound.checked){
       alert("INBOUND OR OUTBOUND SELECT");
       return;
     }
 
+    const selectedTeam = getActiveTeamValue();
+    if(selectedTeam === "ALL"){
+      alert("TEAM SELECT");
+      return;
+    }
+
     const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
-    data.team = (quickTeamSelect && quickTeamSelect.value && quickTeamSelect.value !== "ALL") ? quickTeamSelect.value : "";
+    data.team = selectedTeam;
     data.memoDate = memoDate.value || getViewingDayKey();
     data.dayKey = data.memoDate;
 
@@ -2115,8 +2167,8 @@
       data[type+"-t"] = pad(gi("t")?.value, 3);
       data[type+"-d"] = pad(gi("d")?.value, 2);
       data[type+"-bb"] = pad(gi("bb")?.value, 2);
-      data[type+"-tt"] = type==="OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
-      data[type+"-tb"] = type==="OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
+      data[type+"-tt"] = type==="OUTBOUND" ? (gi("tt")?.value || "") : "";
+      data[type+"-tb"] = type==="OUTBOUND" ? (gi("tb")?.value || "") : "";
 
       data[type+"-cmpt1"] = buildStoredCmptValue(type, 1, root);
       data[type+"-cmpt2"] = buildStoredCmptValue(type, 2, root);
@@ -2140,18 +2192,15 @@
       data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
     });
 
-    if(editId){
-      const idx = memos.findIndex(m=>m.id===editId);
-      if(idx >= 0) memos[idx] = data;
-    }else{
-      memos.push(data);
+    try{
+      await saveMemoRemote(data);
+      dayOffset = calcDayOffsetFromDate(data.memoDate);
+      updateDayLabel();
+      closeModal();
+    }catch(error){
+      console.error(error);
+      alert("SAVE FAIL");
     }
-
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    dayOffset = calcDayOffsetFromDate(data.memoDate);
-    updateDayLabel();
-    closeModal();
-    renderList(data.id);
   }
 
   function formatCombinedLine(m){
@@ -2180,7 +2229,7 @@
     const viewingDay = getViewingDayKey();
     const dayMemos = memos
       .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .filter(m => activeTeamFilter === "ALL" ? true : (m.team || "") === activeTeamFilter)
+      .filter(m => activeTeamFilter === "ALL" ? true : String(m.team || "").toUpperCase() === activeTeamFilter)
       .sort((a,b)=> Number(a.id) - Number(b.id));
 
     if(!dayMemos.length){
@@ -2252,16 +2301,19 @@
     openModal();
   }
 
-  function deleteSelected(){
+  async function deleteSelected(){
     const checks = document.querySelectorAll('.selBox:checked');
     const ids = [...checks].map(c=>Number(c.dataset.id));
     if(!ids.length){
       alert("SELECT MEMO");
       return;
     }
-    memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-    renderList();
+    try{
+      await deleteMemosRemote(ids);
+    }catch(error){
+      console.error(error);
+      alert("DELETE FAIL");
+    }
   }
 
   function addPhoto(){
@@ -2506,12 +2558,33 @@
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
   window.addEventListener("mouseup", ()=> onEnd());
 
+  fillTeamOptions("ALL");
   memoDate.value = getViewingDayKey();
   updateDayLabel();
-  renderList();
+  activeTeamFilter = getActiveTeamValue();
+  listenMemos(activeTeamFilter);
   updateEquipBadge();
   syncPhotoFromStorage(false);
   updateGlobalCalcDisplay("0");
+
+  Object.assign(window, {
+    addExtraRow,
+    addPhoto,
+    closeCalc,
+    closeEquip,
+    closeModal,
+    closePhoto,
+    deleteCurrentDay,
+    deleteSelected,
+    goToday,
+    moveDay,
+    newMemo,
+    openEquip,
+    openPhoto,
+    saveEquip,
+    saveMemo
+  });
+
 </script>
 
 </body>
