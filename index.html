@@ -499,7 +499,7 @@
   .bottomLeftButtons{
     position:fixed;
     left:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
+    bottom:auto;
     z-index:30;
     display:flex;
     flex-direction:column;
@@ -509,7 +509,7 @@
   .bottomRightButtons{
     position:fixed;
     right:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
+    bottom:auto;
     z-index:30;
     display:flex;
     flex-direction:column;
@@ -1516,7 +1516,7 @@
 
   .bottomLeftButtons,
   .bottomRightButtons{
-    bottom:calc(16px * var(--ui));
+    bottom:auto;
   }
 
   .itMemoBtn,
@@ -1713,7 +1713,7 @@
   .schDay{min-height:calc(76px * var(--ui));border-radius:calc(18px * var(--ui));background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);padding:calc(8px * var(--ui));cursor:pointer;overflow:hidden;}
   .schDay.blank{opacity:.18;cursor:default}.schDay.today{outline:2px solid rgba(255,198,26,.8)}
   .schDayNum{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;}.schCode{margin-top:calc(6px * var(--ui));display:inline-flex;max-width:100%;border-radius:999px;background:linear-gradient(180deg,#ff9a2f,#ff6a00);padding:calc(5px * var(--ui)) calc(8px * var(--ui));font-size:calc(12px * var(--ui));font-weight:1000;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.schMemo{margin-top:4px;color:#fff2d8;font-size:calc(10px * var(--ui));font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.schSmall{margin-top:4px;color:#d8d8de;font-size:calc(10px * var(--ui));font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .schBottomActions{position:fixed;left:50%;bottom:calc(16px * var(--ui));transform:translateX(-50%);z-index:46;display:flex;gap:calc(10px * var(--ui));width:min(900px,calc(100% - 24px));justify-content:center;pointer-events:none;}.schBottomActions button{pointer-events:auto;min-width:calc(126px * var(--ui));}
+  .schBottomActions{position:fixed;left:50%;bottom:auto;transform:translateX(-50%);z-index:46;display:flex;gap:calc(10px * var(--ui));width:min(900px,calc(100% - 24px));justify-content:center;pointer-events:none;}.schBottomActions button{pointer-events:auto;min-width:calc(126px * var(--ui));}
   .schPrimary{background:linear-gradient(180deg,#ff9a2f,#ff6a00)!important;color:#fff!important;}.schDark{background:linear-gradient(180deg,#2d2d33,#1c1c20)!important;color:var(--orange1)!important;}
   .schModal{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.58);display:none;align-items:flex-end;justify-content:center;}.schModal.show{display:flex}.schBox{width:100%;max-width:760px;max-height:90vh;overflow:auto;background:#17171a;border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));box-shadow:0 -10px 30px rgba(0,0,0,.28);}.schDrag{position:sticky;top:0;background:#17171a;z-index:2;padding:calc(7px * var(--ui)) 0 calc(8px * var(--ui));}.schHandle{width:calc(62px * var(--ui));height:calc(8px * var(--ui));background:#494952;border-radius:999px;margin:0 auto calc(8px * var(--ui));}.schActionBar{display:flex;justify-content:space-between;gap:calc(10px * var(--ui));}.schSection{background:#1f1f23;border-radius:calc(24px * var(--ui));padding:calc(13px * var(--ui));margin:calc(10px * var(--ui)) 0;border:1px solid rgba(255,255,255,.05);}.schSectionTitle{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff;margin-bottom:calc(8px * var(--ui));}.schCodeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(8px * var(--ui));}.schCodeBtn{padding:calc(10px * var(--ui)) calc(8px * var(--ui));font-size:calc(13px * var(--ui));box-shadow:none;background:#242429;color:#fff;}.schCodeBtn.active{background:linear-gradient(180deg,#ff9a2f,#ff6a00);color:#fff;}.schEditGrid{display:grid;grid-template-columns:calc(52px * var(--ui)) 1fr;gap:calc(8px * var(--ui));align-items:center;}.schEditGrid label{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;}.schEditGrid input,.schEditGrid select{height:calc(44px * var(--ui));font-size:calc(14px * var(--ui));}.schBulkRow{display:grid;grid-template-columns:1fr auto;gap:calc(8px * var(--ui));margin-bottom:calc(8px * var(--ui));}.schMemberEdit{display:grid;grid-template-columns:.8fr .9fr .8fr;gap:calc(6px * var(--ui));align-items:center;margin-top:calc(7px * var(--ui));}.schMemberEdit .name{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.schMemberEdit input,.schMemberEdit select{height:calc(42px * var(--ui));font-size:calc(13px * var(--ui));}.schMemberRow{display:grid;grid-template-columns:1fr auto;gap:calc(8px * var(--ui));align-items:center;margin-top:calc(8px * var(--ui));}.schMemberRow input{height:calc(44px * var(--ui));text-align:left;}.schOtLine{display:flex;flex-wrap:wrap;gap:calc(6px * var(--ui));}.schOtPill{display:inline-flex;gap:4px;align-items:center;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.05);padding:calc(7px * var(--ui)) calc(9px * var(--ui));font-size:calc(12px * var(--ui));font-weight:1000;color:#fff;}.schOtPill b{color:var(--orange1)}
 
@@ -2141,6 +2141,28 @@
   background:#ff6a00;
   color:#fff;
   font-weight:bold;
+}
+
+
+/* 메모 카드 날짜/팀/작성자 표시 숨김 */
+.datePill,
+.authorPill,
+.teamBadge{
+  display:none !important;
+}
+
+
+/* DELETE SPEED + BOTTOM SETTINGS FLOW FIX */
+.bottomLeftButtons,.bottomRightButtons{
+  position:relative !important;
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  margin:20px auto;
+}
+#memoList + .bottomLeftButtons,
+#memoList + .bottomRightButtons{
+  position:relative !important;
 }
 
 </style>
@@ -5069,6 +5091,52 @@ body::before{
 .jagosSettingPanel div{padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.1);font-size:14px;}
 .jagosSettingPanel div:last-child{border-bottom:0;}
 </style>
+
+<style>
+/* JAGOS DELETE + BOTTOM FLOW FIX V2 */
+.bottomLeftButtons,
+.bottomRightButtons{
+    position:relative !important;
+    left:auto !important;
+    right:auto !important;
+    bottom:auto !important;
+    top:auto !important;
+    margin:20px auto;
+    z-index:1 !important;
+}
+
+#memoList{
+    padding-bottom:20px !important;
+}
+</style>
+
+<style>
+/* JAGOS SAFE BOTTOM FLOW ONLY - JS untouched */
+.bottomLeftButtons,
+.bottomRightButtons{
+  position:relative !important;
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  top:auto !important;
+  z-index:5 !important;
+  margin:20px 14px;
+}
+.bottomRightButtons{
+  align-items:flex-end;
+}
+#memoList{
+  padding-bottom:20px !important;
+}
+</style>
+
+
+<style>
+.themePanel{display:flex;flex-direction:column;gap:12px;padding:14px}
+.themeRow{display:flex;flex-wrap:wrap;gap:8px}
+.themeBtn{width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.2);padding:0}
+.themeTitle{color:#fff;font-weight:1000;margin-top:8px}
+</style>
 </head>
 
 <body>
@@ -5349,7 +5417,7 @@ body::before{
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, getDoc, onSnapshot, query, where, runTransaction, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
@@ -5365,11 +5433,11 @@ body::before{
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  // 한 번 로그인하면 현재 앱/탭 세션 동안 로그인 유지.
-  // 새로고침/화면이동/백그라운드 복귀 때 로그인 화면이 다시 뜨지 않으며,
-  // 앱/탭을 완전히 닫아 세션이 끝난 뒤 다시 열면 로그인이 필요하다.
+  // 한 번 로그인하면 기기 저장 로그인 유지.
+  // 앱을 완전히 종료해도 다시 로그인하지 않으며,
+  // 로그아웃하거나 앱 데이터 삭제 시 다시 로그인한다.
   try{
-    await setPersistence(auth, browserSessionPersistence);
+    await setPersistence(auth, browserLocalPersistence);
   }catch(err){
     console.warn("AUTH SESSION PERSISTENCE OFF", err);
   }
@@ -6925,10 +6993,17 @@ body::before{
       alert("SELECT MEMO");
       return;
     }
+
+    const backup = memos.filter(m => ids.includes(Number(m.id)));
+    memos = memos.filter(m => !ids.includes(Number(m.id)));
+    renderList();
+
     try{
       await deleteMemosRemote(ids);
     }catch(error){
       console.error(error);
+      memos = [...memos, ...backup];
+      renderList();
       alert("DELETE FAIL");
     }
   }
@@ -9251,5 +9326,45 @@ button,
 }
 </style>
 
+
+<script>
+/* JAGOS delete rebirth guard */
+window.__jagosDeletedIds = window.__jagosDeletedIds || new Set();
+
+const __jagosOldRenderList = window.renderList;
+if (typeof __jagosOldRenderList === "function") {
+  window.renderList = function(...args){
+    const result = __jagosOldRenderList.apply(this,args);
+    try{
+      document.querySelectorAll("[data-id]").forEach(el=>{
+        if(window.__jagosDeletedIds.has(el.dataset.id)) el.remove();
+      });
+    }catch(e){}
+    return result;
+  };
+}
+</script>
+
+
+<script>
+function setJagosTheme(type,color){
+ localStorage.setItem("jagos_"+type,color);
+ if(type==="bg"){
+  document.documentElement.style.setProperty("--bgSolid",color);
+  document.body.style.background=color;
+ }else{
+  document.documentElement.style.setProperty("--orange1",color);
+  document.documentElement.style.setProperty("--orange2",color);
+  document.documentElement.style.setProperty("--orange3",color);
+ }
+}
+function loadJagosTheme(){
+ const b=localStorage.getItem("jagos_bg");
+ const p=localStorage.getItem("jagos_point");
+ if(b) setJagosTheme("bg",b);
+ if(p) setJagosTheme("point",p);
+}
+window.addEventListener("load",loadJagosTheme);
+</script>
 </body>
 </html>
